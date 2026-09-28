@@ -4,6 +4,7 @@ check:
 	npm ci --ignore-scripts
 	npm run check
 	python3 tools/check.py
+	python3 tests/test_package_identity.py
 	python3 tests/test_distribution_legal.py
 
 # A successful software build is not binary distribution qualification.

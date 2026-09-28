@@ -13,4 +13,5 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run check
       - run: python3 tools/check.py
+      - run: python3 tests/test_package_identity.py
       - run: python3 tests/test_distribution_legal.py

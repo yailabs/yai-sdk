@@ -10,6 +10,11 @@ tags use `vMAJOR.MINOR.PATCH`; no tag or release is implied by a build. Wire
 `yai.application_capability_catalog.v1` are independent contract identities.
 The legacy Application identity is retained without changing its semantics.
 
+Before 1.0, breaking public APIs require a minor increment; patches preserve the
+declared contract. Core, Studio and SDK release independently. Supporting a new
+wire or projection schema requires explicit compatibility negotiation, not merely
+a product version change.
+
 On connection the same-user Unix client verifies discovery permissions, exact
 live process and home identity, peer credentials and handshake identities.
 Compatibility checks protocol/Application/catalog identity, not matching commits
@@ -34,6 +39,9 @@ Linux same-user local transport is qualified; no remote/cloud transport is claim
 `cargo test` is standalone conformance software evidence. Private Core must run
 its own real server tests against these wire/client owners. The SDK's mock server
 tests do not establish Case semantics, authority or runtime qualification.
+
+See [qualified scope](docs/qualification.md) for independent clone, real Core
+and native Studio evidence and the limits of those claims.
 
 Source SDK is MIT; dependencies retain their own licenses. This repository does
 not qualify a binary/customer package for distribution. Such artifacts require
