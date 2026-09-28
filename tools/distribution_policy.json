@@ -1,0 +1,23 @@
+{
+  "schema": "distribution.policy.v1",
+  "product": "yai-sdk",
+  "first_party_license": "LICENSE",
+  "first_party_terms": "MIT",
+  "profiles": {
+    "sdk": {
+      "build_inputs": [
+        "Cargo.toml",
+        "Cargo.lock",
+        "package.json",
+        "package-lock.json",
+        "LICENSE"
+      ],
+      "cargo_manifests": [
+        "Cargo.toml"
+      ],
+      "unresolved": [
+        "An exact distributed Rust binary/source-crate or TypeScript package closure and corresponding original notices have not yet been independently qualified."
+      ]
+    }
+  }
+}

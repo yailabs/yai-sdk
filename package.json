@@ -1,0 +1,30 @@
+{
+  "name": "@yai/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./projections": {
+      "types": "./typescript/projections.ts"
+    }
+  },
+  "files": [
+    "typescript",
+    "LICENSE",
+    "PROVENANCE.md"
+  ],
+  "scripts": {
+    "check": "tsc --noEmit --strict --target ES2022 --module ESNext typescript/projections.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "typesVersions": {
+    "*": {
+      "projections": [
+        "typescript/projections.ts"
+      ]
+    }
+  }
+}
