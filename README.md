@@ -1,5 +1,11 @@
 # YAI SDK
 
+Mutation receipts expose only Case identity/version and selected transition
+identity facts. They do not expose persisted `CaseState` or `Transition` layouts.
+Removing accidentally serialized private fields is a producer defect correction,
+not a promise of payload-byte compatibility; the supported `WorkCommit` fields
+remain stable. Canonical state and persistence schemas remain Core-private.
+
 MIT Rust-first supported local client boundary. YAI Core and Studio are separate
 proprietary products; this repository contains no Case engine, persistence,
 scheduler, server, or semantic admission implementation.
