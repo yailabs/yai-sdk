@@ -56,6 +56,17 @@ pub struct HostClient {
 }
 
 impl HostClient {
+    /// Qualification hook: no response is observed and no outcome is implied.
+    #[cfg(unix)]
+    pub(crate) fn disconnect_after_dispatch(
+        mut self,
+        request: OperationRequest,
+    ) -> Result<(), String> {
+        write_frame(
+            &mut self.stream,
+            &ClientFrame::ApplicationRequest { request },
+        )
+    }
     #[cfg(unix)]
     pub fn connect(home: impl AsRef<Path>, kind: ClientKind) -> Result<Self, String> {
         let home = canonical_home(home.as_ref())?;

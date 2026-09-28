@@ -2,6 +2,15 @@
 use crate::{projections::ApplicationCatalog, *};
 use std::collections::BTreeSet;
 
+/// Exercise real disconnect-after-write without implementing or predicting semantics.
+/// Success proves a complete frame was written, never that Core admitted it.
+pub fn disconnect_after_dispatch(
+    client: HostClient,
+    request: OperationRequest,
+) -> Result<(), String> {
+    client.disconnect_after_dispatch(request)
+}
+
 pub fn validate_catalog(result: &OperationResult) -> Result<ApplicationCatalog, String> {
     if result.operation_ref != "application.capabilities"
         || result.result_state != ResultState::Success

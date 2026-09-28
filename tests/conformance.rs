@@ -140,6 +140,16 @@ fn lost_response_is_indeterminate_without_replay() {
 }
 
 #[test]
+fn qualification_disconnect_writes_complete_request_without_observing_outcome() {
+    let (home, worker) = mock_host(false, true);
+    let client = HostClient::connect(&home, ClientKind::Qualification).unwrap();
+    conformance::disconnect_after_dispatch(client, request()).unwrap();
+    // Mock owner requires a complete ApplicationRequest before exiting.
+    worker.join().unwrap();
+    std::fs::remove_dir_all(home).unwrap();
+}
+
+#[test]
 fn version_compatibility_is_not_git_or_patch_equality() {
     assert!(CompatibilityIdentity::current("0.1.99").validate().is_ok());
     assert!(CompatibilityIdentity::current("0.2.0").validate().is_ok());

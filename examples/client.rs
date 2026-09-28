@@ -9,6 +9,7 @@ fn run() -> Result<(), String> {
     let mut correlation = "sdk:conformance".to_owned();
     let mut status = false;
     let mut subscribe = false;
+    let mut abandon_response = false;
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--home" => home = args.next(),
@@ -20,6 +21,7 @@ fn run() -> Result<(), String> {
             "--ref" => correlation = args.next().ok_or("missing_ref")?,
             "--status" => status = true,
             "--subscribe" => subscribe = true,
+            "--abandon-response" => abandon_response = true,
             _ => return Err(format!("unsupported_argument:{arg}")),
         }
     }
@@ -43,6 +45,17 @@ fn run() -> Result<(), String> {
             println!("{value}");
             Ok(())
         })?;
+    } else if abandon_response {
+        conformance::disconnect_after_dispatch(
+            client,
+            OperationRequest {
+                protocol: APPLICATION_PROTOCOL.into(),
+                operation_ref: operation.ok_or("missing_operation")?,
+                correlation_ref: correlation,
+                input,
+            },
+        )?;
+        println!("{{\"dispatch_only\":true,\"outcome_indeterminate\":true}}");
     } else {
         let result = client
             .call_typed(OperationRequest {
