@@ -128,3 +128,43 @@ pub struct ApplicationCapability {
     pub application_deferred_reason: Option<String>,
     pub studio_posture: String,
 }
+
+/// Public synthetic-check evidence, not the persisted carrier record.
+/// Payload parameters are supported semantic contracts; this envelope never
+/// carries carrier tokens, process identity, credential revisions or storage seals.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProviderProbeRunProjection<Request, Evidence, Qualification> {
+    pub request: Request,
+    pub evidence: Option<Evidence>,
+    pub qualification: Option<Qualification>,
+    pub failure_code: Option<String>,
+    pub owner: ProviderProbeTiming,
+}
+
+/// The existing wire field `owner` exposes timing only, never carrier ownership.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProviderProbeTiming {
+    pub started_at_unix_ms: u64,
+}
+
+#[cfg(test)]
+mod probe_projection_tests {
+    use super::*;
+    type Probe = ProviderProbeRunProjection<serde_json::Value, serde_json::Value, serde_json::Value>;
+    #[test]
+    fn probe_projection_refuses_private_carrier_and_storage_fields() {
+        let public = serde_json::json!({"request":{}, "evidence":null,
+            "qualification":null,"failure_code":null,"owner":{"started_at_unix_ms":7}});
+        assert!(serde_json::from_value::<Probe>(public.clone()).is_ok());
+        for field in ["pid", "process_start_ticks", "boot_id", "token"] {
+            let mut leaked = public.clone(); leaked["owner"][field] = serde_json::json!("private");
+            assert!(serde_json::from_value::<Probe>(leaked).is_err());
+        }
+        for field in ["credential_revision", "integrity_digest", "principal_id"] {
+            let mut leaked = public.clone(); leaked[field] = serde_json::json!("private");
+            assert!(serde_json::from_value::<Probe>(leaked).is_err());
+        }
+    }
+}
