@@ -10,6 +10,14 @@ projection surface. TypeScript declarations are projected contracts, not private
 CaseState representations. Core's current-admission operation dispatcher remains
 the sole authority. Capability metadata grants no permission.
 
+Mutation receipts contain public Case identity/version and selected transition
+identity facts, not canonical CaseState or persisted Transition layouts. Provider
+probe projections retain observable request, timing, evidence and qualification,
+not carrier tokens, process ownership or storage seals. Core constructs these
+typed projections at the Application producer; the SDK neither scrubs arbitrary
+private JSON nor reconstructs semantic state. Removing formerly accidental private
+fields fixes producer exposure and does not promise payload-byte compatibility.
+
 `yai.client.v1` is bounded newline JSON on a same-user Linux Unix socket. Discovery
 is an explicit supported local endpoint record, not permission to inspect stores.
 Server peer credentials and authenticated process/start identity prevent stale PID

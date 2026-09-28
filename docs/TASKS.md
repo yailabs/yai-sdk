@@ -2,7 +2,7 @@
 
 | Task | State | Exit |
 | --- | --- | --- |
-| PRODUCT.REPOSITORY.BOUNDARY.0 | IN_PROGRESS | Independent MIT SDK owner qualified; final Core mutation/probe receipt projection and repeated consumer conformance pending after private persisted-field leakage was found. |
+| PRODUCT.REPOSITORY.BOUNDARY.0 | COMPLETE | Independent MIT client/projection owner; canonical Core mutation/probe projections exclude private persisted state; standalone conformance and final real Core/Studio integration qualified at the bounded Linux local scope. |
 
 No release qualification is implied. Core semantics and Studio product tasks remain in their own repositories.
 
