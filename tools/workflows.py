@@ -23,7 +23,7 @@ def render(contract):
             if kind == 'array':
                 return f'Vec<{inner}>' if language == 'rust' else f'Array<{inner}>'
             if kind in ('optional', 'nullable'):
-                return f'Option<{inner}>' if language == 'rust' else f'{inner} | null'
+                return f'Option<{inner}>' if language == 'rust' else (inner if kind == 'optional' else f'{inner} | null')
             raise ValueError(f'unknown type constructor: {kind}')
         primitives = {'string': ('String', 'string'), 'u8': ('u8', 'number'), 'u64': ('u64', 'number'),
                       'usize': ('usize', 'number'), 'u32': ('u32', 'number'), 'i64': ('i64', 'number'), 'bool': ('bool', 'boolean'),

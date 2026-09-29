@@ -23,15 +23,15 @@ export interface ParticipantRoleInput {
 export interface ReviewResolveInput {
   case_ref: string;
   review_ref: string;
-  participant_ref?: string | null;
+  participant_ref?: string;
   reason: string;
 }
 export interface MaterialReadInput {
   case_ref: string;
   source_ref: string;
-  revision_ref?: string | null;
+  revision_ref?: string;
   path: string;
-  expected_generation?: number | null;
+  expected_generation?: number;
 }
 export interface MaterialReadResult {
   case_ref: string;
@@ -53,8 +53,8 @@ export interface ReviewActionProjection {
   operation_id: string;
   case_id: string;
   reviewer_participant_id: string;
-  principal_id?: string | null;
-  tenant_id?: string | null;
+  principal_id?: string;
+  tenant_id?: string;
   action: string;
   reason: string;
   expected_case_generation: number;
@@ -63,7 +63,7 @@ export interface ReviewActionProjection {
 export interface ReviewResolveResult {
   review_ref: string;
   action: ReviewActionProjection;
-  effective_decision_ref?: string | null;
+  effective_decision_ref?: string;
   state: CaseVersionProjection;
   external_effect: boolean;
 }
@@ -163,12 +163,12 @@ export interface TransitionReceiptPayload {
   data: TransitionReceiptData;
 }
 export interface TransitionReceiptData {
-  patch?: WorkflowPatchReceipt | null;
-  offer?: HandoffOfferReceipt | null;
-  acceptance?: HandoffReceipt | null;
-  decline?: HandoffReceipt | null;
-  result?: HandoffReceipt | null;
-  reconciliation?: HandoffReceipt | null;
+  patch?: WorkflowPatchReceipt;
+  offer?: HandoffOfferReceipt;
+  acceptance?: HandoffReceipt;
+  decline?: HandoffReceipt;
+  result?: HandoffReceipt;
+  reconciliation?: HandoffReceipt;
 }
 export interface WorkflowPatchReceipt {
   patch_id: string;
@@ -235,7 +235,7 @@ export interface ParticipantLinkInput {
 }
 export interface StateMutationReceipt {
   changed: boolean;
-  transition_ref?: string | null;
+  transition_ref?: string;
   state: CaseVersionProjection;
 }
 export interface RegisteredModelsInput {
@@ -243,8 +243,8 @@ export interface RegisteredModelsInput {
   target_ref: string;
 }
 export interface ModelInventory {
-  target_ref?: string | null;
-  observed_at_unix_ms?: number | null;
+  target_ref?: string;
+  observed_at_unix_ms?: number;
   models: Array<string>;
   scope: string;
   authority: string;
@@ -266,7 +266,7 @@ export interface TextConversationInput {
   submission_ref: string;
   expected_generation: number;
   parts: Array<ConversationTextPart>;
-  intent?: ConversationIntent | null;
+  intent?: ConversationIntent;
 }
 export interface ConversationResultSelection {
   selected_target_id: string;
@@ -279,16 +279,16 @@ export interface ConversationPrimaryResult {
 }
 export type ConversationPosture = "admitted" | "running" | "completed" | "provider_result_recorded" | "refused" | "failed" | "cancelled" | "delivery_indeterminate" | "unresolved";
 export interface AttemptObservation {
-  outcome_id?: string | null;
-  target_id?: string | null;
-  attempt_number?: number | null;
-  delivery?: string | null;
-  stage?: string | null;
-  request_bytes_written?: number | null;
-  response_status?: number | null;
-  no_execution_proven?: boolean | null;
-  failure_class?: string | null;
-  recorded_at_unix_ms?: number | null;
+  outcome_id?: string;
+  target_id?: string;
+  attempt_number?: number;
+  delivery?: string;
+  stage?: string;
+  request_bytes_written?: number;
+  response_status?: number;
+  no_execution_proven?: boolean;
+  failure_class?: string;
+  recorded_at_unix_ms?: number;
 }
 export interface ConversationObservation {
   case_ref: string;
@@ -299,7 +299,7 @@ export interface ConversationObservation {
   observed_generation: number;
   posture: ConversationPosture;
   invocation_refs: Array<string>;
-  primary_result?: ConversationPrimaryResult | null;
+  primary_result?: ConversationPrimaryResult;
   attempt_outcomes: Array<AttemptObservation>;
 }
 export interface TextConversationSubmission {
@@ -327,8 +327,8 @@ export interface OperationResult<T = unknown> {
   operation_ref: string;
   result_state: ResultState;
   correlation_ref: string;
-  data?: T | null;
-  error?: OperationError | null;
+  data?: T;
+  error?: OperationError;
 }
 export interface CaseUpdate {
   protocol: string;

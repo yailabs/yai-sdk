@@ -17,7 +17,7 @@
     "PROVENANCE.md"
   ],
   "scripts": {
-    "check": "tsc --noEmit --strict --target ES2022 --module ESNext typescript/projections.ts"
+    "check": "tsc --noEmit --strict --noUnusedLocals --noUnusedParameters --target ES2022 --module ESNext typescript/projections.ts"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

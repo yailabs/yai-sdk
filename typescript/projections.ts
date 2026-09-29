@@ -1,4 +1,4 @@
-import type { RecallBounds, HandoffAcceptInput, ApplicationCapability, ApplicationCatalog, ApplicationOperation, AuthenticationProjection, CaseAttachment, CaseCreateInput, CaseListProjection, CaseRefInput, CaseSummary, CaseVersionProjection, EmptyInput, HandoffOfferReceipt, HandoffReceipt, IdentityBootstrapInput, IdentityPresentation, KnowledgeHit, KnowledgeInspectInput, KnowledgeNavigationResult, KnowledgeRelation, KnowledgeRequest, KnowledgeResolveInput, KnowledgeResolveResult, KnowledgeSearchInput, KnowledgeSearchResult, KnowledgeSource, KnowledgeUnit, KnowledgeView, MaterialReadInput, MaterialReadResult, ParticipantRoleInput, PrincipalProjection, ReviewActionProjection, ReviewResolveInput, ReviewResolveResult, TenantInput, TenantMembershipProjection, TenantProjection, TransitionReceipt, TransitionReceiptData, TransitionReceiptPayload, WorkCommit, WorkflowPatchReceipt } from "./workflows.js";
+import type { RecallBounds, HandoffAcceptInput } from "./workflows.js";
 export * from "./workflows.js";
 export type { CaseSummary as LiveCaseRow } from "./workflows.js";
 /** Supported public Application projections. No semantic implementation.
