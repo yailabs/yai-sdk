@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
+use crate::projections::ApplicationCatalog;
 use std::fs;
 pub const HOST_PROTOCOL: &str = "yai.client.v1";
 pub const HOST_DISCOVERY_SCHEMA: &str = "yai.local_host.discovery.v1";
@@ -17,49 +18,7 @@ pub struct OperationRequest {
     pub input: Value,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct OperationError {
-    pub code: String,
-    pub message: String,
-    pub safe_message: String,
-    pub result_state: ResultState,
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum ResultState {
-    Success,
-    Partial,
-    Unauthorized,
-    Stale,
-    CorePending,
-    NotImplemented,
-    TransportUnavailable,
-    Error,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct OperationResult {
-    pub operation_ref: String,
-    pub result_state: ResultState,
-    pub correlation_ref: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub data: Option<Value>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<OperationError>,
-}
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct CaseUpdate {
-    pub protocol: String,
-    pub event_ref: String,
-    pub event_type: String,
-    pub event_family: String,
-    pub case_ref: String,
-    pub generation: u64,
-    pub sequence: u64,
-    pub cursor: String,
-    pub affected_views: Vec<String>,
-}
+pub use crate::workflows::{OperationError, OperationResult, ResultState, CaseUpdate};
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct RuntimeObservation {
     pub instance_id: String,
@@ -260,4 +219,43 @@ impl CompatibilityIdentity {
         }
         Ok(())
     }
+}
+
+pub fn validate_catalog_result(result: &OperationResult) -> Result<ApplicationCatalog, String> {
+    if result.operation_ref != "application.capabilities"
+        || result.result_state != ResultState::Success
+        || result.error.is_some()
+    {
+        return Err("catalog_result_not_success".into());
+    }
+    let catalog: ApplicationCatalog =
+        serde_json::from_value(result.data.clone().ok_or("catalog_missing")?)
+            .map_err(|e| format!("catalog_projection_invalid:{e}"))?;
+    if catalog.schema != CAPABILITY_CATALOG_SCHEMA
+        || catalog.application_protocol != APPLICATION_PROTOCOL
+    {
+        return Err("catalog_identity_mismatch".into());
+    }
+    let mut operations = BTreeSet::new();
+    for op in &catalog.operations {
+        if op.operation_id.is_empty()
+            || op.input_contract.is_empty()
+            || op.output_contract.is_empty()
+            || !operations.insert(op.operation_id.as_str())
+        {
+            return Err("catalog_operation_invalid".into());
+        }
+    }
+    let mut capabilities = BTreeSet::new();
+    for capability in &catalog.capabilities {
+        if !capabilities.insert(capability.capability_id.as_str())
+            || capability
+                .application_operation_ids
+                .iter()
+                .any(|id| !operations.contains(id.as_str()))
+        {
+            return Err("catalog_capability_invalid".into());
+        }
+    }
+    Ok(catalog)
 }

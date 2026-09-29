@@ -1,5 +1,7 @@
 //! Supported client contracts. No Case semantics, persistence or server implementation.
 pub mod conformance;
+pub mod client;
+pub mod workflows;
 mod contracts;
 mod local;
 pub mod projections;

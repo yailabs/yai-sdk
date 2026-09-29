@@ -1,7 +1,39 @@
+<!-- docs:metadata
+title: SDK Qualification
+id: yai-sdk.qualification
+document: evaluation
+status: current
+owner: sdk
+audience: [developer, engineer]
+publication: {html: true, pdf: false, index: true}
+-->
+
 # Local client boundary qualification
+
+[Documentation](README.md)
 
 The v0.1.0 SDK is a supported client contract, not an implementation of Core
 semantics. This record qualifies Linux same-user local IPC only.
+
+## Platform work in progress
+
+The current platform Task is not yet closed. New evidence obtained on isolated
+profiles against Core `1f012d9` / installed executable SHA-256
+`bef4f843ffb56efae0200dcf4f034d06f45b779c8fde33eeb974898fc65b0aa8`:
+
+| Authority / input | Expected | Observed | Claim |
+| --- | --- | --- | --- |
+| Real Core catalog / released SDK inventory | Every released operation keeps input/output, impact and authority identities | 98 exact matches | PASS: released contract identity conformance, not semantics |
+| Real typed create/role/link/open / fresh Case | Admitted mutations followed by authorized read | Generations 1→2→3; exact Case/Participant returned | PASS: typed action composition, no fixture provider |
+| Real identity + Recall v2 / same Case at generation 3 | Current disclosure and exact cut preserved | Success; cut 3, closure complete, zero selected items and explicit limitations | PASS: typed Recall composition; not retrieval quality |
+| Refusal control / unlinked principal | Opening Case must not infer authority | `unauthorized` | PASS: refusal preserved |
+
+The first role-add test revealed a real projection mismatch: this operation returns
+`StateMutationReceipt`, not `WorkCommit`. The SDK retained the received successful
+envelope, did not replay the mutation, corrected its descriptor and qualified a
+new isolated Case. Full Studio and model-chain requalification remains pending.
+
+## Previously qualified extraction scope
 
 | Owner / oracle | Expected | Observed | Result / scope |
 | --- | --- | --- | --- |

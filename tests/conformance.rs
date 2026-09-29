@@ -102,6 +102,47 @@ fn request() -> OperationRequest {
 }
 
 #[test]
+fn bound_transport_refuses_replacement_without_application_dispatch() {
+    let home = std::env::temp_dir().join(format!("yai-sdk-replacement-{}", std::process::id()));
+    std::fs::create_dir_all(home.join("run/host")).unwrap();
+    let endpoint = home.join("run/host/application.sock");
+    let listener = UnixListener::bind(&endpoint).unwrap();
+    std::fs::set_permissions(&endpoint, std::fs::Permissions::from_mode(0o600)).unwrap();
+    let mut discovery = HostDiscovery {
+        schema: HOST_DISCOVERY_SCHEMA.into(), protocol: HOST_PROTOCOL.into(),
+        endpoint: endpoint.display().to_string(), pid: std::process::id(),
+        process_identity: LocalProcessIdentity::capture(std::process::id()).unwrap(),
+        instance_id: "mock:original".into(), started_at_unix_ms:1,
+        version:"0.1.0".into(), build:"fixture".into(), yai_home:home.display().to_string(),
+        yai_home_identity:platform::home_identity(&home),
+    };
+    let path = home.join("run/host/discovery.json");
+    std::fs::write(&path, serde_json::to_vec(&discovery).unwrap()).unwrap();
+    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600)).unwrap();
+    let home_identity = discovery.yai_home_identity.clone();
+    let server = std::thread::spawn(move || {
+        for instance in ["mock:original", "mock:replacement"] {
+            let (mut stream, _) = listener.accept().unwrap();
+            stream.set_read_timeout(Some(std::time::Duration::from_secs(2))).unwrap();
+            let mut reader = BufReader::new(stream.try_clone().unwrap());
+            assert!(matches!(read_frame::<ClientFrame>(&mut reader).unwrap(), ClientFrame::Handshake { .. }));
+            write_frame(&mut stream, &ServerFrame::Handshake { protocol: HOST_PROTOCOL.into(),
+                compatibility:CompatibilityIdentity::current("0.1.0"), host_instance_id:instance.into(),
+                yai_home_identity:home_identity.clone() }).unwrap();
+            assert!(read_frame::<ClientFrame>(&mut reader).is_err(), "no application dispatch allowed");
+        }
+    });
+    let transport = client::BoundLocalTransport::connect(&home, ClientKind::Qualification).unwrap();
+    discovery.instance_id = "mock:replacement".into();
+    std::fs::write(&path, serde_json::to_vec(&discovery).unwrap()).unwrap();
+    let error = transport.execute(request()).unwrap_err();
+    assert_eq!(error.code, "host_replaced_rediscovery_required");
+    assert!(!error.outcome_indeterminate);
+    server.join().unwrap();
+    std::fs::remove_dir_all(home).unwrap();
+}
+
+#[test]
 fn independent_client_roundtrip_preserves_identity_and_projection() {
     let (home, worker) = mock_host(false, false);
     let result = HostClient::connect(&home, ClientKind::Qualification)

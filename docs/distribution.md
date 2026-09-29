@@ -1,4 +1,16 @@
+<!-- docs:metadata
+title: Distribution Qualification
+id: yai-sdk.distribution
+document: reference
+status: current
+owner: sdk
+audience: [developer, engineer]
+publication: {html: true, pdf: false, index: true}
+-->
+
 # Distribution qualification
+
+[Documentation](README.md)
 
 First-party SDK material is MIT, copyright Francesco Maiomascio where authored
 and owned. The public SDK grant does not relicense proprietary Core or Studio.

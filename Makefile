@@ -1,9 +1,12 @@
 .PHONY: check qualify-distribution
 check:
+	python3 tools/workflows.py --check
+	python3 tests/test_workflow_contract.py
 	cargo test --locked
 	npm ci --ignore-scripts
 	npm run check
 	python3 tools/check.py
+	python3 tools/docs.py
 	python3 tests/test_package_identity.py
 	python3 tests/test_distribution_legal.py
 

@@ -1,4 +1,16 @@
+<!-- docs:metadata
+title: Client Architecture
+id: yai-sdk.architecture
+document: architecture
+status: current
+owner: sdk
+audience: [developer, engineer]
+publication: {html: true, pdf: false, index: true}
+-->
+
 # Supported client boundary
+
+[Documentation](README.md)
 
 Accepted decision: Core owns semantics and resident server lifecycle; SDK owns
 public projections, compatibility, wire framing and client behavior; Studio owns
@@ -9,6 +21,19 @@ The Rust client and public TypeScript DTOs describe the same Application JSON
 projection surface. TypeScript declarations are projected contracts, not private
 CaseState representations. Core's current-admission operation dispatcher remains
 the sole authority. Capability metadata grants no permission.
+
+`contract/workflows.json` owns the shared result envelope, invalidation event,
+common value projections and typed workflow descriptors. Deterministic generation
+produces Rust and TypeScript; `--check` rejects edits to either projection.
+`contract/operations.json` binds the released 98-operation inventory. Core
+conformance compares that inventory with the real catalog, while ordinary clients
+may use a compatible subset. This is contract ownership, not copied admission.
+
+The typed `Client<T>` sits above `ClientTransport`, fences operation schema and
+response identity, and preserves raw received outcomes. `BoundLocalTransport`
+authenticates each connection and refuses a replaced Host before dispatch;
+callers explicitly rediscover and resynchronize. There is no automatic mutation
+replay and no provider bypass.
 
 Mutation receipts contain public Case identity/version and selected transition
 identity facts, not canonical CaseState or persisted Transition layouts. Provider

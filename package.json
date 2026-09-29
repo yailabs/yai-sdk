@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
+  "description": "YAI public contract types only; no TypeScript runtime transport client",
   "type": "module",
   "exports": {
     "./projections": {
@@ -11,6 +12,7 @@
   },
   "files": [
     "typescript",
+    "contract",
     "LICENSE",
     "PROVENANCE.md"
   ],

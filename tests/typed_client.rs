@@ -1,0 +1,122 @@
+use std::cell::RefCell;
+use serde::Serialize;
+use yai_sdk::{client::{Client, Error, Operation}, *};
+
+#[derive(Serialize)]
+struct ListCases {}
+impl Operation for ListCases {
+    type Output = projections::CaseListProjection;
+    const ID: &'static str = "case.list";
+}
+struct Mock { calls: RefCell<Vec<String>>, mode: &'static str }
+impl ClientTransport for &Mock {
+    fn execute(&self, request: OperationRequest) -> Result<OperationResult, ClientError> {
+        self.calls.borrow_mut().push(request.operation_ref.clone());
+        if request.operation_ref != "application.capabilities" && self.mode == "lost" {
+            return Err(ClientError::after_dispatch("lost".into()));
+        }
+        let mut result = OperationResult {
+            operation_ref: request.operation_ref.clone(), correlation_ref: request.correlation_ref,
+            result_state: ResultState::Success, error: None,
+            data: Some(if request.operation_ref == "application.capabilities" {
+                serde_json::json!({"schema": CAPABILITY_CATALOG_SCHEMA,
+                    "application_protocol": APPLICATION_PROTOCOL, "capabilities":[],
+                    "operations": if self.mode == "unsupported" { vec![] } else { vec![serde_json::json!({
+                        "operation_id":"case.list", "meaning":"visible cases", "input_contract":"list",
+                        "output_contract":"cases", "impact":"read", "authority":"local_authenticated"})] }})
+            } else { serde_json::json!({"cases":[], "authority":"current_disclosure"}) }),
+        };
+        if request.operation_ref != "application.capabilities" {
+            match self.mode {
+                "refused" => { result.result_state = ResultState::Unauthorized; result.data = None;
+                    result.error = Some(OperationError { code:"denied".into(), message:"denied".into(),
+                        safe_message:"denied".into(), result_state:ResultState::Unauthorized }); }
+                "foreign" => result.correlation_ref = "other".into(),
+                "malformed" => result.data = Some(serde_json::json!({"private_state":{}})),
+                _ => {}
+            }
+        }
+        Ok(result)
+    }
+}
+fn mock(mode: &'static str) -> Mock { Mock { calls: RefCell::new(vec![]), mode } }
+
+#[test]
+fn typed_read_preserves_public_projection_and_correlation() {
+    let transport = mock("ok");
+    let client = Client::discover(&transport, "discovery:1").unwrap();
+    assert!(client.supports("case.list"));
+    let response = client.execute("read:1", &ListCases {}).unwrap();
+    assert_eq!(response.state, ResultState::Success);
+    assert_eq!(response.correlation_ref, "read:1");
+    assert_eq!(response.data.unwrap().authority, "current_disclosure");
+}
+#[test]
+fn missing_capability_refuses_before_dispatch() {
+    let transport = mock("unsupported");
+    let client = Client::discover(&transport, "discovery:1").unwrap();
+    assert!(matches!(client.execute("read:1", &ListCases {}), Err(Error::UnsupportedOperation(_))));
+    assert_eq!(transport.calls.borrow().len(), 1);
+}
+#[test]
+fn semantic_refusal_is_not_transport_loss() {
+    let transport = mock("refused");
+    let client = Client::discover(&transport, "discovery:1").unwrap();
+    let response = client.execute("read:1", &ListCases {}).unwrap();
+    assert_eq!(response.state, ResultState::Unauthorized);
+    assert!(response.data.is_none());
+    assert_eq!(response.error.unwrap().code, "denied");
+}
+#[test]
+fn post_dispatch_loss_remains_indeterminate_without_retry() {
+    let transport = mock("lost");
+    let client = Client::discover(&transport, "discovery:1").unwrap();
+    let Err(Error::Transport(error)) = client.execute("read:1", &ListCases {}) else { panic!() };
+    assert!(error.outcome_indeterminate);
+    assert_eq!(transport.calls.borrow().len(), 2);
+}
+#[test]
+fn wrong_identity_and_malformed_success_are_not_successes() {
+    for mode in ["foreign", "malformed"] {
+        let transport = mock(mode);
+        let client = Client::discover(&transport, "discovery:1").unwrap();
+        assert!(matches!(client.execute("read:1", &ListCases {}), Err(Error::InvalidResponse { .. })));
+        assert_eq!(transport.calls.borrow().len(), 2);
+    }
+}
+
+#[test]
+fn generated_workflow_refuses_foreign_schema_before_dispatch() {
+    let transport = mock("ok");
+    let client = Client::discover(&transport, "discovery:1").unwrap();
+    assert!(matches!(client.cases().list("read:1", &workflows::EmptyInput {}),
+        Err(Error::ContractMismatch(_))));
+    assert_eq!(transport.calls.borrow().len(), 1);
+}
+
+#[test]
+fn released_catalog_requires_exact_contracts_but_allows_additive_operations() {
+    let catalog: serde_json::Value = serde_json::from_str(include_str!("../contract/operations.json")).unwrap();
+    let mut data = catalog;
+    data["capabilities"] = serde_json::json!([]);
+    let mut response = OperationResult { operation_ref: "application.capabilities".into(),
+        result_state: ResultState::Success, correlation_ref: "catalog".into(),
+        data: Some(data), error: None };
+    let expected = response.data.as_ref().unwrap()["operations"].as_array().unwrap().len();
+    assert_eq!(conformance::validate_released_catalog(&response).unwrap(), expected);
+    response.data.as_mut().unwrap()["operations"].as_array_mut().unwrap().push(serde_json::json!({
+        "operation_id":"future.read", "meaning":"future", "input_contract":"future.in.v1",
+        "output_contract":"future.out.v1", "impact":"read", "authority":"case_disclosure"}));
+    assert_eq!(conformance::validate_released_catalog(&response).unwrap(), expected);
+    response.data.as_mut().unwrap()["operations"][0]["output_contract"] = "foreign.v2".into();
+    assert!(conformance::validate_released_catalog(&response).is_err());
+}
+
+#[test]
+fn public_numeric_and_temporal_projection_preserves_signed_rank_and_cut() {
+    let candidate: workflows::RecallCandidate = serde_json::from_value(serde_json::json!({
+        "source_ref":"source:1","plane":"historical","score_micros":-9,"matched_terms":[]})).unwrap();
+    assert_eq!(candidate.score_micros, -9);
+    let cut = workflows::GenerationCut { kind: workflows::GenerationCutKind::Generation, value: 3 };
+    assert_eq!(serde_json::to_value(cut).unwrap(), serde_json::json!({"kind":"generation","value":3}));
+}

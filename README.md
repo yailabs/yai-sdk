@@ -1,54 +1,97 @@
+<!-- docs:metadata
+title: YAI SDK
+id: yai-sdk
+document: product
+status: current
+owner: sdk
+audience: [developer, engineer]
+publication: {html: true, pdf: false, index: true}
+-->
+
 # YAI SDK
 
-Mutation receipts expose only Case identity/version and selected transition
-identity facts. They do not expose persisted `CaseState` or `Transition` layouts.
-Removing accidentally serialized private fields is a producer defect correction,
-not a promise of payload-byte compatibility; the supported `WorkCommit` fields
-remain stable. Canonical state and persistence schemas remain Core-private.
+**The public client library and contract for governed YAI operations.**
 
-MIT Rust-first supported local client boundary. YAI Core and Studio are separate
-proprietary products; this repository contains no Case engine, persistence,
-scheduler, server, or semantic admission implementation.
+YAI SDK lets a client discover capabilities, inspect authorized Cases and submit
+supported actions to a running YAI Core. Core admits the operation; the SDK does
+not implement Case semantics, policy, persistence or scheduling. Studio consumes
+this same boundary. Provider and YVEX operations go through YAI, never around it.
 
-`Cargo.toml` is the canonical independent SemVer authority (0.1.0). Future release
-tags use `vMAJOR.MINOR.PATCH`; no tag or release is implied by a build. Wire
-`yai.client.v1`, Application `yai.studio.application.v1`, capability catalog
-`yai.application_capability_catalog.v1` are independent contract identities.
-The legacy Application identity is retained without changing its semantics.
+The current functional client is **Rust on Linux, same-user local Unix transport**.
+The TypeScript package exports contract types only, not a runtime client.
+Internet transports and a provider-plugin API are not supported.
 
-Before 1.0, breaking public APIs require a minor increment; patches preserve the
-declared contract. Core, Studio and SDK release independently. Supporting a new
-wire or projection schema requires explicit compatibility negotiation, not merely
-a product version change.
+## Add and connect
 
-On connection the same-user Unix client verifies discovery permissions, exact
-live process and home identity, peer credentials and handshake identities.
-Compatibility checks protocol/Application/catalog identity, not matching commits
-or product patch versions. Core product versions are reported independently.
+The independent product line is `0.1.0`. A published source revision is not a
+crates.io/npm release; pin an exact reviewed Git revision in your application:
 
-Use `HostClient::connect(home, ClientKind::Studio)` then `call`, `status` or
-`subscribe`. Capability discovery is `application.capabilities`; only advertised
-operations are available. `OperationRequest.input` and result data are bounded JSON
-projections using the operation's published contract, not private engine records.
-Common typed projections live in `projections`. Error/refusal result states remain
-distinct from transport failure. `call_typed` marks lost transport responses as
-indeterminate; it never automatically replays mutations. Observe durable operation
-identities through the advertised execution operations before retrying.
+```toml
+[dependencies]
+yai-sdk = { git = "https://github.com/yailabs/yai-sdk", rev = "YOUR_REVIEWED_FULL_COMMIT" }
+```
 
-Subscriptions carry Case invalidation facts, not replacement Case state. Reconnect
-and instance changes require resynchronizing affected views. Closing a connection
-does not stop Core or cancel admitted work. `start(home, installed_yai, &["host",
-"serve"])` may launch an installed Core; it never requires Core source or embeds a
-server. Shutdown is an explicit supported host operation.
+With an installed compatible Core already running against your explicitly chosen
+profile, the SDK performs authenticated discovery and compatibility negotiation:
 
-Linux same-user local transport is qualified; no remote/cloud transport is claimed.
-`cargo test` is standalone conformance software evidence. Private Core must run
-its own real server tests against these wire/client owners. The SDK's mock server
-tests do not establish Case semantics, authority or runtime qualification.
+```rust,no_run
+use yai_sdk::{client::{BoundLocalTransport, Client}, workflows::EmptyInput, ClientKind};
 
-See [qualified scope](docs/qualification.md) for independent clone, real Core
-and native Studio evidence and the limits of those claims.
+# fn main() -> Result<(), Box<dyn std::error::Error>> {
+let home = std::env::var("YAI_HOME")?;
+let transport = BoundLocalTransport::connect(home, ClientKind::External)?;
+let client = Client::discover(transport, "my-client:discovery")?;
+let response = client.cases().list("my-client:list", &EmptyInput {})?;
+println!("{:?}: {:?}", response.state, response.data);
+# Ok(())
+# }
+```
 
-Source SDK is MIT; dependencies retain their own licenses. This repository does
-not qualify a binary/customer package for distribution. Such artifacts require
-an exact dependency closure, notices and the `distribution.legal.v1` gate.
+Use the executable [Case inspection example](examples/cases.rs):
+
+```sh
+cargo run --locked --example cases -- "$YAI_HOME"
+```
+
+This is a real read-only client, not a fixture and not implicit identity enrollment.
+The [workflow guide](docs/guides/README.md) explains setup, actions and observation.
+
+## Capabilities, results and observations
+
+Typed APIs group supported operations into Cases, Identity, Materials, Knowledge,
+Memory, Authority, Work, Handoff, Resources, Compute and Conversation.
+They preserve the operation's contract identities and refuse a
+missing or incompatible catalog entry before dispatch. Discovery never grants
+authority: Core rechecks current access for every operation.
+
+`Response<T>` retains both a typed projection and the exact received envelope.
+Success, partial, unauthorized, stale, unavailable and unsupported postures must
+not be collapsed into a boolean. Transport failures are separate. A lost response
+after dispatch is **indeterminate**, not permission to retry a mutation.
+
+Use the low-level operation API for remaining published operations. It remains a
+supported escape hatch, not a private engine entry point. Case events invalidate
+views; they do not replace state. Reconnect or Host replacement requires fresh
+discovery and resynchronization while preserving client-local edits.
+
+## Developer documentation
+
+[Documentation home](docs/README.md) routes product, architecture, contracts,
+guides, conformance, qualification, project control and release policy.
+
+- [Public contract](docs/contracts/README.md): framing, identities and failure semantics.
+- [API reference](docs/reference/README.md): typed workflows and complete operation inventory.
+- [Development](docs/development/README.md): standalone checks and public fixtures.
+- [Qualification](docs/qualification.md): actual evidence, not inferred support.
+
+## Versions and licensing
+
+Core, Studio and SDK use independent SemVer. `Cargo.toml` owns this repository's
+version; `yai.client.v1`, Application and capability schema identities evolve
+independently. Compatibility never requires matching Git commits. See
+[release policy](docs/releases/README.md).
+
+SDK first-party source is [MIT](LICENSE); Core and Studio remain proprietary.
+Dependencies retain their own terms. Passing source checks is not customer-package
+distribution readiness: [legal qualification](docs/distribution.md) remains
+artifact-specific and fail-closed. [Provenance](PROVENANCE.md) records extraction.

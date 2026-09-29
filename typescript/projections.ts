@@ -1,3 +1,6 @@
+import type { RecallBounds, HandoffAcceptInput, ApplicationCapability, ApplicationCatalog, ApplicationOperation, AuthenticationProjection, CaseAttachment, CaseCreateInput, CaseListProjection, CaseRefInput, CaseSummary, CaseVersionProjection, EmptyInput, HandoffOfferReceipt, HandoffReceipt, IdentityBootstrapInput, IdentityPresentation, KnowledgeHit, KnowledgeInspectInput, KnowledgeNavigationResult, KnowledgeRelation, KnowledgeRequest, KnowledgeResolveInput, KnowledgeResolveResult, KnowledgeSearchInput, KnowledgeSearchResult, KnowledgeSource, KnowledgeUnit, KnowledgeView, MaterialReadInput, MaterialReadResult, ParticipantRoleInput, PrincipalProjection, ReviewActionProjection, ReviewResolveInput, ReviewResolveResult, TenantInput, TenantMembershipProjection, TenantProjection, TransitionReceipt, TransitionReceiptData, TransitionReceiptPayload, WorkCommit, WorkflowPatchReceipt } from "./workflows.js";
+export * from "./workflows.js";
+export type { CaseSummary as LiveCaseRow } from "./workflows.js";
 /** Supported public Application projections. No semantic implementation.
  * Extracted from qualified consumers at Core 1820aec; Core conformance owns meaning. */
 export type CognitiveCapability = "primary_conversation" | "speech_to_text" | "image_understanding";
@@ -64,20 +67,6 @@ export interface MachineRevokeInput {
   asset_id: string;
   reason: string;
 }
-
-export interface KnowledgeRequest { case_id: string; source: string | null; revision: string | null; max_units: number }
-
-export interface KnowledgeUnit { id: string; source: string; text: string; kind: string; posture: string }
-
-export interface KnowledgeView { id: string; case_id: string; units: KnowledgeUnit[]; sources: Array<{ id: string; path: string }>; relations: Array<{ id: string; from: string; to: string; kind: string }> }
-
-export interface KnowledgeSearchResult { view: KnowledgeView; hits: Array<{ document_id: string; score_micros: number; matched_terms: string[] }> }
-
-export interface KnowledgeResolveResult { view: KnowledgeView; unit: KnowledgeUnit }
-
-export interface KnowledgeNavigationResult { view_ref: string; navigation: string }
-
-export interface RecallBounds { candidates: number; events: number; relations: number; segments: number; expansion_depth: number; semantic_units: number; bytes: number }
 
 export interface RecallRequest {
   schema: "yai.recall_request.v2"; case_id: string; expected_generation: number; participant_id: string;
@@ -161,13 +150,9 @@ export interface WorkflowBindInput { case_ref: string; definition_ref: string; e
 
 export interface WorkflowPatchInput { schema: "yai.workflow_plan_patch.v1"; base_effective_topology_digest: string; operations: Array<{ operation: "add_node"; node: HumanCheckpoint } | { operation: "add_edge"; edge: WorkflowEdgeInput } | { operation: "disable_node"; node_id: string }> }
 
-export interface WorkCommit { state: { case_id: string; generation: number }; transition: { transition_id: string; payload: { kind: string; data: { patch?: { patch_id: string; base_effective_topology_digest: string }; offer?: { handoff_id: string; source_case_id: string; target_case_id: string }; acceptance?: { handoff_id: string }; decline?: { handoff_id: string }; result?: { handoff_id: string }; reconciliation?: { handoff_id: string } } } } }
-
 export interface HandoffData { kind: "text"; value: string }
 
 export interface HandoffOfferInput { source_case_ref: string; target_case_ref: string; request: HandoffData; required_target_roles: string[] }
-
-export interface HandoffAcceptInput { target_case_ref: string; source_case_ref: string; handoff_ref: string; participant_ref: string }
 
 export interface HandoffDeclineInput extends HandoffAcceptInput { reason: string }
 
@@ -367,8 +352,6 @@ export type ResourceAction = { action: "filesystem_read" | "discover"; path: str
 
 export interface ResourceRequestInput { case_ref: string; participant_ref: string; resource_ref: string; submission_ref: string; expected_generation: number; request: { schema: "yai.resource_request.v1"; configuration_digest: string; action: ResourceAction } }
 
-export interface ProcessAttachmentInput { case_ref: string; attachment_ref: string; pid: number; policy_owner_participant_ref: string; actions: Array<"terminate" | "suspend" | "resume">; review_requirement: "automatic" | "require_review" }
-
 export interface CaseResumeInput { case_ref: string; participant_ref: string; previous_submission_ref: string; submission_ref: string; run_ref: string; checkpoint_digest: string; budgets: RuntimeBudgets }
 
 export interface ProviderRegistration {
@@ -443,25 +426,7 @@ export interface ProviderProbeExecution {
 
 export interface ProviderProbeList { schema: "yai.provider_probe_list.v1"; target_ref: string; runs: ProviderProbeExecution[] }
 
-export interface ApplicationOperation {
-  operation_id: string; meaning: string; input_contract: string; output_contract: string;
-  impact: string; authority: string;
-}
-
-export interface ApplicationCapability {
-  capability_id: string; meaning: string; application_posture: "ready" | "deferred" | "not_applicable";
-  application_operation_ids: string[]; application_deferred_reason?: string;
-  studio_posture: string;
-}
-
-export interface ApplicationCatalog {
-  schema: "yai.application_capability_catalog.v1"; application_protocol: string;
-  operations: ApplicationOperation[]; capabilities: ApplicationCapability[];
-}
-
 export interface TenantPresentation { membership: string; tenant: { tenant_id: string; organization_ref: string } }
-
-export interface IdentityPresentation { principal: { principal_id: string; authentication_method: string }; tenants: TenantPresentation[]; authentication: { binding_ref: string } }
 
 export interface SourceDeclarationInput {
   case_ref: string; perimeter: string; logical_name: string; participant_ref: string; resource_ref: string;
@@ -498,48 +463,6 @@ export interface CaseCapabilityView {
   case_id: string; case_generation: number; participant_id: string; view_id: string; effective_policy_id: string;
   entries: Array<{ resource: { attachment_id: string }; operation_kind: ResourceOperationKind; requires_current_decision: boolean; policy_constraints: Array<{ kind: string; effect?: string; required?: boolean; resolution: string }> }>;
   exclusions: Array<{ resource_id: string; operation_kind: ResourceOperationKind; reason: string }>;
-}
-
-export type ResultState =
-  | "success"
-  | "partial"
-  | "unauthorized"
-  | "stale"
-  | "core_pending"
-  | "not_implemented"
-  | "transport_unavailable"
-  | "error";
-
-export interface OperationResult<T> {
-  operation_ref: string;
-  result_state: ResultState;
-  correlation_ref: string;
-  data?: T;
-  error?: { code: string; message: string; safe_message: string; result_state: ResultState };
-}
-
-export interface LiveCaseRow {
-  case_ref: string;
-  display_name: string;
-  case_status: string;
-  generation: number;
-  updated_at_unix_ms?: number;
-  participant_count: number;
-  source_count: number;
-  resource_count: number;
-  pending_review_count: number;
-}
-
-export interface CaseListProjection { cases: LiveCaseRow[]; authority: string }
-
-export interface CaseAttachment {
-  case_ref: string;
-  case_status: string;
-  generation: number;
-  authenticated_principal: string;
-  participant_ref: string;
-  thread_ref?: string;
-  attachment: "ephemeral";
 }
 
 export interface LiveNode { id: string; label?: string; kind?: string; detail?: string }
@@ -602,9 +525,4 @@ export interface MaterialReadProjection {
   media_type: string;
   encoding: "utf-8" | "base64";
   content: string;
-}
-
-export interface CaseUpdate {
-  protocol: string; event_ref: string; event_type: string; event_family: string;
-  case_ref: string; generation: number; sequence: number; cursor: string; affected_views: string[];
 }

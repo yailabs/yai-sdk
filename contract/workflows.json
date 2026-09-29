@@ -1,0 +1,727 @@
+{
+  "format": "yai.sdk.workflow-contract.v1",
+  "application_protocol": "yai.studio.application.v1",
+  "types": {
+    "EmptyInput": {},
+    "CaseRefInput": {
+      "case_ref": "string"
+    },
+    "CaseCreateInput": {
+      "tenant_id": "string",
+      "case_ref": "string"
+    },
+    "IdentityBootstrapInput": {
+      "tenant_id": "string",
+      "organization_ref": "string"
+    },
+    "TenantInput": {
+      "tenant_id": "string"
+    },
+    "ParticipantRoleInput": {
+      "case_ref": "string",
+      "participant_ref": "string",
+      "role": "string"
+    },
+    "ReviewResolveInput": {
+      "case_ref": "string",
+      "review_ref": "string",
+      "participant_ref": "optional:string",
+      "reason": "string"
+    },
+    "MaterialReadInput": {
+      "case_ref": "string",
+      "source_ref": "string",
+      "revision_ref": "optional:string",
+      "path": "string",
+      "expected_generation": "optional:u64"
+    },
+    "MaterialReadResult": {
+      "case_ref": "string",
+      "generation": "u64",
+      "source_ref": "string",
+      "revision_ref": "string",
+      "path": "string",
+      "digest": "string",
+      "bytes": "u64",
+      "media_type": "string",
+      "encoding": "string",
+      "content": "string"
+    },
+    "ReviewActionProjection": {
+      "schema": "string",
+      "action_id": "string",
+      "integrity_digest": "string",
+      "review_id": "string",
+      "operation_id": "string",
+      "case_id": "string",
+      "reviewer_participant_id": "string",
+      "principal_id": "optional:string",
+      "tenant_id": "optional:string",
+      "action": "string",
+      "reason": "string",
+      "expected_case_generation": "u64",
+      "source": "string"
+    },
+    "ReviewResolveResult": {
+      "review_ref": "string",
+      "action": "ReviewActionProjection",
+      "effective_decision_ref": "optional:string",
+      "state": "CaseVersionProjection",
+      "external_effect": "bool"
+    },
+    "PrincipalProjection": {
+      "principal_id": "string",
+      "authentication_method": "string"
+    },
+    "TenantProjection": {
+      "tenant_id": "string",
+      "organization_ref": "string"
+    },
+    "TenantMembershipProjection": {
+      "membership": "string",
+      "tenant": "TenantProjection"
+    },
+    "AuthenticationProjection": {
+      "binding_ref": "string"
+    },
+    "IdentityPresentation": {
+      "principal": "PrincipalProjection",
+      "tenants": "array:TenantMembershipProjection",
+      "authentication": "AuthenticationProjection"
+    },
+    "KnowledgeRequest": {
+      "case_id": "string",
+      "source": "nullable:string",
+      "revision": "nullable:string",
+      "max_units": "usize"
+    },
+    "KnowledgeInspectInput": {
+      "request": "KnowledgeRequest"
+    },
+    "KnowledgeSearchInput": {
+      "request": "KnowledgeRequest",
+      "query": "string",
+      "limit": "usize"
+    },
+    "KnowledgeResolveInput": {
+      "request": "KnowledgeRequest",
+      "unit_ref": "string"
+    },
+    "KnowledgeUnit": {
+      "id": "string",
+      "source": "string",
+      "text": "string",
+      "kind": "string",
+      "posture": "string"
+    },
+    "KnowledgeSource": {
+      "id": "string",
+      "path": "string"
+    },
+    "KnowledgeRelation": {
+      "id": "string",
+      "from": "string",
+      "to": "string",
+      "kind": "string"
+    },
+    "KnowledgeView": {
+      "id": "string",
+      "case_id": "string",
+      "units": "array:KnowledgeUnit",
+      "sources": "array:KnowledgeSource",
+      "relations": "array:KnowledgeRelation"
+    },
+    "KnowledgeHit": {
+      "document_id": "string",
+      "score_micros": "i64",
+      "matched_terms": "array:string"
+    },
+    "KnowledgeSearchResult": {
+      "view": "KnowledgeView",
+      "hits": "array:KnowledgeHit"
+    },
+    "KnowledgeResolveResult": {
+      "view": "KnowledgeView",
+      "unit": "KnowledgeUnit"
+    },
+    "KnowledgeNavigationResult": {
+      "view_ref": "string",
+      "navigation": "string"
+    },
+    "CaseVersionProjection": {
+      "case_id": "string",
+      "generation": "u64"
+    },
+    "WorkCommit": {
+      "state": "CaseVersionProjection",
+      "transition": "TransitionReceipt"
+    },
+    "TransitionReceipt": {
+      "transition_id": "string",
+      "payload": "TransitionReceiptPayload"
+    },
+    "TransitionReceiptPayload": {
+      "kind": "string",
+      "data": "TransitionReceiptData"
+    },
+    "TransitionReceiptData": {
+      "patch": "optional:WorkflowPatchReceipt",
+      "offer": "optional:HandoffOfferReceipt",
+      "acceptance": "optional:HandoffReceipt",
+      "decline": "optional:HandoffReceipt",
+      "result": "optional:HandoffReceipt",
+      "reconciliation": "optional:HandoffReceipt"
+    },
+    "WorkflowPatchReceipt": {
+      "patch_id": "string",
+      "base_effective_topology_digest": "string"
+    },
+    "HandoffOfferReceipt": {
+      "handoff_id": "string",
+      "source_case_id": "string",
+      "target_case_id": "string"
+    },
+    "HandoffReceipt": {
+      "handoff_id": "string"
+    },
+    "CaseSummary": {
+      "case_ref": "string",
+      "display_name": "string",
+      "case_status": "string",
+      "generation": "u64",
+      "updated_at_unix_ms": "nullable:u64",
+      "participant_count": "usize",
+      "source_count": "usize",
+      "resource_count": "usize",
+      "pending_review_count": "usize"
+    },
+    "CaseListProjection": {
+      "cases": "array:CaseSummary",
+      "authority": "string"
+    },
+    "CaseAttachment": {
+      "case_ref": "string",
+      "case_status": "string",
+      "generation": "u64",
+      "authenticated_principal": "string",
+      "participant_ref": "string",
+      "thread_ref": "nullable:string",
+      "attachment": "string"
+    },
+    "ApplicationCatalog": {
+      "schema": "string",
+      "application_protocol": "string",
+      "operations": "array:ApplicationOperation",
+      "capabilities": "array:ApplicationCapability"
+    },
+    "ApplicationOperation": {
+      "operation_id": "string",
+      "meaning": "string",
+      "input_contract": "string",
+      "output_contract": "string",
+      "impact": "string",
+      "authority": "string"
+    },
+    "ApplicationCapability": {
+      "capability_id": "string",
+      "meaning": "string",
+      "application_posture": "string",
+      "application_operation_ids": "array:string",
+      "application_deferred_reason": "nullable:string",
+      "studio_posture": "string"
+    },
+    "ParticipantLinkInput": {
+      "case_ref": "string",
+      "participant_ref": "string",
+      "principal_ref": "string"
+    },
+    "StateMutationReceipt": {
+      "changed": "bool",
+      "transition_ref": "optional:string",
+      "state": "CaseVersionProjection"
+    },
+    "RegisteredModelsInput": {
+      "tenant_id": "string",
+      "target_ref": "string"
+    },
+    "ModelInventory": {
+      "target_ref": "optional:string",
+      "observed_at_unix_ms": "optional:u64",
+      "models": "array:string",
+      "scope": "string",
+      "authority": "string"
+    },
+    "ConversationTextPart": {
+      "modality": "TextModality",
+      "media_type": "string",
+      "bytes": "array:u8"
+    },
+    "TextModality": {
+      "$enum": [
+        "text"
+      ]
+    },
+    "ContextDepth": {
+      "$enum": [
+        "focused"
+      ]
+    },
+    "ConversationIntent": {
+      "context_depth": "ContextDepth"
+    },
+    "TextConversationInput": {
+      "case_ref": "string",
+      "participant_ref": "string",
+      "thread_ref": "string",
+      "submission_ref": "string",
+      "expected_generation": "u64",
+      "parts": "array:ConversationTextPart",
+      "intent": "optional:ConversationIntent"
+    },
+    "ConversationResultSelection": {
+      "selected_target_id": "string"
+    },
+    "ConversationPrimaryResult": {
+      "result_id": "string",
+      "invocation_id": "string",
+      "output": "string",
+      "selection": "ConversationResultSelection"
+    },
+    "ConversationPosture": {
+      "$enum": [
+        "admitted",
+        "running",
+        "completed",
+        "provider_result_recorded",
+        "refused",
+        "failed",
+        "cancelled",
+        "delivery_indeterminate",
+        "unresolved"
+      ]
+    },
+    "AttemptObservation": {
+      "outcome_id": "optional:string",
+      "target_id": "optional:string",
+      "attempt_number": "optional:u64",
+      "delivery": "optional:string",
+      "stage": "optional:string",
+      "request_bytes_written": "optional:u64",
+      "response_status": "optional:u64",
+      "no_execution_proven": "optional:bool",
+      "failure_class": "optional:string",
+      "recorded_at_unix_ms": "optional:u64"
+    },
+    "ConversationObservation": {
+      "case_ref": "string",
+      "participant_ref": "string",
+      "submission_ref": "string",
+      "turn_ref": "string",
+      "request_ref": "string",
+      "observed_generation": "u64",
+      "posture": "ConversationPosture",
+      "invocation_refs": "array:string",
+      "primary_result": "optional:ConversationPrimaryResult",
+      "attempt_outcomes": "array:AttemptObservation"
+    },
+    "TextConversationSubmission": {
+      "created": "bool",
+      "execution": "ConversationObservation"
+    },
+    "ConversationDomain": {
+      "$enum": [
+        "conversation"
+      ]
+    },
+    "ConversationExecutionReference": {
+      "domain": "ConversationDomain",
+      "submission_ref": "string"
+    },
+    "ConversationGetInput": {
+      "case_ref": "string",
+      "participant_ref": "string",
+      "execution": "ConversationExecutionReference"
+    },
+    "ResultState": {
+      "$enum": [
+        "success",
+        "partial",
+        "unauthorized",
+        "stale",
+        "core_pending",
+        "not_implemented",
+        "transport_unavailable",
+        "error"
+      ]
+    },
+    "OperationError": {
+      "code": "string",
+      "message": "string",
+      "safe_message": "string",
+      "result_state": "ResultState"
+    },
+    "OperationResult": {
+      "operation_ref": "string",
+      "result_state": "ResultState",
+      "correlation_ref": "string",
+      "data": "optional:T",
+      "error": "optional:OperationError"
+    },
+    "CaseUpdate": {
+      "protocol": "string",
+      "event_ref": "string",
+      "event_type": "string",
+      "event_family": "string",
+      "case_ref": "string",
+      "generation": "u64",
+      "sequence": "u64",
+      "cursor": "string",
+      "affected_views": "array:string"
+    },
+    "GenerationCut": {
+      "kind": "GenerationCutKind",
+      "value": "u64"
+    },
+    "GenerationCutKind": {
+      "$enum": [
+        "generation"
+      ]
+    },
+    "RecallBounds": {
+      "candidates": "usize",
+      "events": "usize",
+      "relations": "usize",
+      "segments": "usize",
+      "expansion_depth": "usize",
+      "semantic_units": "usize",
+      "bytes": "usize"
+    },
+    "RecallQuery": {
+      "schema": "string",
+      "case_id": "string",
+      "expected_generation": "u64",
+      "participant_id": "string",
+      "at": "GenerationCut",
+      "query": "string",
+      "required_refs": "array:string",
+      "bounds": "RecallBounds"
+    },
+    "RecallInput": {
+      "request": "RecallQuery"
+    },
+    "RecallCandidate": {
+      "source_ref": "string",
+      "plane": "string",
+      "score_micros": "i64",
+      "matched_terms": "array:string"
+    },
+    "RecallTraceSummary": {
+      "schema": "string",
+      "trace_id": "string",
+      "request_id": "string",
+      "request": "RecallQuery",
+      "generation": "u64",
+      "disclosure_digest": "string",
+      "qualified_source_digest": "string",
+      "closure_complete": "bool",
+      "omitted_candidates": "usize",
+      "expansion_stopped_at_depth": "bool",
+      "limitations": "array:string",
+      "candidates": "array:RecallCandidate"
+    },
+    "RecallSelection": {
+      "trace": "RecallTraceSummary"
+    },
+    "WorkflowInput": {
+      "case_ref": "string",
+      "node_ref": "string",
+      "value": "string"
+    },
+    "WorkflowAdoptPatchInput": {
+      "case_ref": "string",
+      "patch_ref": "string"
+    },
+    "HandoffAcceptInput": {
+      "target_case_ref": "string",
+      "source_case_ref": "string",
+      "handoff_ref": "string",
+      "participant_ref": "string"
+    },
+    "HandoffReconcileInput": {
+      "source_case_ref": "string",
+      "handoff_ref": "string"
+    },
+    "ProcessAttachmentInput": {
+      "case_ref": "string",
+      "attachment_ref": "string",
+      "pid": "u32",
+      "policy_owner_participant_ref": "string",
+      "actions": "array:ProcessAction",
+      "review_requirement": "ReviewRequirement"
+    },
+    "ProcessAction": {
+      "$enum": [
+        "terminate",
+        "suspend",
+        "resume"
+      ]
+    },
+    "ReviewRequirement": {
+      "$enum": [
+        "automatic",
+        "require_review"
+      ]
+    }
+  },
+  "closed_types": [
+    "CaseVersionProjection",
+    "WorkCommit",
+    "TransitionReceipt",
+    "TransitionReceiptPayload",
+    "TransitionReceiptData",
+    "WorkflowPatchReceipt",
+    "HandoffOfferReceipt",
+    "HandoffReceipt",
+    "StateMutationReceipt"
+  ],
+  "operations": [
+    {
+      "family": "identity",
+      "method": "current",
+      "id": "identity.current",
+      "input": "EmptyInput",
+      "output": "IdentityPresentation",
+      "input_contract": "yai.identity_current_input.v1",
+      "output_contract": "yai.identity_projection.v1"
+    },
+    {
+      "family": "knowledge",
+      "method": "inspect",
+      "id": "knowledge.inspect",
+      "input": "KnowledgeInspectInput",
+      "output": "KnowledgeView",
+      "input_contract": "yai.knowledge_inspect_input.v1",
+      "output_contract": "yai.source_knowledge.v1"
+    },
+    {
+      "family": "knowledge",
+      "method": "search",
+      "id": "knowledge.search",
+      "input": "KnowledgeSearchInput",
+      "output": "KnowledgeSearchResult",
+      "input_contract": "yai.knowledge_search_input.v1",
+      "output_contract": "yai.knowledge_search_result.v1"
+    },
+    {
+      "family": "knowledge",
+      "method": "resolve",
+      "id": "knowledge.resolve",
+      "input": "KnowledgeResolveInput",
+      "output": "KnowledgeResolveResult",
+      "input_contract": "yai.knowledge_resolve_input.v1",
+      "output_contract": "yai.knowledge_resolve_result.v1"
+    },
+    {
+      "family": "knowledge",
+      "method": "navigation",
+      "id": "knowledge.navigation",
+      "input": "KnowledgeInspectInput",
+      "output": "KnowledgeNavigationResult",
+      "input_contract": "yai.knowledge_inspect_input.v1",
+      "output_contract": "yai.knowledge_navigation_result.v1"
+    },
+    {
+      "family": "cases",
+      "method": "list",
+      "id": "case.list",
+      "input": "EmptyInput",
+      "output": "CaseListProjection",
+      "input_contract": "yai.case_list_input.v1",
+      "output_contract": "yai.case_list_projection.v1"
+    },
+    {
+      "family": "cases",
+      "method": "recent",
+      "id": "case.recent",
+      "input": "EmptyInput",
+      "output": "CaseListProjection",
+      "input_contract": "yai.case_list_input.v1",
+      "output_contract": "yai.case_list_projection.v1"
+    },
+    {
+      "family": "cases",
+      "method": "open",
+      "id": "case.open",
+      "input": "CaseRefInput",
+      "output": "CaseAttachment",
+      "input_contract": "yai.case_open_input.v1",
+      "output_contract": "yai.case_attachment.v1"
+    },
+    {
+      "family": "cases",
+      "method": "create",
+      "id": "case.create",
+      "input": "CaseCreateInput",
+      "output": "WorkCommit",
+      "input_contract": "yai.case_create_input.v1",
+      "output_contract": "yai.canonical_commit.v1"
+    },
+    {
+      "family": "authority",
+      "method": "add_role",
+      "id": "participant.role.add",
+      "input": "ParticipantRoleInput",
+      "output": "StateMutationReceipt",
+      "input_contract": "yai.participant_role_add_input.v1",
+      "output_contract": "yai.case_state_mutation_result.v1"
+    },
+    {
+      "family": "authority",
+      "method": "approve",
+      "id": "review.approve",
+      "input": "ReviewResolveInput",
+      "output": "ReviewResolveResult",
+      "input_contract": "yai.review_resolve_input.v1",
+      "output_contract": "yai.review_resolve_result.v1"
+    },
+    {
+      "family": "authority",
+      "method": "deny",
+      "id": "review.deny",
+      "input": "ReviewResolveInput",
+      "output": "ReviewResolveResult",
+      "input_contract": "yai.review_resolve_input.v1",
+      "output_contract": "yai.review_resolve_result.v1"
+    },
+    {
+      "family": "authority",
+      "method": "defer",
+      "id": "review.defer",
+      "input": "ReviewResolveInput",
+      "output": "ReviewResolveResult",
+      "input_contract": "yai.review_resolve_input.v1",
+      "output_contract": "yai.review_resolve_result.v1"
+    },
+    {
+      "family": "materials",
+      "method": "read",
+      "id": "material.read",
+      "input": "MaterialReadInput",
+      "output": "MaterialReadResult",
+      "input_contract": "yai.material_read_input.v1",
+      "output_contract": "yai.material_read_projection.v1"
+    },
+    {
+      "family": "authority",
+      "method": "link_principal",
+      "id": "participant.principal.link",
+      "input": "ParticipantLinkInput",
+      "output": "StateMutationReceipt",
+      "input_contract": "yai.participant_principal_link_input.v1",
+      "output_contract": "yai.case_state_mutation_result.v1"
+    },
+    {
+      "family": "compute",
+      "method": "models",
+      "id": "provider.models",
+      "input": "RegisteredModelsInput",
+      "output": "ModelInventory",
+      "input_contract": "yai.provider_models_input.v1",
+      "output_contract": "yai.provider_models.v1"
+    },
+    {
+      "family": "conversation",
+      "method": "send_text",
+      "id": "conversation.send",
+      "input": "TextConversationInput",
+      "output": "TextConversationSubmission",
+      "input_contract": "yai.conversation_send_input.v1",
+      "output_contract": "yai.conversation_submission_result.v1"
+    },
+    {
+      "family": "conversation",
+      "method": "get",
+      "id": "execution.get",
+      "input": "ConversationGetInput",
+      "output": "ConversationObservation",
+      "input_contract": "yai.execution_get_input.v1",
+      "output_contract": "yai.execution_observation.v1"
+    },
+    {
+      "family": "memory",
+      "method": "recall",
+      "id": "semantic.recall",
+      "input": "RecallInput",
+      "output": "RecallSelection",
+      "input_contract": "yai.recall_execute_input.v1",
+      "output_contract": "yai.recall_result.v2"
+    },
+    {
+      "family": "work",
+      "method": "record_input",
+      "id": "workflow.input.record",
+      "input": "WorkflowInput",
+      "output": "WorkCommit",
+      "input_contract": "yai.workflow_input_record_input.v1",
+      "output_contract": "yai.canonical_commit.v1"
+    },
+    {
+      "family": "work",
+      "method": "adopt_patch",
+      "id": "workflow.patch.adopt",
+      "input": "WorkflowAdoptPatchInput",
+      "output": "WorkCommit",
+      "input_contract": "yai.workflow_patch_adopt_input.v1",
+      "output_contract": "yai.canonical_commit.v1"
+    },
+    {
+      "family": "handoff",
+      "method": "accept",
+      "id": "handoff.accept",
+      "input": "HandoffAcceptInput",
+      "output": "WorkCommit",
+      "input_contract": "yai.handoff_accept_input.v1",
+      "output_contract": "yai.canonical_commit.v1"
+    },
+    {
+      "family": "handoff",
+      "method": "reconcile",
+      "id": "handoff.reconcile",
+      "input": "HandoffReconcileInput",
+      "output": "WorkCommit",
+      "input_contract": "yai.handoff_reconcile_input.v1",
+      "output_contract": "yai.canonical_commit.v1"
+    },
+    {
+      "family": "resources",
+      "method": "attach_process",
+      "id": "resource.attach_process",
+      "input": "ProcessAttachmentInput",
+      "output": "StateMutationReceipt",
+      "input_contract": "yai.resource_attach_process_input.v1",
+      "output_contract": "yai.case_state_mutation_result.v1"
+    }
+  ],
+  "generics": {
+    "OperationResult": "T"
+  },
+  "typescript_constraints": {
+    "ApplicationCatalog": {
+      "schema": [
+        "yai.application_capability_catalog.v1"
+      ]
+    },
+    "CaseAttachment": {
+      "attachment": [
+        "ephemeral"
+      ]
+    },
+    "ApplicationCapability": {
+      "application_posture": [
+        "ready",
+        "deferred",
+        "not_applicable"
+      ]
+    }
+  }
+}

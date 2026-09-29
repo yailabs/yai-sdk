@@ -1,0 +1,790 @@
+{
+  "schema": "yai.application_capability_catalog.v1",
+  "application_protocol": "yai.studio.application.v1",
+  "operations": [
+    {
+      "operation_id": "application.capabilities",
+      "input_contract": "yai.application_capabilities_input.v1",
+      "output_contract": "yai.application_capability_catalog.v1",
+      "meaning": "Discover stable product capabilities and application operations",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "case.cancel",
+      "input_contract": "yai.case_terminal_input.v1",
+      "output_contract": "yai.case_cancellation_outcome.v1",
+      "meaning": "Cancel further Case advancement and terminalize still-usable review/grant authority",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "case.capabilities",
+      "input_contract": "yai.case_capabilities_input.v1",
+      "output_contract": "yai.case_capability_view.v1",
+      "meaning": "Inspect current Participant-scoped Resource requestability without granting execution authority",
+      "impact": "derived_computation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "case.close",
+      "input_contract": "yai.case_terminal_input.v1",
+      "output_contract": "yai.case_closure_outcome.v1",
+      "meaning": "Close a terminal Case non-destructively",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "case.create",
+      "input_contract": "yai.case_create_input.v1",
+      "output_contract": "yai.canonical_commit.v1",
+      "meaning": "Create one Tenant-scoped governed Case",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "case.list",
+      "input_contract": "yai.case_list_input.v1",
+      "output_contract": "yai.case_list_projection.v1",
+      "meaning": "List Cases visible to the authenticated local Principal",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "case.open",
+      "input_contract": "yai.case_open_input.v1",
+      "output_contract": "yai.case_attachment.v1",
+      "meaning": "Attach an authenticated local client to an existing visible Case",
+      "impact": "read",
+      "authority": "case_disclosure"
+    },
+    {
+      "operation_id": "case.recent",
+      "input_contract": "yai.case_list_input.v1",
+      "output_contract": "yai.case_list_projection.v1",
+      "meaning": "List recently updated visible Cases",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "case.resume",
+      "input_contract": "yai.case_resume_input.v1",
+      "output_contract": "yai.execution_submission_result.v1",
+      "meaning": "Admit one exact checkpoint-bound continuation without resetting delivery lineage or consumed budgets",
+      "impact": "external_effect",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "case.run",
+      "input_contract": "yai.case_run_input.v1",
+      "output_contract": "yai.execution_submission_result.v1",
+      "meaning": "Durably submit exact bounded work to the existing runtime scheduler with an explicit idempotency identity",
+      "impact": "external_effect",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "case.stop",
+      "input_contract": "yai.case_stop_input.v1",
+      "output_contract": "yai.runtime_execution_observation.v1",
+      "meaning": "Request a cooperative stop of one exact admitted runner; does not cancel or close its Case",
+      "impact": "operational_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "case.summary",
+      "input_contract": "yai.case_summary_input.v1",
+      "output_contract": "yai.case_workspace_projection.v1",
+      "meaning": "Project the current authorized Case workspace",
+      "impact": "derived_computation",
+      "authority": "case_disclosure"
+    },
+    {
+      "operation_id": "cognitive.binding.set",
+      "input_contract": "yai.cognitive_bind_input.v1",
+      "output_contract": "yai.case_cognitive_binding.v1",
+      "meaning": "Bind one exact ordered qualified target set to a Case cognitive role",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "cognitive.compose",
+      "input_contract": "yai.cognitive_compose_input.v1",
+      "output_contract": "yai.conversation_submission_result.v1",
+      "meaning": "Admit one immutable composition intent over an existing Turn; observe exact results without restarting on retry",
+      "impact": "external_effect",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "cognitive.plan",
+      "input_contract": "yai.cognitive_plan_input.v1",
+      "output_contract": "yai.cognitive_execution_plan.v1",
+      "meaning": "Plan one current qualified cognitive execution without invoking a provider",
+      "impact": "derived_computation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "cognitive.realization.prepare",
+      "input_contract": "yai.cognitive_realization_prepare_input.v1",
+      "output_contract": "yai.cognitive_execution_plan.v1",
+      "meaning": "Prepare a current cognitive plan over exact admitted Turn parts without client-generated semantic hashes",
+      "impact": "derived_computation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "cognitive.realize",
+      "input_contract": "yai.cognitive_realize_input.v1",
+      "output_contract": "yai.cognitive_realization_observation.v1",
+      "meaning": "Submit an exact qualified realization plan; acknowledge its durable ProviderSelection and never redispatch an observed plan",
+      "impact": "external_effect",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "conversation.send",
+      "input_contract": "yai.conversation_send_input.v1",
+      "output_contract": "yai.conversation_submission_result.v1",
+      "meaning": "Atomically commit an exact Turn and ordinary execution intent; acknowledge before provider execution and observe without redispatch",
+      "impact": "external_effect",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "decision.frontier.prepare",
+      "input_contract": "yai.decision_frontier_prepare_input.v1",
+      "output_contract": "yai.cognitive_decision_frontier_qualification.v1",
+      "meaning": "Derive the current disclosed finite cognitive candidate frontier from an exact W/task",
+      "impact": "derived_computation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "decision.request.prepare",
+      "input_contract": "yai.decision_request_prepare_input.v1",
+      "output_contract": "yai.cognitive_decision_request.v1",
+      "meaning": "Prepare a non-authoritative CognitiveDecisionRequest from a current exact frontier",
+      "impact": "derived_computation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "decision.trajectory.corpus",
+      "input_contract": "yai.decision_trajectory_corpus_input.v1",
+      "output_contract": "yai.cognitive_decision_corpus.v1",
+      "meaning": "Export bounded structured currently disclosed historical Decision trajectories",
+      "impact": "derived_computation",
+      "authority": "case_disclosure"
+    },
+    {
+      "operation_id": "decision.trajectory.evaluate",
+      "input_contract": "yai.decision_trajectory_corpus_input.v1",
+      "output_contract": "yai.cognitive_decision_trajectory_evaluation.v1",
+      "meaning": "Characterize structural coverage and violations of a bounded derived Decision corpus",
+      "impact": "derived_computation",
+      "authority": "case_disclosure"
+    },
+    {
+      "operation_id": "decision.trajectory.inspect",
+      "input_contract": "yai.decision_trajectory_inspect_input.v1",
+      "output_contract": "yai.cognitive_decision_trajectory.v1",
+      "meaning": "Inspect one exact Decision at its pre-decision cut and its qualified later lineage",
+      "impact": "derived_computation",
+      "authority": "case_disclosure"
+    },
+    {
+      "operation_id": "effect.propose",
+      "input_contract": "yai.effect_propose_input.v1",
+      "output_contract": "yai.effect_proposal_result.v1",
+      "meaning": "Normalize exact retained provider candidate material into a canonical Operation or recorded refusal; never execute it",
+      "impact": "proposal",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "effect.reconcile",
+      "input_contract": "yai.effect_reconcile_input.v1",
+      "output_contract": "yai.controlled_effect_observation.v1",
+      "meaning": "Reconcile one exact prepared effect under current authority; only explicitly requested qualified filesystem no-effect recovery may retry",
+      "impact": "external_effect",
+      "authority": "review_grant_and_effect_fence"
+    },
+    {
+      "operation_id": "effect.submit",
+      "input_contract": "yai.effect_submit_input.v1",
+      "output_contract": "yai.controlled_effect_observation.v1",
+      "meaning": "Advance one exact canonical filesystem/process Operation through current admission; existing PREPARE is observed without redispatch",
+      "impact": "external_effect",
+      "authority": "review_grant_and_effect_fence"
+    },
+    {
+      "operation_id": "events.heartbeat",
+      "input_contract": "yai.events_heartbeat_input.v1",
+      "output_contract": "yai.case_event_heartbeat.v1",
+      "meaning": "Report the current generation cursor for one visible Case",
+      "impact": "read",
+      "authority": "case_disclosure"
+    },
+    {
+      "operation_id": "events.resume",
+      "input_contract": "yai.events_resume_input.v1",
+      "output_contract": "yai.events_subscription.v1",
+      "meaning": "Describe local event resynchronization from a client cursor",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "events.subscribe",
+      "input_contract": "yai.events_subscribe_input.v1",
+      "output_contract": "yai.events_subscription.v1",
+      "meaning": "Describe local event subscription and snapshot posture",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "execution.get",
+      "input_contract": "yai.execution_get_input.v1",
+      "output_contract": "yai.execution_observation.v1",
+      "meaning": "Observe an exact durable submission without redispatch; admitted participant Resource requests expose exact continuation input, retained process exit facts and optional output requalify current authority, and optional Conversation context inspection requalifies archived W under current disclosure",
+      "impact": "read",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "execution.list",
+      "input_contract": "yai.execution_list_input.v1",
+      "output_contract": "yai.execution_list_projection.v1",
+      "meaning": "Discover bounded recent execution references under each current owner disclosure check; no outputs or dispatch",
+      "impact": "read",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "handoff.accept",
+      "input_contract": "yai.handoff_accept_input.v1",
+      "output_contract": "yai.canonical_commit.v1",
+      "meaning": "Accept one visible same-Tenant Handoff as an eligible target Participant",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "handoff.decline",
+      "input_contract": "yai.handoff_decline_input.v1",
+      "output_contract": "yai.canonical_commit.v1",
+      "meaning": "Decline one visible same-Tenant Handoff without transferring authority",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "handoff.inspect",
+      "input_contract": "yai.handoff_inspect_input.v1",
+      "output_contract": "yai.handoff_inspection.v1",
+      "meaning": "Inspect one visible Handoff and current Case-local protocol facts without transferring authority",
+      "impact": "read",
+      "authority": "case_disclosure"
+    },
+    {
+      "operation_id": "handoff.offer",
+      "input_contract": "yai.handoff_offer_input.v1",
+      "output_contract": "yai.canonical_commit.v1",
+      "meaning": "Offer one bounded data item and role requirement set to a same-Tenant Case",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "handoff.pending",
+      "input_contract": "yai.handoff_pending_input.v1",
+      "output_contract": "yai.handoff_pending_projection.v1",
+      "meaning": "List pending incoming offers from the existing bounded authorized Tenant Case scan",
+      "impact": "read",
+      "authority": "case_disclosure"
+    },
+    {
+      "operation_id": "handoff.reconcile",
+      "input_contract": "yai.handoff_reconcile_input.v1",
+      "output_contract": "yai.canonical_commit.v1",
+      "meaning": "Reconcile one terminal target Handoff result into source-local truth",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "handoff.result.record",
+      "input_contract": "yai.handoff_result_input.v1",
+      "output_contract": "yai.canonical_commit.v1",
+      "meaning": "Record one bounded terminal result in the target Case",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "identity.bootstrap",
+      "input_contract": "yai.identity_bootstrap_input.v1",
+      "output_contract": "yai.security_bootstrap_outcome.v1",
+      "meaning": "Enroll the kernel-authenticated local Principal and initialize one Tenant",
+      "impact": "canonical_mutation",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "identity.current",
+      "input_contract": "yai.identity_current_input.v1",
+      "output_contract": "yai.identity_projection.v1",
+      "meaning": "Inspect the kernel-authenticated Principal and its Tenant relations",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "knowledge.inspect",
+      "input_contract": "yai.knowledge_inspect_input.v1",
+      "output_contract": "yai.source_knowledge.v1",
+      "meaning": "Reconstruct the currently disclosed source-grounded Knowledge view including exact graph relations",
+      "impact": "derived_computation",
+      "authority": "case_disclosure"
+    },
+    {
+      "operation_id": "knowledge.navigation",
+      "input_contract": "yai.knowledge_inspect_input.v1",
+      "output_contract": "yai.knowledge_navigation_result.v1",
+      "meaning": "Derive documentary navigation from the current qualified Knowledge view",
+      "impact": "derived_computation",
+      "authority": "case_disclosure"
+    },
+    {
+      "operation_id": "knowledge.resolve",
+      "input_contract": "yai.knowledge_resolve_input.v1",
+      "output_contract": "yai.knowledge_resolve_result.v1",
+      "meaning": "Resolve one exact unit only inside current disclosed Knowledge with source closure",
+      "impact": "derived_computation",
+      "authority": "case_disclosure"
+    },
+    {
+      "operation_id": "knowledge.search",
+      "input_contract": "yai.knowledge_search_input.v1",
+      "output_contract": "yai.knowledge_search_result.v1",
+      "meaning": "Search current qualified Knowledge with bounded lexical discovery, not confidence scoring",
+      "impact": "derived_computation",
+      "authority": "case_disclosure"
+    },
+    {
+      "operation_id": "machine.get",
+      "input_contract": "yai.machine_get_input.v1",
+      "output_contract": "yai.machine_asset_view.v1",
+      "meaning": "Inspect one exact Tenant machine pin and revocation under current membership",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "machine.list",
+      "input_contract": "yai.machine_list_input.v1",
+      "output_contract": "yai.machine_asset_view_list.v1",
+      "meaning": "List only the authenticated Principal's Tenant machine registrations",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "machine.register",
+      "input_contract": "yai.machine_register_input.v1",
+      "output_contract": "yai.machine_asset_view.v1",
+      "meaning": "Register one independently approved exact SSH host identity without probing or executing",
+      "impact": "canonical_mutation",
+      "authority": "tenant_owner"
+    },
+    {
+      "operation_id": "machine.revoke",
+      "input_contract": "yai.machine_revoke_input.v1",
+      "output_contract": "yai.machine_asset_view.v1",
+      "meaning": "Revoke one exact Tenant machine registration without changing Case or remote host state",
+      "impact": "canonical_mutation",
+      "authority": "tenant_owner"
+    },
+    {
+      "operation_id": "material.read",
+      "input_contract": "yai.material_read_input.v1",
+      "output_contract": "yai.material_read_projection.v1",
+      "meaning": "Read exact retained source material after current Case/source qualification",
+      "impact": "read",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "participant.principal.link",
+      "input_contract": "yai.participant_principal_link_input.v1",
+      "output_contract": "yai.case_state_mutation_result.v1",
+      "meaning": "Link one enrolled Principal to one Case Participant under Tenant-owner authority",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "participant.role.add",
+      "input_contract": "yai.participant_role_add_input.v1",
+      "output_contract": "yai.case_state_mutation_result.v1",
+      "meaning": "Bind one exact role to a Case Participant",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "participant.view.admit",
+      "input_contract": "yai.participant_view_admit_input.v1",
+      "output_contract": "yai.case_state_mutation_result.v1",
+      "meaning": "Admit one supported disclosure view for a bound Case Participant",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "policy.case.bind",
+      "input_contract": "yai.case_policy_bind_input.v1",
+      "output_contract": "yai.case_policy_mutation_outcome.v1",
+      "meaning": "Bind one exact currently published PolicyArtifact to a current Case",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "policy.case.replace",
+      "input_contract": "yai.case_policy_replace_input.v1",
+      "output_contract": "yai.case_policy_mutation_outcome.v1",
+      "meaning": "Replace one current Case Policy binding with a published artifact from the same lineage",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "policy.case.unbind",
+      "input_contract": "yai.case_policy_unbind_input.v1",
+      "output_contract": "yai.case_policy_mutation_outcome.v1",
+      "meaning": "Remove one exact current Case Policy binding",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "policy.ingest",
+      "input_contract": "yai.policy_ingest_input.v1",
+      "output_contract": "yai.policy_ingest_outcome.v1",
+      "meaning": "Compile and ingest immutable Tenant-scoped Policy source bytes as a candidate artifact",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "policy.publish",
+      "input_contract": "yai.policy_artifact_lifecycle_input.v1",
+      "output_contract": "yai.policy_lifecycle_outcome.v1",
+      "meaning": "Publish one qualified PolicyArtifact",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "policy.retire",
+      "input_contract": "yai.policy_artifact_lifecycle_input.v1",
+      "output_contract": "yai.policy_lifecycle_outcome.v1",
+      "meaning": "Retire one PolicyArtifact from catalog use",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "policy.revoke",
+      "input_contract": "yai.policy_artifact_lifecycle_input.v1",
+      "output_contract": "yai.policy_lifecycle_outcome.v1",
+      "meaning": "Withdraw one published, superseded or retired PolicyArtifact from authority",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "policy.validate",
+      "input_contract": "yai.policy_artifact_lifecycle_input.v1",
+      "output_contract": "yai.policy_lifecycle_outcome.v1",
+      "meaning": "Validate one qualified candidate PolicyArtifact",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "provider.case.bind",
+      "input_contract": "yai.provider_case_bind_input.v1",
+      "output_contract": "yai.case_provider_binding.v1",
+      "meaning": "Bind one ordered governed provider target envelope to a Case Participant",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "provider.inventory",
+      "input_contract": "yai.tenant_get_input.v1",
+      "output_contract": "yai.provider_inventory.v1",
+      "meaning": "Inspect authenticated Tenant provider inventory independently of Case bindings",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "provider.models",
+      "input_contract": "yai.provider_models_input.v1",
+      "output_contract": "yai.provider_models.v1",
+      "meaning": "Discover exact exposed models; an authorized compatibility target may project exact public catalog capacity, without qualification or residency claims",
+      "impact": "derived_computation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "provider.probe",
+      "input_contract": "yai.provider_probe_input.v1",
+      "output_contract": "yai.provider_probe_execution.v1",
+      "meaning": "Owner-authorized synthetic probe with exact durable identity; no Case material, trust or binding",
+      "impact": "external_effect",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "provider.probe.get",
+      "input_contract": "yai.provider_probe_get_input.v1",
+      "output_contract": "yai.provider_probe_execution.v1",
+      "meaning": "Observe an exact retained synthetic probe under current Tenant owner authority without dispatch",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "provider.probe.list",
+      "input_contract": "yai.provider_probe_list_input.v1",
+      "output_contract": "yai.provider_probe_list.v1",
+      "meaning": "Discover retained target probe identities under current Tenant Owner authority without dispatch",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "provider.qualify",
+      "input_contract": "yai.provider_qualify_input.v1",
+      "output_contract": "yai.provider_qualification.v1",
+      "meaning": "Persist exact mechanical provider qualification evidence",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "provider.register",
+      "input_contract": "yai.provider_register_input.v1",
+      "output_contract": "yai.provider_target.v1",
+      "meaning": "Register one immutable generic provider target without secrets",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "provider.suitability.record",
+      "input_contract": "yai.provider_suitability_record_input.v1",
+      "output_contract": "yai.semantic_suitability_evidence.v1",
+      "meaning": "Record exact authenticated operator attestation of semantic suitability, distinct from wire qualification",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "provider.trust.set",
+      "input_contract": "yai.provider_trust_input.v1",
+      "output_contract": "yai.provider_trust_event.v1",
+      "meaning": "Set current owner-authenticated provider trust posture",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "resource.attach",
+      "input_contract": "yai.resource_attach_input.v1",
+      "output_contract": "yai.case_state_mutation_result.v1",
+      "meaning": "Attach one exact typed local Resource binding and immutable access envelope",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "resource.attach_process",
+      "input_contract": "yai.resource_attach_process_input.v1",
+      "output_contract": "yai.case_state_mutation_result.v1",
+      "meaning": "Capture and attach one exact live process identity with explicit signal and review bounds",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "resource.import",
+      "input_contract": "yai.resource_import_input.v1",
+      "output_contract": "yai.case_state_mutation_result.v1",
+      "meaning": "Resolve an explicit Resource definition under current owner authority and attach its immutable native configuration; exact retry does not duplicate attachment",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "resource.request",
+      "input_contract": "yai.resource_request_input.v1",
+      "output_contract": "yai.resource_submission_result.v1",
+      "meaning": "Admit an exact participant Resource request and advance through existing governed carriers; observe the same submission after reconnect",
+      "impact": "external_effect",
+      "authority": "review_grant_and_effect_fence"
+    },
+    {
+      "operation_id": "review.approve",
+      "input_contract": "yai.review_resolve_input.v1",
+      "output_contract": "yai.review_resolve_result.v1",
+      "meaning": "Record an eligible authenticated approval and derive its current effective Decision",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "review.defer",
+      "input_contract": "yai.review_resolve_input.v1",
+      "output_contract": "yai.review_resolve_result.v1",
+      "meaning": "Record an eligible authenticated deferral without creating an execution Grant",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "review.deny",
+      "input_contract": "yai.review_resolve_input.v1",
+      "output_contract": "yai.review_resolve_result.v1",
+      "meaning": "Record an eligible authenticated denial and derive its current effective Decision",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "runtime.readiness",
+      "input_contract": "yai.runtime_readiness_input.v1",
+      "output_contract": "yai.application_status.v1",
+      "meaning": "Inspect local application-host readiness",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "semantic.ambient_refresh.assess",
+      "input_contract": "yai.ambient_refresh_assess_input.v1",
+      "output_contract": "yai.ambient_refresh_result.v1",
+      "meaning": "Requalify one active semantic consumer after admitted changes without model execution",
+      "impact": "derived_computation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "semantic.fast_search.prepare",
+      "input_contract": "yai.fast_search_prepare_input.v1",
+      "output_contract": "yai.fast_search_prepare_result.v1",
+      "meaning": "Derive finite W-bound memory navigation choices; report unavailable System Model and deterministic fallback without scoring",
+      "impact": "derived_computation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "semantic.recall",
+      "input_contract": "yai.recall_execute_input.v1",
+      "output_contract": "yai.recall_result.v2",
+      "meaning": "Reconstruct bounded task-qualified D/H/S evidence through Recall v2",
+      "impact": "derived_computation",
+      "authority": "case_disclosure"
+    },
+    {
+      "operation_id": "semantic.working_state.compile",
+      "input_contract": "yai.working_state_compile_input.v1",
+      "output_contract": "yai.qualified_working_state.v1",
+      "meaning": "Compile current Recall-aware W3 or exact-group W4 state",
+      "impact": "derived_computation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "semantic.working_state.page",
+      "input_contract": "yai.working_state_page_input.v1",
+      "output_contract": "yai.semantic_page_result.v1",
+      "meaning": "Requalify and expand or evict exact W4 semantic groups",
+      "impact": "derived_computation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "semantic.working_state.refresh",
+      "input_contract": "yai.working_state_refresh_input.v1",
+      "output_contract": "yai.working_refresh_result.v1",
+      "meaning": "Recompile the same stored task against current authority and Recall",
+      "impact": "derived_computation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "source.acquire",
+      "input_contract": "yai.source_acquire_input.v1",
+      "output_contract": "yai.source_acquisition_submission_result.v1",
+      "meaning": "Submit one exact durable source acquisition attempt; duplicate submissions observe without redispatch",
+      "impact": "external_effect",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "source.declare",
+      "input_contract": "yai.source_declare_input.v1",
+      "output_contract": "yai.case_state_mutation_result.v1",
+      "meaning": "Declare one Case-local source relation over an attached typed Resource",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "source.publish",
+      "input_contract": "yai.source_publish_input.v1",
+      "output_contract": "yai.source_policy_publication_result.v1",
+      "meaning": "Publish a qualified bootstrap-policy source through the existing Policy lifecycle",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "source.resume",
+      "input_contract": "yai.source_resume_input.v1",
+      "output_contract": "yai.source_acquisition_submission_result.v1",
+      "meaning": "Resume one exact settled acquisition interruption once; never blindly redispatch a still-acquiring attempt",
+      "impact": "external_effect",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "source.revoke",
+      "input_contract": "yai.source_revoke_input.v1",
+      "output_contract": "yai.case_state_mutation_result.v1",
+      "meaning": "Revoke one Case-local source relation without deleting retained physical backing",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "system.status",
+      "input_contract": "yai.system_status_input.v1",
+      "output_contract": "yai.application_status.v1",
+      "meaning": "Inspect local Application protocol and runtime posture",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "tenant.get",
+      "input_contract": "yai.tenant_get_input.v1",
+      "output_contract": "yai.tenant_projection.v1",
+      "meaning": "Inspect one Tenant visible to the authenticated Principal",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "tenant.list",
+      "input_contract": "yai.tenant_list_input.v1",
+      "output_contract": "yai.principal_tenant_relation_collection.v1",
+      "meaning": "List Tenant relations visible to the authenticated Principal",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "tenant.member.add",
+      "input_contract": "yai.tenant_member_add_input.v1",
+      "output_contract": "yai.security_event.v1",
+      "meaning": "Add one enrolled Principal to a Tenant as Owner-authorized membership",
+      "impact": "canonical_mutation",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "workflow.bind",
+      "input_contract": "yai.workflow_bind_input.v1",
+      "output_contract": "yai.canonical_commit.v1",
+      "meaning": "Bind one exact Workflow definition and explicit slots to a Case",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "workflow.define",
+      "input_contract": "yai.workflow_define_input.v1",
+      "output_contract": "yai.workflow_definition.v1",
+      "meaning": "Admit one immutable typed Workflow definition",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "workflow.input.record",
+      "input_contract": "yai.workflow_input_record_input.v1",
+      "output_contract": "yai.canonical_commit.v1",
+      "meaning": "Record bounded HumanInput for a ready Workflow node",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "workflow.patch.adopt",
+      "input_contract": "yai.workflow_patch_adopt_input.v1",
+      "output_contract": "yai.canonical_commit.v1",
+      "meaning": "Adopt one valid Case-local Workflow PlanPatch",
+      "impact": "canonical_mutation",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "workflow.patch.propose",
+      "input_contract": "yai.workflow_patch_propose_input.v1",
+      "output_contract": "yai.canonical_commit.v1",
+      "meaning": "Propose one bounded human-authored Workflow PlanPatch",
+      "impact": "proposal",
+      "authority": "current_case_authority"
+    }
+  ]
+}
