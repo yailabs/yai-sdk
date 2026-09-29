@@ -18,6 +18,14 @@ publication: {html: true, pdf: false, index: true}
 | YAI.SDK.PLATFORM.0 | COMPLETE | 24 typed workflows across 11 families; 79 checked shared types; standalone docs/examples; 98-operation Core conformance; real native two-client and 17 interaction lanes; exact external inference blocker retained without a model-chain success claim. |
 | PLATFORM.SDK.PARITY.REFOUNDATION.0 | IN_PROGRESS | Separate YVEX SDK domain, bounded Core capacity adapter, read-only Studio dual consumption and distributed contract/disposition parity are implemented; deployed remote management, installed-version compatibility breadth and real governed model result remain open. |
 
+The cross-repository checker passes 98 YAI operation descriptors, two YVEX
+read-only management operations and two Studio dispositions, including negative
+owner-delta controls. This qualifies contract/disposition parity, not runtime
+generation. A later 2026-09-29 YVEX-side diagnostic handoff reports synthetic
+HTTP 503 / CUDA MoE layer 30/device status 1. The first invalid numerical
+operation remains unknown; the older layer-24 result below is retained as the
+earlier exact observation. No SDK or Studio model-result claim is promoted.
+
 ## Completed platform delivery
 
 1. Reconcile admitted operations and public contract ownership; implement typed

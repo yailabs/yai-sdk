@@ -63,6 +63,12 @@ library or wire contract and do not require matching repository HEADs.
 | Real model addressing | Core provider discovery and typed SDK compute.models | Registered real YVEX target | Preserve exact model identity without inferring execution readiness | Catalog/health HTTP 200; 32768 capacity; execution_or_resources_qualified=false | Exact identity; capacity not latency | PASS | YAI-mediated discovery only |
 | Real inference prerequisite | Core's public provider qualifier; YVEX HTTP result | One fresh probe ID, text/JSON controls; one bounded diagnostic | Producer must complete before admitting a real Case execution | Text and JSON HTTP 503; diagnostic runtime_unavailable, CUDA MoE layer 24 status 1 | No numerical result available | BLOCKED | External producer cannot presently qualify ChatText; full model chain NOT established |
 
+The table retains the earlier exact run. A separate YVEX-side reverse-chain
+handoff on 2026-09-29 reports a newer synthetic HTTP 503 with CUDA MoE layer 30,
+device status 1. It is not a rerun of this SDK qualification lane, does not
+identify the first invalid numeric operation and supplies no completed governed
+Case result. Contract parity remains PASS independently of this producer gate.
+
 Native run `native-portfolio-1790682024243503055` binds Core executable SHA-256
 `3c0e835f8906cb07b6ea085b34c315c36027ea7176f751d974c695df5ef84bd9`,
 Studio executable `89f2171e9202e5ddfccd6cb4801fb169eecb962557631b9a3daeb92be26da8f6`
