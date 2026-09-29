@@ -97,6 +97,10 @@ pub struct HostTelemetry {
     /// `linked` does not prove that the process matches the latest source.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub executable_posture: Option<String>,
+    /// Client-side comparison with the exact installed Core selected by this
+    /// client. Inode equality is process identity, not product compatibility.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub installed_executable_posture: Option<String>,
     pub yai_home: String,
     pub yai_home_identity: String,
     pub transport: String,

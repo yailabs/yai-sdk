@@ -30,6 +30,7 @@ impl HostTelemetry {
             version: "unknown".into(),
             build: "unknown".into(),
             executable_posture: None,
+            installed_executable_posture: None,
             yai_home: canonical.display().to_string(),
             yai_home_identity: home_identity(&canonical),
             transport: "unix_domain_socket".into(),
@@ -506,6 +507,45 @@ fn annotate_executable_posture(telemetry: &mut HostTelemetry, discovery: &HostDi
         }
         .into(),
     );
+    if let Some(selected) = std::env::var_os("YAI_EXECUTABLE") {
+        telemetry.installed_executable_posture = Some(
+            if telemetry.pid == Some(discovery.pid)
+                && telemetry.process_identity.as_deref()
+                    == Some(discovery.process_identity.canonical_identity().as_str())
+            {
+                installed_executable_posture(&discovery.process_identity, Path::new(&selected))
+            } else {
+                "unknown"
+            }
+            .into(),
+        );
+    }
+}
+
+fn installed_executable_posture(identity: &LocalProcessIdentity, installed: &Path) -> &'static str {
+    #[cfg(target_os = "linux")]
+    {
+        if !identity.is_live() {
+            return "unknown";
+        }
+        let running = fs::metadata(format!("/proc/{}/exe", identity.pid));
+        let selected = fs::metadata(installed);
+        if !identity.is_live() {
+            return "unknown";
+        }
+        match (running, selected) {
+            (_, Err(error)) if error.kind() == std::io::ErrorKind::NotFound => "installed_missing",
+            (Ok(running), Ok(selected)) if running.dev() == selected.dev()
+                && running.ino() == selected.ino() => "matches_running",
+            (Ok(_), Ok(_)) => "different_from_running",
+            _ => "unknown",
+        }
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = (identity, installed);
+        "unknown"
+    }
 }
 
 fn executable_link_posture(identity: &LocalProcessIdentity) -> &'static str {
@@ -569,11 +609,17 @@ mod tests {
         let mut child = Command::new(&executable).arg("30").spawn().unwrap();
         let identity = LocalProcessIdentity::capture(child.id()).unwrap();
         assert_eq!(executable_link_posture(&identity), "linked");
+        assert_eq!(installed_executable_posture(&identity, &executable), "matches_running");
+        let replacement = home.join("replacement");
+        fs::copy("/usr/bin/sleep", &replacement).unwrap();
+        assert_eq!(installed_executable_posture(&identity, &replacement), "different_from_running");
         fs::remove_file(&executable).unwrap();
         assert_eq!(executable_link_posture(&identity), "replaced_on_disk");
+        assert_eq!(installed_executable_posture(&identity, &executable), "installed_missing");
         let mut wrong_identity = identity.clone();
         wrong_identity.start_ticks += 1;
         assert_eq!(executable_link_posture(&wrong_identity), "unknown");
+        assert_eq!(installed_executable_posture(&wrong_identity, &replacement), "unknown");
         child.kill().unwrap();
         child.wait().unwrap();
         fs::remove_dir_all(home).unwrap();

@@ -76,6 +76,15 @@ A live incompatible Host still refuses before application dispatch. This lets
 supported startup reclaim stale metadata without treating it as a live protocol
 mismatch.
 
+When a client selects an exact installed Core through `YAI_EXECUTABLE`, SDK
+telemetry also compares that executable's device/inode with the fenced running
+Host process. `matches_running`, `different_from_running`, `installed_missing`
+and `unknown` are local installation observations, not protocol compatibility
+or a reason to replay work. The existing process-link observation separately
+reports an executable replaced on disk. Clients can distinguish a stale Host
+from a compatible binary that is merely installed; replacing or restarting
+the Host remains an explicit lifecycle operation after active work is checked.
+
 Client attach and subscription do not own Core lifetime. Explicit launcher support
 starts an installed executable with `host serve`, never links Core into Studio.
 An admitted mutation may survive disconnect: no automatic replay occurs; typed
