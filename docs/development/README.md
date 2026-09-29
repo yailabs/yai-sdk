@@ -33,6 +33,25 @@ framing, correlation, refusals, disclosure-safe projection shape and lost-respon
 behavior, not Core semantics. Real Core and Studio integration must additionally
 exercise admitted operations through the same public transport.
 
+For intentional four-repository work, build the current YAI CLI, run Studio's
+`npm run test:kernel` to compile its consumer disposition module, then compose
+the owner-published inventories explicitly:
+
+```sh
+make check-platform-parity \
+  YAI_BIN=/absolute/path/to/yai/target/debug/yai \
+  STUDIO_ROOT=/absolute/path/to/studio \
+  YVEX_ROOT=/absolute/path/to/yvex
+```
+
+The checker compares YAI's live Application catalog with the SDK operation
+projection, Studio's YAI operation dispositions, YVEX's canonical remote
+operation registry with the separate YVEX SDK manifest, and Studio's native
+YVEX dispositions. Controlled owner deltas must fail. This is contract and
+consumer-disposition parity, not installed compatibility or real-model evidence.
+No sibling checkout is an implicit package dependency; release consumers pin
+reviewed SDK revisions, while local source overrides are explicit and temporary.
+
 Keep temporary profiles, logs, installed dependencies and build products out of
 Git. Never use an operator Case for destructive test setup. Publication follows
 focused review and qualification; the legal gate remains independent.

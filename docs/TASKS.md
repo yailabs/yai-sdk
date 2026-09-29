@@ -16,7 +16,7 @@ publication: {html: true, pdf: false, index: true}
 | --- | --- | --- |
 | PRODUCT.REPOSITORY.BOUNDARY.0 | COMPLETE | Independent MIT client/projection owner; canonical Core mutation/probe projections exclude private persisted state; standalone conformance and final real Core/Studio integration qualified at the bounded Linux local scope. |
 | YAI.SDK.PLATFORM.0 | COMPLETE | 24 typed workflows across 11 families; 79 checked shared types; standalone docs/examples; 98-operation Core conformance; real native two-client and 17 interaction lanes; exact external inference blocker retained without a model-chain success claim. |
-| PLATFORM.SDK.PARITY.REFOUNDATION.0 | IN_PROGRESS | Separate YVEX SDK domain and exact remote-management v1 conformance are a first slice; provider-adapter, Studio dual consumption, distributed parity and real model chain remain open. |
+| PLATFORM.SDK.PARITY.REFOUNDATION.0 | IN_PROGRESS | Separate YVEX SDK domain, bounded Core capacity adapter, read-only Studio dual consumption and distributed contract/disposition parity are implemented; deployed remote management, installed-version compatibility breadth and real governed model result remain open. |
 
 ## Completed platform delivery
 

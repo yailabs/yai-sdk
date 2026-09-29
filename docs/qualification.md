@@ -15,6 +15,15 @@ publication: {html: true, pdf: false, index: true}
 The v0.1.0 SDK is a supported client contract, not an implementation of Core
 semantics. This record qualifies Linux same-user local IPC only.
 
+The later platform-parity lane compares current owner-published inventories
+across YAI, this SDK, Studio and YVEX with
+`tools/check_platform_parity.py`. Its bounded source run matched 98 YAI
+Application operations and 2 YVEX remote management operations; controlled
+YAI contract and YVEX operation deltas both refused. Studio's two YVEX
+read-only dispositions have controlled UI evidence, and the YVEX SDK has an
+isolated real SSH fixture. These results do not establish a deployed YVEX
+management endpoint, runtime compatibility or real Case model completion.
+
 ## SDK platform qualification
 
 YAI.SDK.PLATFORM.0 is complete at the Linux local client scope. Real model-chain
