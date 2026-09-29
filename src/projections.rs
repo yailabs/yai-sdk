@@ -1,6 +1,63 @@
 //! Public value projections, not private state or authority objects.
 use serde::{Deserialize, Serialize};
 pub use crate::workflows::{ApplicationCapability, ApplicationCatalog, ApplicationOperation, CaseAttachment, CaseListProjection, CaseSummary, CaseVersionProjection, HandoffOfferReceipt, HandoffReceipt, TransitionReceipt, TransitionReceiptData, TransitionReceiptPayload, WorkCommit, WorkflowPatchReceipt};
+
+/// Authorized Tenant machine pin returned by YAI Application. This is not a
+/// YVEX runtime fact and does not establish reachability or client enrollment.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct MachineAssetView {
+    pub registration: MachineAssetRegistration,
+    pub revocation: Option<MachineAssetRevocation>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct MachineAssetRegistration {
+    pub schema: String,
+    pub asset_id: String,
+    pub integrity_digest: String,
+    pub tenant_id: String,
+    pub device_identity: String,
+    pub address: String,
+    pub port: u16,
+    pub management_user: String,
+    pub host_public_key: String,
+    pub approval_ref: String,
+    pub approved_by_principal_id: String,
+    pub approved_at_unix_ms: u64,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct MachineAssetRevocation {
+    pub schema: String,
+    pub asset_id: String,
+    pub tenant_id: String,
+    pub device_identity: String,
+    pub revoked_at_unix_ms: u64,
+    pub revoked_by_principal_id: String,
+    pub reason: String,
+    pub integrity_digest: String,
+}
+
+#[cfg(test)]
+mod machine_projection_tests {
+    use super::*;
+
+    #[test]
+    fn machine_pin_remains_yai_owned_and_distinct_from_runtime_state() {
+        let value = serde_json::json!({"registration": {
+            "schema":"yai.machine_asset.v1", "asset_id":"machine:one",
+            "integrity_digest":"digest:one", "tenant_id":"tenant:one",
+            "device_identity":format!("ssh-ed25519:sha256:{}", "a".repeat(64)),
+            "address":"example.test", "port":2222, "management_user":"yvex",
+            "host_public_key":format!("ssh-ed25519 {}", "A".repeat(64)),
+            "approval_ref":"approval:one", "approved_by_principal_id":"principal:one",
+            "approved_at_unix_ms":1
+        }, "revocation":null});
+        let pin: MachineAssetView = serde_json::from_value(value).unwrap();
+        assert_eq!(pin.registration.asset_id, "machine:one");
+        assert!(pin.revocation.is_none());
+    }
+}
 /// Mutation receipt identity, never the private canonical CaseState layout.
 #[cfg(test)]
 mod receipt_tests {

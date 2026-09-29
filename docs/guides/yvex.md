@@ -46,6 +46,14 @@ validates this configuration; `device_describe()` and `host_status()` perform
 one bounded read each. The executable [example](../../crates/yvex-sdk/examples/management.rs)
 accepts these exact values:
 
+When the host key comes from an authorized YAI `machine.get` projection,
+`PinnedHostFile::new(address, port, host_public_key)` may materialize one
+short-lived, private OpenSSH trust file. Keep that value alive for the read and
+pass `pin.path()` into `SshConnection`; do not use `ssh-keyscan` as approval or
+persist the enrolled private client key in a Case. The SDK's Rust
+`MachineAssetView` is a typed YAI client projection of the approved pin, not
+YVEX runtime state. A revoked registration cannot be used as current trust.
+
 ```sh
 cargo run --locked -p yvex-sdk --example management -- \
   /absolute/pinned_known_hosts /absolute/enrolled_client_key \

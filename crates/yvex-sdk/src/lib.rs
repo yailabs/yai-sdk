@@ -11,6 +11,7 @@ use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::time::Duration;
+use tempfile::NamedTempFile;
 use wait_timeout::ChildExt;
 
 pub const REQUEST_SCHEMA: &str = "yvex.management.request.v1";
@@ -18,6 +19,32 @@ pub const RESPONSE_SCHEMA: &str = "yvex.management.response.v1";
 /// Exact public management operations represented by this SDK projection.
 pub const MANAGEMENT_OPERATIONS: [&str; 2] = ["device.describe", "host.status"];
 pub const MAX_RESPONSE_BYTES: usize = 8192;
+
+/// Short-lived OpenSSH trust file materialized from an independently approved
+/// exact host key. Keeping this value alive keeps its private file available.
+pub struct PinnedHostFile(NamedTempFile);
+
+impl PinnedHostFile {
+    pub fn new(address: &str, port: u16, public_key: &str) -> Result<Self, ClientError> {
+        if port == 0 || !valid_address(address) || !valid_host_key(public_key) {
+            return Err(ClientError::InvalidConfiguration);
+        }
+        let host = if port == 22 && !address.contains(':') {
+            address.to_string()
+        } else {
+            format!("[{address}]:{port}")
+        };
+        let mut file = NamedTempFile::new().map_err(|_| ClientError::TransportUnavailable)?;
+        writeln!(file, "{host} {public_key}").map_err(|_| ClientError::TransportUnavailable)?;
+        file.flush()
+            .map_err(|_| ClientError::TransportUnavailable)?;
+        Ok(Self(file))
+    }
+
+    pub fn path(&self) -> &std::path::Path {
+        self.0.path()
+    }
+}
 
 #[derive(Clone, Debug)]
 pub struct SshConnection {
@@ -321,6 +348,18 @@ fn valid_identity(identity: &str) -> bool {
         })
 }
 
+fn valid_host_key(key: &str) -> bool {
+    let mut parts = key.split(' ');
+    matches!(parts.next(), Some("ssh-ed25519"))
+        && parts.next().is_some_and(|blob| {
+            (40..=4096).contains(&blob.len())
+                && blob
+                    .bytes()
+                    .all(|byte| byte.is_ascii_alphanumeric() || b"+/=".contains(&byte))
+        })
+        && parts.next().is_none()
+}
+
 fn valid_user(user: &str) -> bool {
     !user.is_empty()
         && user
@@ -365,6 +404,26 @@ mod tests {
         changed = connection();
         changed.address = "-oProxyCommand=evil".into();
         assert_eq!(changed.validate(), Err(ClientError::InvalidConfiguration));
+    }
+
+    #[test]
+    fn approved_key_materializes_only_one_exact_host_pin() {
+        let key = format!("ssh-ed25519 {}", "A".repeat(64));
+        let pin = PinnedHostFile::new("example.test", 2222, &key).unwrap();
+        let content = std::fs::read_to_string(pin.path()).unwrap();
+        assert_eq!(content, format!("[example.test]:2222 {key}\n"));
+        assert_eq!(
+            PinnedHostFile::new("example.test", 2222, "ssh-ed25519 AAAA\nevil").err(),
+            Some(ClientError::InvalidConfiguration)
+        );
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            assert_eq!(
+                std::fs::metadata(pin.path()).unwrap().permissions().mode() & 0o077,
+                0
+            );
+        }
     }
 
     #[test]
