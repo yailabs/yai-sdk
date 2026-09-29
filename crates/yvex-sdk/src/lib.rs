@@ -4,6 +4,8 @@
 //! The current remote contract is deliberately read-only: device identity and
 //! host status. Model/runtime mutation is not represented by this crate.
 
+pub mod openai;
+
 use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};
 use std::path::PathBuf;

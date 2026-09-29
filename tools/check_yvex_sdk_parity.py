@@ -24,6 +24,7 @@ def compare(producer: dict, client: dict) -> None:
     require(client.get("producer_request_schema") == "yvex.management.request.v1", "request schema drift")
     require(client.get("producer_response_schema") == "yvex.management.response.v1", "response schema drift")
     require(client.get("posture") == "contract_supported_runtime_not_implied", "evidence posture drift")
+    require(client.get("openai_capacity_profile") == "yvex.openai.compat.v3", "YVEX OpenAI profile drift")
     owned = producer["catalogs"]["remote_management_operations"]
     projected = client["operations"]
     require(isinstance(owned, list) and len(owned) == len(set(owned)), "producer operation inventory invalid")

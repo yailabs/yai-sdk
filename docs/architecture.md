@@ -27,6 +27,12 @@ not a second SDK-owned model/runtime registry. It does not expose the private
 YVEX Unix wire or wrap human CLI output. Adding a Rust type does not establish
 live YVEX service availability.
 
+The `yvex-sdk::openai` module separately interprets YVEX's public profile-v3
+catalog and exact-request preflight reports. It takes a caller-owned HTTP fetch
+callback, so YAI retains endpoint locality, credentials, transport policy and
+Case admission; only the YVEX-specific payload contract is projected here.
+This module neither sends generation nor creates a model-session authority.
+
 Control flows from clients into the owning service; facts flow back from YVEX
 through the provider adapter to YAI where a Case result is involved. Studio
 may read YVEX operator facts directly, but any Case-affecting action remains

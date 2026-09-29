@@ -19,6 +19,14 @@ read-only `device.describe` and `host.status` operations from YVEX management
 v1. It does not discover an untrusted machine for you, enroll a peer, start
 YVEX, load a model, invoke generation or inspect a Case.
 
+The same crate also has an `openai` module for the public
+`yvex.openai.compat.v3` model-catalog and exact-request capacity preflight
+projection. An integrator supplies one already-qualified HTTP fetch function;
+the module validates the exact YVEX fields, deployment identity and token
+accounting, and passes the complete request bytes unchanged to preflight.
+This is a producer extension, not an alternative YAI admission chain or a
+promise that an engine can subsequently execute the request.
+
 An operator must independently approve the exact Ed25519 host key and enroll
 the client key on the YVEX machine. OpenSSH verifies that key against a private
 known-hosts file. The SDK then checks the returned device and peer identities
