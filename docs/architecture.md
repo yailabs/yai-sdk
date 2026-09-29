@@ -12,10 +12,26 @@ publication: {html: true, pdf: false, index: true}
 
 [Documentation](README.md)
 
-Accepted decision: Core owns semantics and resident server lifecycle; SDK owns
-public projections, compatibility, wire framing and client behavior; Studio owns
-presentation, interaction and local UI state. This repository is independently
-MIT licensed; no private repository history or semantic implementation is copied.
+Accepted decision: YAI Core owns governed Case semantics and its resident server
+lifecycle; YVEX owns model/runtime truth; the SDK owns separate public client
+projections, compatibility and conformance; Studio owns presentation and local
+UI state. This repository is independently MIT licensed; no private repository
+history or semantic implementation is copied.
+
+The Cargo workspace contains the existing `yai-sdk` client and a separate
+`yvex-sdk` crate. Neither depends on the other. The former speaks the YAI local
+Application contract. The latter currently speaks only YVEX's versioned,
+read-only, identity-pinned OpenSSH management contract. Its canonical producer
+is YVEX's public [remote-management contract](https://github.com/yailabs/yvex/blob/main/docs/contracts/remote-management.md),
+not a second SDK-owned model/runtime registry. It does not expose the private
+YVEX Unix wire or wrap human CLI output. Adding a Rust type does not establish
+live YVEX service availability.
+
+Control flows from clients into the owning service; facts flow back from YVEX
+through the provider adapter to YAI where a Case result is involved. Studio
+may read YVEX operator facts directly, but any Case-affecting action remains
+on the governed YAI Application path. YAI CLI and SDK are sibling clients of
+YAI owners; YVEX CLI and SDK are sibling projections of YVEX owners.
 
 The Rust client and public TypeScript DTOs describe the same Application JSON
 projection surface. TypeScript declarations are projected contracts, not private

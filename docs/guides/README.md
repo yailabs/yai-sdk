@@ -14,6 +14,9 @@ publication: {html: true, pdf: false, index: true}
 
 [Documentation](../README.md) · [Contract](../contracts/README.md)
 
+For YVEX-owned device/Host facts, use the separate [YVEX client guide](yvex.md).
+It does not confer access to YAI Cases.
+
 ## Inspect an authorized Case
 
 Select an explicit `YAI_HOME` containing your enrolled identity. Start or attach

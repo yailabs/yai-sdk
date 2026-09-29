@@ -8,12 +8,14 @@
       "build_inputs": [
         "Cargo.toml",
         "Cargo.lock",
+        "crates/yvex-sdk/Cargo.toml",
         "package.json",
         "package-lock.json",
         "LICENSE"
       ],
       "cargo_manifests": [
-        "Cargo.toml"
+        "Cargo.toml",
+        "crates/yvex-sdk/Cargo.toml"
       ],
       "unresolved": [
         "An exact distributed Rust binary/source-crate or TypeScript package closure and corresponding original notices have not yet been independently qualified."
