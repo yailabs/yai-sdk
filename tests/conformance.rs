@@ -321,10 +321,19 @@ fn discovery_security_and_lineage_fail_before_dispatch() {
     );
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600)).unwrap();
     discovery.process_identity.start_ticks += 1;
+    discovery.protocol = "yai.local_host.v1".into();
     std::fs::write(&path, serde_json::to_vec(&discovery).unwrap()).unwrap();
     assert!(
         matches!(HostClient::connect(&home, ClientKind::Qualification), Err(e) if e == "host_discovery_stale")
     );
+    assert_eq!(yai_sdk::observe(&home).unwrap().state, "stopped");
+    discovery.process_identity = LocalProcessIdentity::capture(std::process::id()).unwrap();
+    discovery.pid = discovery.process_identity.pid;
+    std::fs::write(&path, serde_json::to_vec(&discovery).unwrap()).unwrap();
+    assert!(
+        matches!(HostClient::connect(&home, ClientKind::Qualification), Err(e) if e == "host_discovery_protocol_mismatch")
+    );
+    discovery.protocol = HOST_PROTOCOL.into();
     discovery.process_identity =
         LocalProcessIdentity::capture(unsafe { libc::getppid() } as u32).unwrap();
     discovery.pid = discovery.process_identity.pid;

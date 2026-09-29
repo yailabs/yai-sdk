@@ -379,9 +379,6 @@ pub fn validate_discovery(home: &Path, discovery: &HostDiscovery) -> Result<(), 
             return Err("host_discovery_security_invalid".into());
         }
     }
-    if discovery.schema != HOST_DISCOVERY_SCHEMA || discovery.protocol != HOST_PROTOCOL {
-        return Err("host_discovery_protocol_mismatch".into());
-    }
     if discovery.yai_home != home.display().to_string()
         || discovery.yai_home_identity != home_identity(home)
     {
@@ -392,6 +389,9 @@ pub fn validate_discovery(home: &Path, discovery: &HostDiscovery) -> Result<(), 
     }
     if discovery.pid != discovery.process_identity.pid {
         return Err("host_discovery_process_mismatch".into());
+    }
+    if discovery.schema != HOST_DISCOVERY_SCHEMA || discovery.protocol != HOST_PROTOCOL {
+        return Err("host_discovery_protocol_mismatch".into());
     }
     let endpoint = Path::new(&discovery.endpoint);
     if endpoint != home.join("run/host/application.sock") {

@@ -48,6 +48,11 @@ is an explicit supported local endpoint record, not permission to inspect stores
 Server peer credentials and authenticated process/start identity prevent stale PID
 reuse. Handshake advertises independent Core SemVer, wire protocol, Application
 protocol and capability schema; Git identity has no compatibility meaning.
+After checking the private discovery file's ownership and YAI_HOME identity, a
+dead process identity is reported as stale before comparing protocol versions.
+A live incompatible Host still refuses before application dispatch. This lets
+supported startup reclaim stale metadata without treating it as a live protocol
+mismatch.
 
 Client attach and subscription do not own Core lifetime. Explicit launcher support
 starts an installed executable with `host serve`, never links Core into Studio.
