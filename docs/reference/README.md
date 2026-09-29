@@ -35,7 +35,7 @@ Conversation convenience sends text with optional focused context; other media
 remain on the existing published low-level contracts. Compute calls YAI's
 registered-target model inventory; it never calls a provider directly.
 
-The workflow descriptor format distinguishes strings, booleans, unsigned integer
+The workflow descriptor format distinguishes strings, booleans, signed/unsigned integer
 domains, arrays, named records, omitted optional fields and nullable values.
 `u64` is a JSON integer; JavaScript `number` cannot exactly represent every u64.
 TypeScript is a type-only projection, not a promise that arbitrary integer

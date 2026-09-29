@@ -15,9 +15,11 @@ publication: {html: true, pdf: false, index: true}
 The v0.1.0 SDK is a supported client contract, not an implementation of Core
 semantics. This record qualifies Linux same-user local IPC only.
 
-## Platform work in progress
+## SDK platform qualification
 
-The current platform Task is not yet closed. New evidence obtained on isolated
+YAI.SDK.PLATFORM.0 is complete at the Linux local client scope. Real model-chain
+completion is **BLOCKED** at the external producer, not counted as integration
+success. Initial typed workflow evidence was obtained on isolated
 profiles against Core `1f012d9` / installed executable SHA-256
 `bef4f843ffb56efae0200dcf4f034d06f45b779c8fde33eeb974898fc65b0aa8`:
 
@@ -31,7 +33,74 @@ profiles against Core `1f012d9` / installed executable SHA-256
 The first role-add test revealed a real projection mismatch: this operation returns
 `StateMutationReceipt`, not `WorkCommit`. The SDK retained the received successful
 envelope, did not replay the mutation, corrected its descriptor and qualified a
-new isolated Case. Full Studio and model-chain requalification remains pending.
+new isolated Case. Final Core/Studio consumer checks below use the corrected
+published SDK implementation `47707a2c472e564b94b888edf064cf873c6a435a`.
+Consumer commits are Core `e091b9e4ff94549b625381d0f28ed85d91da5fe6`
+and Studio `b33fb51d5b1706d154fb58de07553661487089d6`. Both pin that exact SDK
+implementation. Subsequent SDK example/test/evidence updates do not change its
+library or wire contract and do not require matching repository HEADs.
+
+### Final software and product evidence
+
+| Test / lane | Authority / oracle | Input / fixture | Expected | Observed | Metric / tolerance | Result | Claim supported |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| SDK contracts and typed client | Published protocol and workflow descriptor | Positive, refusal, malformed, replacement and lost-response controls | Preserve identity, classify failure, never replay uncertain dispatch | 26 Rust tests pass; all six examples compile | Exact software predicates; numerical tolerance N/A | PASS | Client behavior, not Core semantics |
+| Contract projections | Canonical operations/workflows descriptors | Rust/TypeScript generated projections and stale/invalid descriptor controls | One common owner; drift refuses | 79 shared types, 24 typed operations, 8 generator controls pass; strict TypeScript compiles | Exact regeneration | PASS | Shared projections cannot silently diverge; TS remains types-only |
+| Package/legal controls | Independent SemVer and distribution.legal.v1 | Version drift, unknown closure, absent notices/source | Invalid package refuses | 4 version and 11 legal controls pass | Exact refusal | PASS | Guard behavior, not customer distribution readiness |
+| Core conformance | Canonical Application/Host implementation | 98 released descriptors, 16 typed input shapes, real store/Host tests | Same operation identities and admitted semantics | 82 tests pass: Application 34+3+33, Host 12 | Exact contracts/lifecycle | PASS | Core implements the released boundary; no semantic owner moved |
+| Native two-client integration | Real installed Core and two Tauri/WebKit processes | Isolated Cases; mutation, duplicate submission, Host replacement, window close | Same admitted state; no duplicate mutation; resynchronize replacement | Generations 3→4→5; repeat idempotent; other Case unchanged; both resync; closing one leaves Host/peer alive | Exact identities and generations | PASS | Real Studio→SDK→Core lifecycle, not a model response |
+| Studio interaction composition | Existing admitted Application contracts | 17 isolated interaction lanes | Preserve read/action/refusal/context/material behavior | All 17 pass; kernel 30 tests and frontend/native builds pass | Exact assertions, byte-equal retained materials | PASS | Supported client behavior; controlled providers are not model evidence |
+| Independent public consumer | Public Git clone, no private source | SDK implementation 47707a2 | Build/test/docs without Core or Studio | make check, all-target examples and cargo doc pass; clean checkout | Exact package identities | PASS | Standalone consumer repository |
+| Real model addressing | Core provider discovery and typed SDK compute.models | Registered real YVEX target | Preserve exact model identity without inferring execution readiness | Catalog/health HTTP 200; 32768 capacity; execution_or_resources_qualified=false | Exact identity; capacity not latency | PASS | YAI-mediated discovery only |
+| Real inference prerequisite | Core's public provider qualifier; YVEX HTTP result | One fresh probe ID, text/JSON controls; one bounded diagnostic | Producer must complete before admitting a real Case execution | Text and JSON HTTP 503; diagnostic runtime_unavailable, CUDA MoE layer 24 status 1 | No numerical result available | BLOCKED | External producer cannot presently qualify ChatText; full model chain NOT established |
+
+Native run `native-portfolio-1790682024243503055` binds Core executable SHA-256
+`3c0e835f8906cb07b6ea085b34c315c36027ea7176f751d974c695df5ef84bd9`,
+Studio executable `89f2171e9202e5ddfccd6cb4801fb169eecb962557631b9a3daeb92be26da8f6`
+and SDK test client `c4c662c7a20074836689ff8f49abc5163143e55e06c027510fff0c6331712636`.
+The 17 lanes cover application, compute, conversation, effects, environment,
+execution, identity, memory, policy, policy intake, resources, resource setup,
+source policy, work, execution context, operational live reads and material preview.
+The operational-live run observed two attachments and zero events: mutation
+fanout is proved by the native run, not inferred from that read-only lane.
+Context run `context-capacity-1790682351273023831` uses a controlled HTTP provider.
+Material preview uses two independently acquired 87-byte Markdown fixtures, not
+private source dependencies. Initial missing fixture configuration was corrected
+before the context lane passed; no failed setup is reported as successful.
+
+Reproduction owners: SDK `make check` and `cargo doc --no-deps`; Core
+`cargo test --manifest-path application/Cargo.toml -p yai-host -p yai-application --locked`,
+`make check-docs test-roadmap` and `python3 tests/test_product_boundary.py`; Studio
+`npm run check`, `npm run test:kernel`, `npm run build`,
+`npm run desktop:build -- -- --locked` and its existing `tests/studio/` harnesses.
+Native harness `tests/studio/native-portfolio.py` takes explicit installed Core,
+Studio and public SDK client binaries and disposable profiles. Evidence and build
+products remain outside Git. Human acceptance, Canary, full Core Golden and
+customer package qualification were not run for this SDK milestone.
+
+### External producer limit
+
+Fresh probe `probe:sdk-platform-20260929-01` on target
+`provider-target:6369eba7d4b03ea9737a3bd69719720c` retained qualification
+`provider-qualification:89b50a4bcbf8b6913f99f2f257b35360` in an isolated Core profile.
+Catalog/health completed; text returned HTTP 503 after 10585 ms and JSON after
+7093 ms. Only model addressing/health qualified, not ChatText. A fresh bounded
+`Reply OK.` diagnostic (8 output tokens maximum) returned:
+
+```json
+{"error":{"message":"deferred CUDA MoE layer 24 reported device status 1","type":"server_error","param":null,"code":"runtime_unavailable"}}
+```
+
+Exact model:
+`deepseek4-v4-flash-dspark-deepseek-v4-flash-mixed-iq2xxs-q2k-mxfp4-v1-cuda`,
+engine generation 1; artifact
+`b669d80726cf83331c0d8016debbde44cf965a1503c33f605e92ea4e550ee87f`, binding
+`8cdb4929c523bd42e3fb82fa18ceed0a0a6732d6efd1d852c88398c8d2d6cd5e`.
+The live YVEX process and loaded model were not restarted or modified. No Case
+SEND was forced past failed provider qualification and no historical indeterminate
+request was replayed. There is no completed model result, canonical Case result or
+Studio model-result presentation to claim. Repair/qualification of that producer
+is outside the SDK boundary. Discovery success is not inference support.
 
 ## Previously qualified extraction scope
 

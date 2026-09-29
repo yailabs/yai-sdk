@@ -58,6 +58,16 @@ contract identities on a real Host without requiring its source checkout.
 
 ## Observe and resynchronize
 
+For a configured provider, [models](../../examples/models.rs) uses only the
+YAI registered-target operation:
+
+```sh
+cargo run --locked --example models -- "$YAI_HOME" tenant:example provider-target:example
+```
+
+A returned model name is catalog evidence, not current inference availability or
+permission. The SDK neither contacts the provider directly nor loads its engines.
+
 The low-level `HostClient::subscribe` provides typed `HostEvent` values. Use a
 separate connection for subscription and operations. Case updates invalidate the
 named views; fetch a fresh authorized projection. A new Host instance requires a

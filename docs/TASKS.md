@@ -15,9 +15,9 @@ publication: {html: true, pdf: false, index: true}
 | Task | State | Exit |
 | --- | --- | --- |
 | PRODUCT.REPOSITORY.BOUNDARY.0 | COMPLETE | Independent MIT client/projection owner; canonical Core mutation/probe projections exclude private persisted state; standalone conformance and final real Core/Studio integration qualified at the bounded Linux local scope. |
-| YAI.SDK.PLATFORM.0 | IN PROGRESS | Typed public workflows, mechanically coherent contract projections, standalone developer documentation/examples, Core/Studio conformance and one real model-chain outcome or exact producer blocker. |
+| YAI.SDK.PLATFORM.0 | COMPLETE | 24 typed workflows across 11 families; 79 checked shared types; standalone docs/examples; 98-operation Core conformance; real native two-client and 17 interaction lanes; exact external inference blocker retained without a model-chain success claim. |
 
-## Current delivery
+## Completed platform delivery
 
 1. Reconcile admitted operations and public contract ownership; implement typed
    client workflows without copying semantic admission.
@@ -29,6 +29,11 @@ publication: {html: true, pdf: false, index: true}
 The delivery does not select remote transports, provider plugins, model-quality
 claims or customer-package release qualification. Core owns semantic authority;
 Studio and other clients consume the same public contract.
+
+The real YVEX prerequisite returned HTTP 503, `runtime_unavailable`: deferred CUDA
+MoE layer 24 device status 1. No Case SEND was forced and no indeterminate request
+was retried. This is the permitted externally owned producer blocker, not an SDK
+capability promotion. No successor implementation is selected here.
 
 No release qualification is implied. Core semantics and Studio product tasks remain in their own repositories.
 

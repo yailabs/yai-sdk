@@ -28,23 +28,23 @@ crates.io/npm release; pin an exact reviewed Git revision in your application:
 
 ```toml
 [dependencies]
-yai-sdk = { git = "https://github.com/yailabs/yai-sdk", rev = "YOUR_REVIEWED_FULL_COMMIT" }
+yai-sdk = { git = "https://github.com/yailabs/yai-sdk", rev = "47707a2c472e564b94b888edf064cf873c6a435a" }
 ```
 
 With an installed compatible Core already running against your explicitly chosen
 profile, the SDK performs authenticated discovery and compatibility negotiation:
 
-```rust,no_run
+```rust
 use yai_sdk::{client::{BoundLocalTransport, Client}, workflows::EmptyInput, ClientKind};
 
-# fn main() -> Result<(), Box<dyn std::error::Error>> {
-let home = std::env::var("YAI_HOME")?;
-let transport = BoundLocalTransport::connect(home, ClientKind::External)?;
-let client = Client::discover(transport, "my-client:discovery")?;
-let response = client.cases().list("my-client:list", &EmptyInput {})?;
-println!("{:?}: {:?}", response.state, response.data);
-# Ok(())
-# }
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let home = std::env::var("YAI_HOME")?;
+    let transport = BoundLocalTransport::connect(home, ClientKind::External)?;
+    let client = Client::discover(transport, "my-client:discovery")?;
+    let response = client.cases().list("my-client:list", &EmptyInput {})?;
+    println!("{:?}: {:?}", response.state, response.data);
+    Ok(())
+}
 ```
 
 Use the executable [Case inspection example](examples/cases.rs):

@@ -33,6 +33,9 @@ impl ClientTransport for &Mock {
                         safe_message:"denied".into(), result_state:ResultState::Unauthorized }); }
                 "foreign" => result.correlation_ref = "other".into(),
                 "malformed" => result.data = Some(serde_json::json!({"private_state":{}})),
+                "unavailable" => { result.result_state = ResultState::CorePending;
+                    result.data = Some(serde_json::json!({"availability":"producer_unavailable"})); }
+                "partial" => result.result_state = ResultState::Partial,
                 _ => {}
             }
         }
@@ -119,4 +122,22 @@ fn public_numeric_and_temporal_projection_preserves_signed_rank_and_cut() {
     assert_eq!(candidate.score_micros, -9);
     let cut = workflows::GenerationCut { kind: workflows::GenerationCutKind::Generation, value: 3 };
     assert_eq!(serde_json::to_value(cut).unwrap(), serde_json::json!({"kind":"generation","value":3}));
+}
+
+#[test]
+fn partial_and_unavailable_do_not_become_success_or_erase_evidence() {
+    for mode in ["partial", "unavailable"] {
+        let transport = mock(mode);
+        let client = Client::discover(&transport, "discovery:1").unwrap();
+        let response = client.execute("read:1", &ListCases {}).unwrap();
+        if mode == "partial" {
+            assert_eq!(response.state, ResultState::Partial);
+            assert!(response.data.is_some());
+        } else {
+            assert_eq!(response.state, ResultState::CorePending);
+            assert!(response.data.is_none());
+            assert_eq!(response.raw.data.unwrap()["availability"], "producer_unavailable");
+        }
+        assert_eq!(transport.calls.borrow().len(), 2);
+    }
 }

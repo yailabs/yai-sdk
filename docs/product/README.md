@@ -19,9 +19,10 @@ public contract. A client expresses bounded intent, observes admitted results,
 and reacts to invalidations without reading stores or reconstructing authority.
 
 CURRENT: Linux local Rust client, compatibility negotiation, public projections,
-capability discovery, failure/indeterminate-delivery distinctions and conformance.
-TARGET: ordinary supported workflows expressed through ergonomic typed entry
-points, with documented and mechanically coherent language projections.
+capability discovery, failure/indeterminate-delivery distinctions and conformance;
+24 typed workflow methods in 11 families, with 79 shared contract types projected
+mechanically to Rust and TypeScript. Remaining low-level operations and
+TypeScript-only projections remain explicit, not fictitious complete typed coverage.
 
 Neither a convenience method nor a discovered capability promises permission.
 The client must handle current disclosure, stale state, unavailable producers and

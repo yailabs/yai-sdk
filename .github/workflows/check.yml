@@ -11,7 +11,7 @@ jobs:
           node-version: '22'
       - run: python3 tools/workflows.py --check
       - run: python3 tests/test_workflow_contract.py
-      - run: cargo test --locked
+      - run: cargo test --locked --all-targets
       - run: npm ci --ignore-scripts
       - run: npm run check
       - run: python3 tools/check.py
