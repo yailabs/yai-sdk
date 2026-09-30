@@ -340,7 +340,21 @@ pub enum ContextDepth {
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct ConversationIntent {
-    pub context_depth: ContextDepth,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context_depth: Option<ContextDepth>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub executor_participant_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub work_limits: Option<CaseWorkLimits>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub workflow_execution_id: Option<String>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct CaseWorkLimits {
+    pub invocations: u16,
+    pub operations: u16,
+    pub effects: u16,
+    pub max_input_units: usize,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct TextConversationInput {
@@ -383,8 +397,54 @@ pub enum ConversationPosture {
     Cancelled,
     #[serde(rename = "delivery_indeterminate")]
     DeliveryIndeterminate,
+    #[serde(rename = "awaiting_review")]
+    AwaitingReview,
+    #[serde(rename = "budget_exhausted")]
+    BudgetExhausted,
     #[serde(rename = "unresolved")]
     Unresolved,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CaseWorkPosture {
+    #[default]
+    #[serde(rename = "completed")]
+    Completed,
+    #[serde(rename = "awaiting_review")]
+    AwaitingReview,
+    #[serde(rename = "delivery_indeterminate")]
+    DeliveryIndeterminate,
+    #[serde(rename = "budget_exhausted")]
+    BudgetExhausted,
+    #[serde(rename = "unresolved")]
+    Unresolved,
+    #[serde(rename = "cancelled_before_dispatch")]
+    CancelledBeforeDispatch,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct CaseWorkStepObservation {
+    pub ordinal: u16,
+    pub source_ref: String,
+    pub selection_ref: String,
+    pub target_ref: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub invocation_ref: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub provider_result_ref: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub operation_ref: Option<String>,
+    pub outcome_refs: Vec<String>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct CaseWorkObservation {
+    pub schema: String,
+    pub request_ref: String,
+    pub participant_ref: String,
+    pub thread_ref: String,
+    pub observed_generation: u64,
+    pub posture: CaseWorkPosture,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub answer: Option<String>,
+    pub steps: Vec<CaseWorkStepObservation>,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct AttemptObservation {
@@ -422,6 +482,8 @@ pub struct ConversationObservation {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub primary_result: Option<ConversationPrimaryResult>,
     pub attempt_outcomes: Vec<AttemptObservation>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub work: Option<CaseWorkObservation>,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct TextConversationSubmission {
@@ -444,6 +506,13 @@ pub struct ConversationGetInput {
     pub case_ref: String,
     pub participant_ref: String,
     pub execution: ConversationExecutionReference,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ConversationWorkResumeInput {
+    pub case_ref: String,
+    pub participant_ref: String,
+    pub submission_ref: String,
+    pub observed_generation: u64,
 }
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ResultState {
@@ -871,6 +940,20 @@ impl Operation for ConversationSendText<'_> {
 impl<T: ClientTransport> Conversation<'_, T> {
     pub fn send_text(&self, correlation: &str, input: &TextConversationInput) -> Result<Response<TextConversationSubmission>, Error> {
         self.0.execute(correlation, &ConversationSendText(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ConversationResumeWork<'a>(&'a ConversationWorkResumeInput);
+impl Operation for ConversationResumeWork<'_> {
+    type Output = TextConversationSubmission;
+    const ID: &'static str = "conversation.work.resume";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.conversation_work_resume_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.conversation_submission_result.v1");
+}
+impl<T: ClientTransport> Conversation<'_, T> {
+    pub fn resume_work(&self, correlation: &str, input: &ConversationWorkResumeInput) -> Result<Response<TextConversationSubmission>, Error> {
+        self.0.execute(correlation, &ConversationResumeWork(input))
     }
 }
 #[derive(Serialize)]

@@ -125,6 +125,31 @@ fn public_numeric_and_temporal_projection_preserves_signed_rank_and_cut() {
 }
 
 #[test]
+fn case_work_contract_retains_bounded_intent_and_exact_observation_lineage() {
+    let intent: workflows::ConversationIntent = serde_json::from_value(serde_json::json!({
+        "executor_participant_id":"participant:model",
+        "work_limits":{"invocations":2,"operations":1,"effects":0,"max_input_units":8192}
+    })).unwrap();
+    let serialized = serde_json::to_value(intent).unwrap();
+    assert_eq!(serialized["work_limits"]["effects"], 0);
+    let observed: workflows::CaseWorkObservation = serde_json::from_value(serde_json::json!({
+        "schema":"yai.case_work_observation.v1", "request_ref":"request:1",
+        "participant_ref":"participant:model", "thread_ref":"thread:work",
+        "observed_generation":7, "posture":"completed", "answer":"done",
+        "steps":[{"ordinal":0,"source_ref":"source:0","selection_ref":"selection:0",
+            "target_ref":"target:qualified","invocation_ref":"invocation:0",
+            "provider_result_ref":"result:0","operation_ref":"operation:0",
+            "outcome_refs":["observation:0"]}]
+    })).unwrap();
+    assert_eq!(observed.steps[0].target_ref, "target:qualified");
+    assert_eq!(observed.steps[0].outcome_refs, ["observation:0"]);
+    let catalog: serde_json::Value = serde_json::from_str(include_str!("../contract/operations.json")).unwrap();
+    assert!(catalog["operations"].as_array().unwrap().iter().any(|operation|
+        operation["operation_id"] == "conversation.work.resume"
+            && operation["input_contract"] == "yai.conversation_work_resume_input.v1"));
+}
+
+#[test]
 fn partial_and_unavailable_do_not_become_success_or_erase_evidence() {
     for mode in ["partial", "unavailable"] {
         let transport = mock(mode);

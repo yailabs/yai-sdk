@@ -267,7 +267,16 @@
       ]
     },
     "ConversationIntent": {
-      "context_depth": "ContextDepth"
+      "context_depth": "optional:ContextDepth",
+      "executor_participant_id": "optional:string",
+      "work_limits": "optional:CaseWorkLimits",
+      "workflow_execution_id": "optional:string"
+    },
+    "CaseWorkLimits": {
+      "invocations": "u16",
+      "operations": "u16",
+      "effects": "u16",
+      "max_input_units": "usize"
     },
     "TextConversationInput": {
       "case_ref": "string",
@@ -297,8 +306,40 @@
         "failed",
         "cancelled",
         "delivery_indeterminate",
+        "awaiting_review",
+        "budget_exhausted",
         "unresolved"
       ]
+    },
+    "CaseWorkPosture": {
+      "$enum": [
+        "completed",
+        "awaiting_review",
+        "delivery_indeterminate",
+        "budget_exhausted",
+        "unresolved",
+        "cancelled_before_dispatch"
+      ]
+    },
+    "CaseWorkStepObservation": {
+      "ordinal": "u16",
+      "source_ref": "string",
+      "selection_ref": "string",
+      "target_ref": "string",
+      "invocation_ref": "optional:string",
+      "provider_result_ref": "optional:string",
+      "operation_ref": "optional:string",
+      "outcome_refs": "array:string"
+    },
+    "CaseWorkObservation": {
+      "schema": "string",
+      "request_ref": "string",
+      "participant_ref": "string",
+      "thread_ref": "string",
+      "observed_generation": "u64",
+      "posture": "CaseWorkPosture",
+      "answer": "optional:string",
+      "steps": "array:CaseWorkStepObservation"
     },
     "AttemptObservation": {
       "outcome_id": "optional:string",
@@ -322,7 +363,8 @@
       "posture": "ConversationPosture",
       "invocation_refs": "array:string",
       "primary_result": "optional:ConversationPrimaryResult",
-      "attempt_outcomes": "array:AttemptObservation"
+      "attempt_outcomes": "array:AttemptObservation",
+      "work": "optional:CaseWorkObservation"
     },
     "TextConversationSubmission": {
       "created": "bool",
@@ -341,6 +383,12 @@
       "case_ref": "string",
       "participant_ref": "string",
       "execution": "ConversationExecutionReference"
+    },
+    "ConversationWorkResumeInput": {
+      "case_ref": "string",
+      "participant_ref": "string",
+      "submission_ref": "string",
+      "observed_generation": "u64"
     },
     "ResultState": {
       "$enum": [
@@ -636,6 +684,15 @@
       "input": "TextConversationInput",
       "output": "TextConversationSubmission",
       "input_contract": "yai.conversation_send_input.v1",
+      "output_contract": "yai.conversation_submission_result.v1"
+    },
+    {
+      "family": "conversation",
+      "method": "resume_work",
+      "id": "conversation.work.resume",
+      "input": "ConversationWorkResumeInput",
+      "output": "TextConversationSubmission",
+      "input_contract": "yai.conversation_work_resume_input.v1",
       "output_contract": "yai.conversation_submission_result.v1"
     },
     {

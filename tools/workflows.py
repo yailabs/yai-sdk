@@ -26,7 +26,7 @@ def render(contract):
                 return f'Option<{inner}>' if language == 'rust' else (inner if kind == 'optional' else f'{inner} | null')
             raise ValueError(f'unknown type constructor: {kind}')
         primitives = {'string': ('String', 'string'), 'u8': ('u8', 'number'), 'u64': ('u64', 'number'),
-                      'usize': ('usize', 'number'), 'u32': ('u32', 'number'), 'i64': ('i64', 'number'), 'bool': ('bool', 'boolean'),
+                      'usize': ('usize', 'number'), 'u16': ('u16', 'number'), 'u32': ('u32', 'number'), 'i64': ('i64', 'number'), 'bool': ('bool', 'boolean'),
                       'json': ('serde_json::Value', 'unknown'), 'T': ('serde_json::Value', 'T')}
         if value in primitives:
             return primitives[value][language == 'typescript']

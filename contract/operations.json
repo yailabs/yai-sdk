@@ -142,7 +142,15 @@
       "operation_id": "conversation.send",
       "input_contract": "yai.conversation_send_input.v1",
       "output_contract": "yai.conversation_submission_result.v1",
-      "meaning": "Atomically commit an exact Turn and ordinary execution intent; acknowledge before provider execution and observe without redispatch",
+      "meaning": "Atomically commit an exact Turn and bounded ordinary or Case Work intent; acknowledge before provider execution and observe without redispatch",
+      "impact": "external_effect",
+      "authority": "current_case_authority"
+    },
+    {
+      "operation_id": "conversation.work.resume",
+      "input_contract": "yai.conversation_work_resume_input.v1",
+      "output_contract": "yai.conversation_submission_result.v1",
+      "meaning": "Explicitly resume exact bounded Case Work after current-authority observation; completed and uncertain steps are never blindly redispatched",
       "impact": "external_effect",
       "authority": "current_case_authority"
     },

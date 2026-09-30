@@ -18,7 +18,7 @@ publication: {html: true, pdf: false, index: true}
 | YAI.SDK.PLATFORM.0 | COMPLETE | 24 typed workflows across 11 families; 79 checked shared types; standalone docs/examples; 98-operation Core conformance; real native two-client and 17 interaction lanes; exact external inference blocker retained without a model-chain success claim. |
 | PLATFORM.SDK.PARITY.REFOUNDATION.0 | COMPLETE | Separate YVEX SDK domain, bounded Core capacity adapter, read-only Studio dual consumption, distributed contract/disposition parity and local Core/Host installed identity qualified at the published-contract scope; deployed YVEX management, producer version identity and real governed model result remain external/unqualified. |
 
-The cross-repository checker passes 98 YAI operation descriptors, two YVEX
+The completed platform delivery checked 98 YAI operation descriptors, two YVEX
 read-only management operations and two Studio dispositions, including negative
 owner-delta controls. This qualifies contract/disposition parity, not runtime
 generation. The current installed Core executable matches its running Host;
@@ -31,6 +31,13 @@ MoE layer 30/device status 1. Its first invalid numerical operation is unknown;
 the older layer-24 result below is historical. Independent YVEX Task
 `RUNTIME.CUDA.MOE.NUMERICAL.CORRECTNESS.0` owns repair. No SDK or Studio
 model-result claim is promoted and the indeterminate Tech Infra SEND was not retried.
+
+Current downstream projection of the selected YAI
+`YAI.CASE.ACTIVE.EXECUTION.CONVERGENCE.0` Task adds
+`conversation.work.resume` to the released inventory (99 descriptors) and
+projects Case Work intent/step observation into 25 typed workflows and 84
+shared types. SDK standalone conformance is separate from YAI's real-model
+and Studio interaction evidence; the previous platform Task is not reopened.
 
 ## Completed platform delivery
 

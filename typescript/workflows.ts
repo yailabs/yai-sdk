@@ -257,7 +257,16 @@ export interface ConversationTextPart {
 export type TextModality = "text";
 export type ContextDepth = "focused";
 export interface ConversationIntent {
-  context_depth: ContextDepth;
+  context_depth?: ContextDepth;
+  executor_participant_id?: string;
+  work_limits?: CaseWorkLimits;
+  workflow_execution_id?: string;
+}
+export interface CaseWorkLimits {
+  invocations: number;
+  operations: number;
+  effects: number;
+  max_input_units: number;
 }
 export interface TextConversationInput {
   case_ref: string;
@@ -277,7 +286,28 @@ export interface ConversationPrimaryResult {
   output: string;
   selection: ConversationResultSelection;
 }
-export type ConversationPosture = "admitted" | "running" | "completed" | "provider_result_recorded" | "refused" | "failed" | "cancelled" | "delivery_indeterminate" | "unresolved";
+export type ConversationPosture = "admitted" | "running" | "completed" | "provider_result_recorded" | "refused" | "failed" | "cancelled" | "delivery_indeterminate" | "awaiting_review" | "budget_exhausted" | "unresolved";
+export type CaseWorkPosture = "completed" | "awaiting_review" | "delivery_indeterminate" | "budget_exhausted" | "unresolved" | "cancelled_before_dispatch";
+export interface CaseWorkStepObservation {
+  ordinal: number;
+  source_ref: string;
+  selection_ref: string;
+  target_ref: string;
+  invocation_ref?: string;
+  provider_result_ref?: string;
+  operation_ref?: string;
+  outcome_refs: Array<string>;
+}
+export interface CaseWorkObservation {
+  schema: string;
+  request_ref: string;
+  participant_ref: string;
+  thread_ref: string;
+  observed_generation: number;
+  posture: CaseWorkPosture;
+  answer?: string;
+  steps: Array<CaseWorkStepObservation>;
+}
 export interface AttemptObservation {
   outcome_id?: string;
   target_id?: string;
@@ -301,6 +331,7 @@ export interface ConversationObservation {
   invocation_refs: Array<string>;
   primary_result?: ConversationPrimaryResult;
   attempt_outcomes: Array<AttemptObservation>;
+  work?: CaseWorkObservation;
 }
 export interface TextConversationSubmission {
   created: boolean;
@@ -315,6 +346,12 @@ export interface ConversationGetInput {
   case_ref: string;
   participant_ref: string;
   execution: ConversationExecutionReference;
+}
+export interface ConversationWorkResumeInput {
+  case_ref: string;
+  participant_ref: string;
+  submission_ref: string;
+  observed_generation: number;
 }
 export type ResultState = "success" | "partial" | "unauthorized" | "stale" | "core_pending" | "not_implemented" | "transport_unavailable" | "error";
 export interface OperationError {
