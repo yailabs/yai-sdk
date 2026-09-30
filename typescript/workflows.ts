@@ -267,6 +267,7 @@ export interface CaseWorkLimits {
   operations: number;
   effects: number;
   max_input_units: number;
+  max_output_tokens?: number;
 }
 export interface TextConversationInput {
   case_ref: string;

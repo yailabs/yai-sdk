@@ -132,6 +132,14 @@ fn case_work_contract_retains_bounded_intent_and_exact_observation_lineage() {
     })).unwrap();
     let serialized = serde_json::to_value(intent).unwrap();
     assert_eq!(serialized["work_limits"]["effects"], 0);
+    assert!(serialized["work_limits"].get("max_output_tokens").is_none(),
+        "historical Work requests keep their prior wire bytes");
+    let bounded: workflows::ConversationIntent = serde_json::from_value(serde_json::json!({
+        "executor_participant_id":"participant:model",
+        "work_limits":{"invocations":2,"operations":1,"effects":0,
+            "max_input_units":8192,"max_output_tokens":96}
+    })).unwrap();
+    assert_eq!(serde_json::to_value(bounded).unwrap()["work_limits"]["max_output_tokens"], 96);
     let observed: workflows::CaseWorkObservation = serde_json::from_value(serde_json::json!({
         "schema":"yai.case_work_observation.v1", "request_ref":"request:1",
         "participant_ref":"participant:model", "thread_ref":"thread:work",

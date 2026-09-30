@@ -276,7 +276,8 @@
       "invocations": "u16",
       "operations": "u16",
       "effects": "u16",
-      "max_input_units": "usize"
+      "max_input_units": "usize",
+      "max_output_tokens": "optional:u32"
     },
     "TextConversationInput": {
       "case_ref": "string",

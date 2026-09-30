@@ -355,6 +355,8 @@ pub struct CaseWorkLimits {
     pub operations: u16,
     pub effects: u16,
     pub max_input_units: usize,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_output_tokens: Option<u32>,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct TextConversationInput {

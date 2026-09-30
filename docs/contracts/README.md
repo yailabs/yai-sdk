@@ -70,8 +70,11 @@ For bounded Case Work, `conversation.send` accepts an executor Participant and
 finite `work_limits` in the typed intent. Its acknowledgement names the one
 committed Turn/request; `execution.get` returns a `work` projection with exact
 thread, step, provider selection/target, invocation, Operation and outcome
-references. `conversation.work.resume` accepts that same submission identity
-and observed generation. It is explicit continuation of a recoverable intent,
+references. New Work may bind an optional exact per-invocation
+`max_output_tokens` ceiling; historical Work without it retains its original
+intent bytes and provider response contract. `conversation.work.resume` accepts
+that same submission identity and observed generation. It is explicit
+continuation of a recoverable intent,
 not a fresh SEND or automatic retry. A client must preserve `awaiting_review`,
 `budget_exhausted`, `delivery_indeterminate` and terminal completion as distinct
 postures; an indeterminate delivery is never permission to dispatch again.
