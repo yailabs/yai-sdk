@@ -66,6 +66,15 @@ envelope for inspection of diagnostic or additive data.
 
 ## Observation and lifecycle
 
+The independent YVEX domain also projects the schema-v1 public finite producer
+through `yvex-sdk::finite`, not the YAI Application wire. Question/context and
+ordered opaque candidates cross the public native C client; results retain
+model/binding/tokenizer/input/program/population/result identities and engine
+generation. Scores are model logits and relative **uncalibrated** probabilities.
+Wrong generation/population, non-finite scores, generated output and unsupported
+calibration refuse. A YVEX computational result does not admit a YAI Decision;
+the YAI consumer still owns disclosure, current-W validation and qualification.
+
 Commercial installation activation uses the product owner, never a Supabase
 password client or a local account database. `product().activation_start` accepts
 an installation name; Core returns a same-service browser URL and short-lived

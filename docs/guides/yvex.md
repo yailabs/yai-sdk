@@ -75,3 +75,43 @@ isolated YVEX SSH fixture also invokes this SDK example against the real
 forced-command service, including wrong-device refusal and stopped/running
 Host observations. Those tests do not claim a deployed remote listener or
 real-model inference.
+
+## Finite decision public C client
+
+`yvex-sdk::finite::Request` contains an exact model alias/resident generation,
+bounded question/context and ordered opaque candidate IDs/text. It carries no
+Case authority, templates, marker/token IDs or model-family selectors. Call
+`finite::execute_local(absolute_socket, &request)` once; the public YVEX C client
+opens the existing host transport. This SDK never encodes the private wire,
+retries automatically or switches generation/model. A caller must independently
+qualify the producer and admit disclosure before calling it.
+
+The default crate builds without YVEX and returns `NativeClientNotInstalled`.
+To build an actual native consumer, explicitly enable `finite-decision-native`
+and supply `YVEX_CLIENT_PREFIX`: a reviewed prefix with
+`include/yvex/{core,finite_decision_producer}.h` and `lib/libyvex.a` from one
+compatible producer installation. Optional `YVEX_CLIENT_LINK_LIBS` lists the
+installation's additional linker library names, comma-separated. Native builds
+need Python 3, Clang/libclang and a C compiler; bindings are generated at build
+time, never hand-maintained ABI structs. `YVEX_SDK_PYTHON` may select the build
+Python. This is not a Python inference runtime.
+
+At producer reference `67a7905`, ordinary YVEX `make install` publishes only the
+executable product, not this native client prefix. This SDK does not silently
+copy a sibling checkout, manufacture a library or claim a supported producer
+installer. Real client installation/runtime qualification therefore remains an
+explicit producer packaging dependency until its owner supplies the prefix.
+The [public contract](https://github.com/yailabs/yvex/blob/67a7905ea9deb98b0704629a1f979634e19007fb/docs/contracts/c-api.md)
+and [declaration projection](../../crates/yvex-sdk/contract/finite.json) own compatibility;
+source revisions identify evidence rather than requiring matching repository HEADs.
+
+The [finite example](../../crates/yvex-sdk/examples/finite.rs) takes a socket and
+structured request file. Relative candidate probabilities are not calibrated
+confidence. The copied result includes zero-generation counters and exact
+computational identities; it is not a semantic decision or proof of model quality.
+
+`make check-finite-native YVEX_CLIENT_INCLUDE_DIR=/reviewed/public/include`
+compiles an SDK-only synthetic C peer in a disposable prefix and tests bindings,
+result/refusal handling and declaration-drift rejection. It never loads a model,
+starts a YVEX host or qualifies System-1/Fast Search. Ordinary standalone checks
+continue without external headers or private repositories.

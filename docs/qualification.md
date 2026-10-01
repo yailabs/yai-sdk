@@ -16,6 +16,33 @@ The v0.1.0 SDK is a supported client contract, not an implementation of Core
 semantics. This record qualifies Linux same-user local IPC and bounded macOS
 peer-credential queries; full native Host integration remains Linux-only.
 
+## Product operational consumer slices
+
+Browser activation projects five Core-owned operations without credentials or
+Supabase objects: the released YAI inventory is 108 operations. Pending,
+indeterminate, closed-input and identity controls pass independently of a real
+commercial issuer or Studio login journey. Core's isolated native qualification
+owns the actual vault/Application/CLI proof; SDK does not infer entitlement or
+Case authority from these DTOs.
+
+Finite client conformance uses the exact public headers at YVEX `67a7905` and an
+SDK-authored C fixture, not YVEX inference. Default standalone tests cover byte
+bounds, identity/score negatives and native-client absence. The explicit native
+lane compiles generated bindings plus C layout assertions, preserves exact
+candidate/generation identity and refuses stale/foreign/non-finite/calibrated/
+generated/oversized/unterminated/error responses. A same-size declaration change
+and nested candidate/status changes plus a limit delta fail closed. Ordinary
+`make check` covers both workspace domains: 43 Rust tests, generator, TypeScript,
+documentation and package/legal controls pass. The explicit native lane passes
+8 tests plus its C-client result/drift controls. The fixture has no host, weights
+or computational capability; its counters are test data, not runtime evidence.
+
+Real finite C-client installation, exact CPU/model inference, Participant-step
+integration and production Fast Search remain unqualified here. The current
+producer executable package does not install the required native client archive
+and headers. No private wire fallback or producer mutation is introduced.
+No Human/Canary/commercial distribution or model-quality claim follows.
+
 The later platform-parity lane compares current owner-published inventories
 across YAI, this SDK, Studio and YVEX with
 `tools/check_platform_parity.py`. Its bounded source run matched 98 YAI

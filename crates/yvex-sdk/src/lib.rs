@@ -1,9 +1,10 @@
-//! YVEX-owned operational facts projected through the public management v1
-//! contract. This crate has no dependency on the YAI semantic client.
+//! Independent YVEX client domain: management v1, OpenAI projections and the
+//! optional public native finite-decision client. No YAI semantic dependency.
 //!
 //! The current remote contract is deliberately read-only: device identity and
 //! host status. Model/runtime mutation is not represented by this crate.
 
+pub mod finite;
 pub mod openai;
 
 use serde::{Deserialize, Serialize};

@@ -20,7 +20,7 @@ history or semantic implementation is copied.
 
 The Cargo workspace contains the existing `yai-sdk` client and a separate
 `yvex-sdk` crate. Neither depends on the other. The former speaks the YAI local
-Application contract. The latter currently speaks only YVEX's versioned,
+Application contract. The latter exposes YVEX's versioned,
 read-only, identity-pinned OpenSSH management contract. Its canonical producer
 is YVEX's public [remote-management contract](https://github.com/yailabs/yvex/blob/main/docs/contracts/remote-management.md),
 not a second SDK-owned model/runtime registry. It does not expose the private
@@ -32,6 +32,18 @@ catalog and exact-request preflight reports. It takes a caller-owned HTTP fetch
 callback, so YAI retains endpoint locality, credentials, transport policy and
 Case admission; only the YVEX-specific payload contract is projected here.
 This module neither sends generation nor creates a model-session authority.
+
+`yvex-sdk::finite` is the separate semantic-neutral finite-decision client.
+With the optional `finite-decision-native` feature, Rust bindings are generated
+from verified installed public YVEX headers and call
+`yvex_finite_producer_execute_local` in the public C client archive. YVEX owns
+private transport, model input construction and execution. SDK owns byte bounds,
+copied projections and exact population/generation/result checks. Without the
+native client, it refuses explicitly; it does not implement a substitute scorer.
+The [ABI projection](../crates/yvex-sdk/contract/finite.json) follows YVEX's declaration
+signatures and schema-v1 records, not producer Git equality. Native compilation
+and synthetic ABI conformance are not real-model or YAI Fast Search qualification.
+See [consumer setup and current packaging boundary](guides/yvex.md#finite-decision-public-c-client).
 
 Control flows from clients into the owning service; facts flow back from YVEX
 through the provider adapter to YAI where a Case result is involved. Studio

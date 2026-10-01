@@ -1,8 +1,8 @@
-.PHONY: check check-platform-parity qualify-distribution
+.PHONY: check check-platform-parity check-finite-native qualify-distribution
 check:
 	python3 tools/workflows.py --check
 	python3 tests/test_workflow_contract.py
-	cargo test --locked --all-targets
+	cargo test --locked --workspace --all-targets
 	npm ci --ignore-scripts
 	npm run check
 	python3 tools/check.py
@@ -14,6 +14,11 @@ check:
 check-platform-parity:
 	@test -n "$(YAI_BIN)" -a -n "$(STUDIO_ROOT)" -a -n "$(YVEX_ROOT)" || { echo 'Set YAI_BIN, STUDIO_ROOT and YVEX_ROOT to reviewed local checkouts'; exit 1; }
 	python3 tools/check_platform_parity.py --yai-bin "$(YAI_BIN)" --studio-root "$(STUDIO_ROOT)" --yvex-root "$(YVEX_ROOT)"
+
+# Public headers supplied explicitly; isolated synthetic ABI peer, never inference.
+check-finite-native:
+	@test -n "$(YVEX_CLIENT_INCLUDE_DIR)" || { echo 'Set YVEX_CLIENT_INCLUDE_DIR to reviewed public installed headers'; exit 1; }
+	python3 tests/test_finite_native.py --include-dir "$(YVEX_CLIENT_INCLUDE_DIR)"
 
 # A successful software build is not binary distribution qualification.
 qualify-distribution:

@@ -60,6 +60,20 @@ capability promotion. No successor implementation is selected here.
 
 No release qualification is implied. Core semantics and Studio product tasks remain in their own repositories.
 
+## Active downstream product delivery
+
+The temporary Core-owned `YAI.PRODUCT.OPERATIONAL.CONVERGENCE.0` Task Pack
+includes `YAI.PRODUCT.COMMERCIAL.ACCESS.0`,
+`YAI.SYSTEM.ONE.FAST.SEARCH.INTEGRATION.0` and the existing Real Case Task.
+SDK slices project their contracts; they are not a competing semantic program
+or a reopening of completed platform/bootstrap Tasks. Browser installation
+activation adds five secret-free typed workflows (108 YAI descriptors).
+The separated YVEX finite client uses its public C ABI and preserves explicit
+absence, result identity and uncalibrated semantics. Real commercial activation,
+real finite inference, governed Case results and Studio interaction remain
+independent consumer/producer evidence. [Current conformance](qualification.md#product-operational-consumer-slices)
+records the bounded SDK scope.
+
 [Qualification](qualification.md) records the bounded local producer/consumer
 evidence. Remote transport, other language clients and customer-package legal
 qualification remain separate, unselected pressures.
