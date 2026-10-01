@@ -799,11 +799,157 @@ pub struct ProductEntitlementRecordInput {
     pub expected_revision: u64,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProductActivationStartInput {
+    pub name: String,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProductActivationPollInput {
+    pub activation_ref: String,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CommercialSessionPosture {
+    #[default]
+    #[serde(rename = "signed_out")]
+    SignedOut,
+    #[serde(rename = "activation_pending")]
+    ActivationPending,
+    #[serde(rename = "authenticated")]
+    Authenticated,
+    #[serde(rename = "credential_unavailable")]
+    CredentialUnavailable,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ActivationPosture {
+    #[default]
+    #[serde(rename = "pending")]
+    Pending,
+    #[serde(rename = "slow_down")]
+    SlowDown,
+    #[serde(rename = "activated")]
+    Activated,
+    #[serde(rename = "expired")]
+    Expired,
+    #[serde(rename = "denied")]
+    Denied,
+    #[serde(rename = "indeterminate")]
+    Indeterminate,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CommercialServicePosture {
+    #[default]
+    #[serde(rename = "not_observed")]
+    NotObserved,
+    #[serde(rename = "reachable")]
+    Reachable,
+    #[serde(rename = "unavailable")]
+    Unavailable,
+    #[serde(rename = "credential_rejected")]
+    CredentialRejected,
+    #[serde(rename = "entitlement_refused")]
+    EntitlementRefused,
+    #[serde(rename = "unsupported_contract")]
+    UnsupportedContract,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ProductAccessPosture {
+    #[default]
+    #[serde(rename = "trial_active")]
+    TrialActive,
+    #[serde(rename = "paid_active")]
+    PaidActive,
+    #[serde(rename = "not_yet_valid")]
+    NotYetValid,
+    #[serde(rename = "expired")]
+    Expired,
+    #[serde(rename = "revoked")]
+    Revoked,
+    #[serde(rename = "clock_rollback")]
+    ClockRollback,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum AcquiredAccessKind {
+    #[default]
+    #[serde(rename = "trial")]
+    Trial,
+    #[serde(rename = "subscription")]
+    Subscription,
+    #[serde(rename = "team")]
+    Team,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum EntitlementVerificationRefusal {
+    #[default]
+    #[serde(rename = "malformed")]
+    Malformed,
+    #[serde(rename = "unsupported_contract")]
+    UnsupportedContract,
+    #[serde(rename = "unsupported_issuer")]
+    UnsupportedIssuer,
+    #[serde(rename = "unsupported_key")]
+    UnsupportedKey,
+    #[serde(rename = "invalid_signature")]
+    InvalidSignature,
+    #[serde(rename = "invalid_installation_binding")]
+    InvalidInstallationBinding,
+    #[serde(rename = "invalid_claims")]
+    InvalidClaims,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProductActivationObservation {
+    pub activation_ref: String,
+    pub posture: ActivationPosture,
+    pub user_code: String,
+    pub verification_uri: String,
+    pub verification_uri_complete: String,
+    pub expires_at_unix_ms: u64,
+    pub poll_interval_ms: u64,
+    pub next_poll_at_unix_ms: u64,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct VerifiedProductAccessObservation {
+    pub schema: String,
+    pub posture: ProductAccessPosture,
+    pub licensed_operation_allowed: bool,
+    pub account_ref: String,
+    pub commercial_installation_ref: String,
+    pub grant_ref: String,
+    pub attestation_ref: String,
+    pub attestation_digest: String,
+    pub issuer_ref: String,
+    pub key_ref: String,
+    pub kind: AcquiredAccessKind,
+    pub issued_at_unix_ms: u64,
+    pub not_before_unix_ms: u64,
+    pub valid_until_unix_ms: u64,
+    pub offline_until_unix_ms: u64,
+    pub observed_at_unix_ms: u64,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProductAuthObservation {
+    pub schema: String,
+    pub session: CommercialSessionPosture,
+    pub service: CommercialServicePosture,
+    pub account_ref: Option<String>,
+    pub commercial_installation_ref: Option<String>,
+    pub activation: Option<ProductActivationObservation>,
+    pub access: Option<VerifiedProductAccessObservation>,
+    pub verification_refusal: Option<EntitlementVerificationRefusal>,
+    pub online_access_refused: bool,
+    pub licensed_progress_allowed: bool,
+    pub credential_storage: String,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct ProductBootstrapProjection {
     pub schema: String,
     pub posture: BootstrapPosture,
     pub product: ProductAccess,
     pub account: ProductAccount,
+    pub commercial_auth: Option<ProductAuthObservation>,
     pub profile: Option<ProductProfile>,
     pub local_home: String,
     pub principal: ProductPrincipal,
@@ -1218,6 +1364,76 @@ impl<T: ClientTransport> Resources<'_, T> {
 pub struct Product<'a, T>(pub(crate) &'a Client<T>);
 impl<T: ClientTransport> Client<T> {
     pub fn product(&self) -> Product<'_, T> { Product(self) }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductActivationStart<'a>(&'a ProductActivationStartInput);
+impl Operation for ProductActivationStart<'_> {
+    type Output = ProductAuthObservation;
+    const ID: &'static str = "product.activation.start";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_activation_start_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn activation_start(&self, correlation: &str, input: &ProductActivationStartInput) -> Result<Response<ProductAuthObservation>, Error> {
+        self.0.execute(correlation, &ProductActivationStart(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductActivationPoll<'a>(&'a ProductActivationPollInput);
+impl Operation for ProductActivationPoll<'_> {
+    type Output = ProductAuthObservation;
+    const ID: &'static str = "product.activation.poll";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_activation_poll_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn activation_poll(&self, correlation: &str, input: &ProductActivationPollInput) -> Result<Response<ProductAuthObservation>, Error> {
+        self.0.execute(correlation, &ProductActivationPoll(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductAuth<'a>(&'a EmptyInput);
+impl Operation for ProductAuth<'_> {
+    type Output = ProductAuthObservation;
+    const ID: &'static str = "product.auth.get";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth_get_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn auth(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductAuthObservation>, Error> {
+        self.0.execute(correlation, &ProductAuth(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductRefreshAuth<'a>(&'a EmptyInput);
+impl Operation for ProductRefreshAuth<'_> {
+    type Output = ProductAuthObservation;
+    const ID: &'static str = "product.auth.refresh";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth_refresh_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn refresh_auth(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductAuthObservation>, Error> {
+        self.0.execute(correlation, &ProductRefreshAuth(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductSignOut<'a>(&'a EmptyInput);
+impl Operation for ProductSignOut<'_> {
+    type Output = ProductAuthObservation;
+    const ID: &'static str = "product.auth.sign_out";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth_sign_out_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn sign_out(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductAuthObservation>, Error> {
+        self.0.execute(correlation, &ProductSignOut(input))
+    }
 }
 #[derive(Serialize)]
 #[serde(transparent)]

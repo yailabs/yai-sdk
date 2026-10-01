@@ -66,6 +66,22 @@ envelope for inspection of diagnostic or additive data.
 
 ## Observation and lifecycle
 
+Commercial installation activation uses the product owner, never a Supabase
+password client or a local account database. `product().activation_start` accepts
+an installation name; Core returns a same-service browser URL and short-lived
+correlation code. The user signs into the real commercial account in that browser
+and explicitly approves the installation. `activation_poll` preserves the exact
+activation reference and returns pending/slow-down/activated/refused/indeterminate
+posture. A consumed exchange with a lost response is not automatically retried.
+
+`auth`, `refresh_auth` and `sign_out` expose separate session, service and verified
+offline-access observations. Bearer/PKCE credentials, installation private keys
+and signed token bytes never belong to these DTOs. Core retains them through its
+native credential owner. Sign-out is not entitlement revoke or Case deletion.
+Account references, commercial installation references and local YAI identity
+are distinct. A contract fixture is not live account activation; native Studio
+consumption and commercial issuer evidence require independent qualification.
+
 For bounded Case Work, `conversation.send` accepts an executor Participant and
 finite `work_limits` in the typed intent. Its acknowledgement names the one
 committed Turn/request; `execution.get` returns a `work` projection with exact

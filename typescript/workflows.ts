@@ -531,11 +531,65 @@ export interface ProductEntitlementRecordInput {
   claim?: EntitlementClaim | null;
   expected_revision: number;
 }
+export interface ProductActivationStartInput {
+  name: string;
+}
+export interface ProductActivationPollInput {
+  activation_ref: string;
+}
+export type CommercialSessionPosture = "signed_out" | "activation_pending" | "authenticated" | "credential_unavailable";
+export type ActivationPosture = "pending" | "slow_down" | "activated" | "expired" | "denied" | "indeterminate";
+export type CommercialServicePosture = "not_observed" | "reachable" | "unavailable" | "credential_rejected" | "entitlement_refused" | "unsupported_contract";
+export type ProductAccessPosture = "trial_active" | "paid_active" | "not_yet_valid" | "expired" | "revoked" | "clock_rollback";
+export type AcquiredAccessKind = "trial" | "subscription" | "team";
+export type EntitlementVerificationRefusal = "malformed" | "unsupported_contract" | "unsupported_issuer" | "unsupported_key" | "invalid_signature" | "invalid_installation_binding" | "invalid_claims";
+export interface ProductActivationObservation {
+  activation_ref: string;
+  posture: ActivationPosture;
+  user_code: string;
+  verification_uri: string;
+  verification_uri_complete: string;
+  expires_at_unix_ms: number;
+  poll_interval_ms: number;
+  next_poll_at_unix_ms: number;
+}
+export interface VerifiedProductAccessObservation {
+  schema: string;
+  posture: ProductAccessPosture;
+  licensed_operation_allowed: boolean;
+  account_ref: string;
+  commercial_installation_ref: string;
+  grant_ref: string;
+  attestation_ref: string;
+  attestation_digest: string;
+  issuer_ref: string;
+  key_ref: string;
+  kind: AcquiredAccessKind;
+  issued_at_unix_ms: number;
+  not_before_unix_ms: number;
+  valid_until_unix_ms: number;
+  offline_until_unix_ms: number;
+  observed_at_unix_ms: number;
+}
+export interface ProductAuthObservation {
+  schema: string;
+  session: CommercialSessionPosture;
+  service: CommercialServicePosture;
+  account_ref?: string | null;
+  commercial_installation_ref?: string | null;
+  activation?: ProductActivationObservation | null;
+  access?: VerifiedProductAccessObservation | null;
+  verification_refusal?: EntitlementVerificationRefusal | null;
+  online_access_refused: boolean;
+  licensed_progress_allowed: boolean;
+  credential_storage: string;
+}
 export interface ProductBootstrapProjection {
   schema: string;
   posture: BootstrapPosture;
   product: ProductAccess;
   account: ProductAccount;
+  commercial_auth?: ProductAuthObservation | null;
   profile?: ProductProfile | null;
   local_home: string;
   principal: ProductPrincipal;

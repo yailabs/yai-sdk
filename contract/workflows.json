@@ -613,11 +613,39 @@
       "claim": "nullable:EntitlementClaim",
       "expected_revision": "u64"
     },
+    "ProductActivationStartInput": { "name": "string" },
+    "ProductActivationPollInput": { "activation_ref": "string" },
+    "CommercialSessionPosture": { "$enum": ["signed_out", "activation_pending", "authenticated", "credential_unavailable"] },
+    "ActivationPosture": { "$enum": ["pending", "slow_down", "activated", "expired", "denied", "indeterminate"] },
+    "CommercialServicePosture": { "$enum": ["not_observed", "reachable", "unavailable", "credential_rejected", "entitlement_refused", "unsupported_contract"] },
+    "ProductAccessPosture": { "$enum": ["trial_active", "paid_active", "not_yet_valid", "expired", "revoked", "clock_rollback"] },
+    "AcquiredAccessKind": { "$enum": ["trial", "subscription", "team"] },
+    "EntitlementVerificationRefusal": { "$enum": ["malformed", "unsupported_contract", "unsupported_issuer", "unsupported_key", "invalid_signature", "invalid_installation_binding", "invalid_claims"] },
+    "ProductActivationObservation": {
+      "activation_ref": "string", "posture": "ActivationPosture", "user_code": "string",
+      "verification_uri": "string", "verification_uri_complete": "string",
+      "expires_at_unix_ms": "u64", "poll_interval_ms": "u64", "next_poll_at_unix_ms": "u64"
+    },
+    "VerifiedProductAccessObservation": {
+      "schema": "string", "posture": "ProductAccessPosture", "licensed_operation_allowed": "bool",
+      "account_ref": "string", "commercial_installation_ref": "string", "grant_ref": "string",
+      "attestation_ref": "string", "attestation_digest": "string", "issuer_ref": "string", "key_ref": "string",
+      "kind": "AcquiredAccessKind", "issued_at_unix_ms": "u64", "not_before_unix_ms": "u64",
+      "valid_until_unix_ms": "u64", "offline_until_unix_ms": "u64", "observed_at_unix_ms": "u64"
+    },
+    "ProductAuthObservation": {
+      "schema": "string", "session": "CommercialSessionPosture", "service": "CommercialServicePosture",
+      "account_ref": "nullable:string", "commercial_installation_ref": "nullable:string",
+      "activation": "nullable:ProductActivationObservation", "access": "nullable:VerifiedProductAccessObservation",
+      "verification_refusal": "nullable:EntitlementVerificationRefusal", "online_access_refused": "bool", "licensed_progress_allowed": "bool",
+      "credential_storage": "string"
+    },
     "ProductBootstrapProjection": {
       "schema": "string",
       "posture": "BootstrapPosture",
       "product": "ProductAccess",
       "account": "ProductAccount",
+      "commercial_auth": "nullable:ProductAuthObservation",
       "profile": "nullable:ProductProfile",
       "local_home": "string",
       "principal": "ProductPrincipal",
@@ -647,7 +675,9 @@
     "ProductInitializeInput",
     "ProductWorkspaceSelectInput",
     "ProductEntitlementRecordInput",
-    "CaseListInput"
+    "CaseListInput",
+    "ProductActivationStartInput", "ProductActivationPollInput", "ProductActivationObservation",
+    "VerifiedProductAccessObservation", "ProductAuthObservation"
   ],
   "operations": [
     {
@@ -874,6 +904,31 @@
       "output": "StateMutationReceipt",
       "input_contract": "yai.resource_attach_process_input.v1",
       "output_contract": "yai.case_state_mutation_result.v1"
+    },
+    {
+      "family": "product", "method": "activation_start", "id": "product.activation.start",
+      "input": "ProductActivationStartInput", "output": "ProductAuthObservation",
+      "input_contract": "yai.product_activation_start_input.v1", "output_contract": "yai.product_auth.v1"
+    },
+    {
+      "family": "product", "method": "activation_poll", "id": "product.activation.poll",
+      "input": "ProductActivationPollInput", "output": "ProductAuthObservation",
+      "input_contract": "yai.product_activation_poll_input.v1", "output_contract": "yai.product_auth.v1"
+    },
+    {
+      "family": "product", "method": "auth", "id": "product.auth.get",
+      "input": "EmptyInput", "output": "ProductAuthObservation",
+      "input_contract": "yai.product_auth_get_input.v1", "output_contract": "yai.product_auth.v1"
+    },
+    {
+      "family": "product", "method": "refresh_auth", "id": "product.auth.refresh",
+      "input": "EmptyInput", "output": "ProductAuthObservation",
+      "input_contract": "yai.product_auth_refresh_input.v1", "output_contract": "yai.product_auth.v1"
+    },
+    {
+      "family": "product", "method": "sign_out", "id": "product.auth.sign_out",
+      "input": "EmptyInput", "output": "ProductAuthObservation",
+      "input_contract": "yai.product_auth_sign_out_input.v1", "output_contract": "yai.product_auth.v1"
     },
     {
       "family": "product",

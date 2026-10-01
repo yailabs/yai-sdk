@@ -491,6 +491,37 @@
       "authority": "current_case_authority"
     },
     {
+      "operation_id": "product.activation.poll",
+      "input_contract": "yai.product_activation_poll_input.v1",
+      "output_contract": "yai.product_auth.v1",
+      "meaning": "Redeem or observe one browser-approved activation without blindly repeating a consumed exchange",
+      "impact": "external_effect", "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "product.activation.start",
+      "input_contract": "yai.product_activation_start_input.v1", "output_contract": "yai.product_auth.v1",
+      "meaning": "Request browser approval for this installation; never grants Case authority",
+      "impact": "external_effect", "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "product.auth.get",
+      "input_contract": "yai.product_auth_get_input.v1", "output_contract": "yai.product_auth.v1",
+      "meaning": "Observe commercial session and independently verified offline product access without dispatch",
+      "impact": "read", "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "product.auth.refresh",
+      "input_contract": "yai.product_auth_refresh_input.v1", "output_contract": "yai.product_auth.v1",
+      "meaning": "Refresh this installation's commercial credential/entitlement posture without changing Case authority",
+      "impact": "external_effect", "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "product.auth.sign_out",
+      "input_contract": "yai.product_auth_sign_out_input.v1", "output_contract": "yai.product_auth.v1",
+      "meaning": "Clear only the local commercial session, preserving attestation, profile, YAI identity and Cases",
+      "impact": "operational_mutation", "authority": "local_authenticated"
+    },
+    {
       "operation_id": "product.bootstrap.get",
       "input_contract": "yai.product_bootstrap_get_input.v1",
       "output_contract": "yai.product_bootstrap.v1",

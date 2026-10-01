@@ -20,14 +20,20 @@ and reacts to invalidations without reading stores or reconstructing authority.
 
 CURRENT: Linux local Rust client, compatibility negotiation, public projections,
 capability discovery, failure/indeterminate-delivery distinctions and conformance;
-24 typed workflow methods in 11 families, with 79 shared contract types projected
+34 typed workflow methods in 11 families, with 110 shared contract types projected
 mechanically to Rust and TypeScript. Remaining low-level operations and
 TypeScript-only projections remain explicit, not fictitious complete typed coverage.
 
 Neither a convenience method nor a discovered capability promises permission.
 The client must handle current disclosure, stale state, unavailable producers and
-unsupported instances. YVEX remains a computational producer behind Core provider
-realization; this library is not a direct YVEX or provider-plugin SDK.
+unsupported instances. The YAI client domain consumes Core-governed semantics.
+The independent `yvex-sdk` domain projects YVEX-owned producer contracts; it does
+not grant Case authority or acquire Core semantics. Studio may compose both.
+
+Product activation initiates browser-based commercial account approval through
+Core, then observes the exact installation/activation identity. Client DTOs never
+contain bearer credentials, installation private keys or signed entitlement bytes.
+Account session, verified offline product access and Case authority are separate.
 
 This milestone does not promise network transport, portable OS support, model
 quality, calibration, human acceptance or customer-binary distribution readiness.

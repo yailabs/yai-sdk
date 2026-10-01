@@ -78,6 +78,25 @@ fn post_dispatch_loss_remains_indeterminate_without_retry() {
     assert!(error.outcome_indeterminate);
     assert_eq!(transport.calls.borrow().len(), 2);
 }
+
+#[test]
+fn activation_contract_preserves_pending_identity_and_rejects_credentials() {
+    use workflows::{ProductActivationStartInput, ProductActivationPollInput, ProductAuthObservation, ActivationPosture};
+    let start=serde_json::to_value(ProductActivationStartInput {name:"actual installation".into()}).unwrap();
+    assert_eq!(start,serde_json::json!({"name":"actual installation"}));
+    assert!(serde_json::from_value::<ProductActivationStartInput>(serde_json::json!({"email":"existing@example.invalid"})).is_err());
+    assert!(serde_json::from_value::<ProductActivationPollInput>(serde_json::json!({"activation_ref":"activation:one","access_token":"not-a-client-input"})).is_err());
+    let mut value=serde_json::json!({"schema":"yai.product_auth.v1","session":"activation_pending","service":"reachable",
+        "account_ref":null,"commercial_installation_ref":null,"access":null,"verification_refusal":null,
+        "online_access_refused":false,"licensed_progress_allowed":false,"credential_storage":"native_os_credential_store",
+        "activation":{"activation_ref":"activation:one","posture":"indeterminate","user_code":"1234-ABCD",
+            "verification_uri":"https://commercial.invalid/activate/","verification_uri_complete":"https://commercial.invalid/activate/?code=1234-ABCD",
+            "expires_at_unix_ms":600000,"poll_interval_ms":5000,"next_poll_at_unix_ms":10000}});
+    let observed:ProductAuthObservation=serde_json::from_value(value.clone()).unwrap();
+    assert_eq!(observed.activation.unwrap().posture,ActivationPosture::Indeterminate);
+    value["access_token"]=serde_json::json!("must-never-cross-the-client-contract");
+    assert!(serde_json::from_value::<ProductAuthObservation>(value).is_err());
+}
 #[test]
 fn wrong_identity_and_malformed_success_are_not_successes() {
     for mode in ["foreign", "malformed"] {
