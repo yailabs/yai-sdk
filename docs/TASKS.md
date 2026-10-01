@@ -65,8 +65,9 @@ qualification remain separate, unselected pressures.
 
 ## YAI.PRODUCT.BOOTSTRAP.IDENTITY.0
 
-In progress: project the YAI-owned pre-Case product profile, entitlement observation,
+Complete at the owned public projection boundary: project the YAI-owned pre-Case product profile, entitlement observation,
 Principal and real Tenant Workspace membership through the public SDK. Four typed
 product workflows share the released operation inventory. No commercial verifier,
-account service or authority is implemented by the SDK. Standalone and real
-Core/CLI/Studio conformance must qualify this boundary before closure.
+account service or authority is implemented by the SDK. Standalone checks and actual Core/CLI/native Studio consumption qualify this
+boundary; see [qualification](qualification.md). Production account and issuer
+services remain external, with no fabricated activation result.

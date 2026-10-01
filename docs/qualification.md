@@ -157,3 +157,20 @@ No production provider request, model-quality, human acceptance, internet
 transport, customer package or security-certification claim follows from these
 software and local product checks. Core and Studio retain their own evidence and
 project-control authorities; this repository does not mirror their roadmaps.
+
+## Product bootstrap and Workspace catalog
+
+The product wave adds four typed workflows and a Workspace filter to Case list
+and recent reads: 103 operation descriptors, 99 shared types, 29 typed workflows.
+Standalone Rust tests, TypeScript checks, generated workflow verification and the
+private-boundary guard pass. The built `examples/conformance` consumer validates
+all 103 descriptors against the actual updated Core Host in an isolated temporary
+installation (`/tmp/yai-product-live-sdk-conformance.log`).
+
+Core owns the separate product profile/claim store and membership checks. CLI
+qualification exercises fresh/init/select, unauthorized and stale refusal, claim
+import/removal and restart through the public SDK. Studio's actual native desktop
+qualifies first-run, Workspace selection/switching, Host replacement and retained
+Case/draft continuity (`/tmp/studio-native-product-final/result.json`). This is local
+consumer proof, not production account authentication or signed-license validity.
+No account service, issuer, trust-root distribution or payment producer exists.
