@@ -92,7 +92,7 @@ fn wrong_identity_and_malformed_success_are_not_successes() {
 fn generated_workflow_refuses_foreign_schema_before_dispatch() {
     let transport = mock("ok");
     let client = Client::discover(&transport, "discovery:1").unwrap();
-    assert!(matches!(client.cases().list("read:1", &workflows::EmptyInput {}),
+    assert!(matches!(client.cases().list("read:1", &workflows::CaseListInput { tenant_id: None }),
         Err(Error::ContractMismatch(_))));
     assert_eq!(transport.calls.borrow().len(), 1);
 }

@@ -546,3 +546,6 @@ export interface ProductBootstrapProjection {
   external_prerequisites: Array<string>;
   case_authority: string;
 }
+export interface CaseListInput {
+  tenant_id?: string;
+}

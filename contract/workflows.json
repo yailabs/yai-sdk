@@ -627,6 +627,9 @@
       "selected_workspace_available": "bool",
       "external_prerequisites": "array:string",
       "case_authority": "string"
+    },
+    "CaseListInput": {
+      "tenant_id": "optional:string"
     }
   },
   "closed_types": [
@@ -643,7 +646,8 @@
     "EntitlementClaim",
     "ProductInitializeInput",
     "ProductWorkspaceSelectInput",
-    "ProductEntitlementRecordInput"
+    "ProductEntitlementRecordInput",
+    "CaseListInput"
   ],
   "operations": [
     {
@@ -695,7 +699,7 @@
       "family": "cases",
       "method": "list",
       "id": "case.list",
-      "input": "EmptyInput",
+      "input": "CaseListInput",
       "output": "CaseListProjection",
       "input_contract": "yai.case_list_input.v1",
       "output_contract": "yai.case_list_projection.v1"
@@ -704,7 +708,7 @@
       "family": "cases",
       "method": "recent",
       "id": "case.recent",
-      "input": "EmptyInput",
+      "input": "CaseListInput",
       "output": "CaseListProjection",
       "input_contract": "yai.case_list_input.v1",
       "output_contract": "yai.case_list_projection.v1"

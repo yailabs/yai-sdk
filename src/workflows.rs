@@ -814,6 +814,12 @@ pub struct ProductBootstrapProjection {
     pub external_prerequisites: Vec<String>,
     pub case_authority: String,
 }
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CaseListInput {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tenant_id: Option<String>,
+}
 use crate::{ClientTransport, client::{Client, Error, Operation, Response}};
 pub struct Identity<'a, T>(pub(crate) &'a Client<T>);
 impl<T: ClientTransport> Client<T> {
@@ -899,7 +905,7 @@ impl<T: ClientTransport> Client<T> {
 }
 #[derive(Serialize)]
 #[serde(transparent)]
-struct CasesList<'a>(&'a EmptyInput);
+struct CasesList<'a>(&'a CaseListInput);
 impl Operation for CasesList<'_> {
     type Output = CaseListProjection;
     const ID: &'static str = "case.list";
@@ -907,13 +913,13 @@ impl Operation for CasesList<'_> {
     const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.case_list_projection.v1");
 }
 impl<T: ClientTransport> Cases<'_, T> {
-    pub fn list(&self, correlation: &str, input: &EmptyInput) -> Result<Response<CaseListProjection>, Error> {
+    pub fn list(&self, correlation: &str, input: &CaseListInput) -> Result<Response<CaseListProjection>, Error> {
         self.0.execute(correlation, &CasesList(input))
     }
 }
 #[derive(Serialize)]
 #[serde(transparent)]
-struct CasesRecent<'a>(&'a EmptyInput);
+struct CasesRecent<'a>(&'a CaseListInput);
 impl Operation for CasesRecent<'_> {
     type Output = CaseListProjection;
     const ID: &'static str = "case.recent";
@@ -921,7 +927,7 @@ impl Operation for CasesRecent<'_> {
     const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.case_list_projection.v1");
 }
 impl<T: ClientTransport> Cases<'_, T> {
-    pub fn recent(&self, correlation: &str, input: &EmptyInput) -> Result<Response<CaseListProjection>, Error> {
+    pub fn recent(&self, correlation: &str, input: &CaseListInput) -> Result<Response<CaseListProjection>, Error> {
         self.0.execute(correlation, &CasesRecent(input))
     }
 }

@@ -41,3 +41,8 @@ product account connectivity and YAI membership/Case authority are independent.
 The local profile revision fences stale selection or entitlement edits. A repeated
 exact selection or retained claim is idempotent. Clients must not infer a login,
 license grant or Participant role from these projections.
+
+Workspace-scoped discovery uses `CaseListInput.tenant_id` for `case.list` and
+`case.recent`. Omission retains the authorized multi-Tenant inventory for existing
+operators. An explicit Workspace filter is validated by Core; it does not grant
+membership or a Case Participant role.
