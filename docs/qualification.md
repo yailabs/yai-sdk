@@ -13,7 +13,8 @@ publication: {html: true, pdf: false, index: true}
 [Documentation](README.md)
 
 The v0.1.0 SDK is a supported client contract, not an implementation of Core
-semantics. This record qualifies Linux same-user local IPC only.
+semantics. This record qualifies Linux same-user local IPC and bounded macOS
+peer-credential queries; full native Host integration remains Linux-only.
 
 The later platform-parity lane compares current owner-published inventories
 across YAI, this SDK, Studio and YVEX with
@@ -174,3 +175,34 @@ qualifies first-run, Workspace selection/switching, Host replacement and retaine
 Case/draft continuity (`/tmp/studio-native-product-final/result.json`). This is local
 consumer proof, not production account authentication or signed-license validity.
 No account service, issuer, trust-root distribution or payment producer exists.
+
+## macOS peer credentials 2026-10-01
+
+Bounded repair of the SDK compilation failure exposed by Studio's pinned
+`22feee68` dependency: `libc::ucred` and `SO_PEERCRED` are Linux APIs.
+The published-main baseline is `506a2ed86d10ce7deaab1851931fa85b0bdab2b5`.
+The isolated Exon snapshot `e0e2323005c49480514b571346c8638c1ab0be1c` has the
+same affected transport source; its three unpublished commits were inspected
+and tested in a separate copy and are not included in this repair.
+
+On macOS arm64 26.6.2, `cargo check --locked --workspace --all-targets` and
+`cargo test --locked --test native_peer` pass (5 tests). Native controls check
+the actual UID/PID of a socket pair, the distinct connecting child's PID on
+an accepted Unix socket, rejection of an IPv4 descriptor, and explicit refusal
+of the unported process/start identity. The helper entry is a subprocess
+fixture, not a separate capability claim. No credentials are mocked.
+
+An isolated copy of local Studio `7074c31`, preserving its local case-sensitive
+module repair, compiles with the candidate through a temporary Cargo path
+override. This qualifies resolution of the compilation failure, not Studio
+release or full native runtime integration. Linux `cargo test --locked
+--workspace` passes all 38 tests, including the 4 applicable native peer
+controls. `npm ci && npm run check`, `python3 tools/check.py`, package identity
+and workflow contract controls pass. The public wire/product versions remain
+unchanged; no release tag is created.
+
+The full macOS SDK suite is not green: an existing Linux executable test
+requires `/usr/bin/sleep`, absent on this Mac, and process identity remains
+Linux-only. The isolated Studio native suite reports 8 pass, 1 ignored,
+1 failure at its existing `less` alternate-screen expectation. These broader
+boundaries are retained and are not suppressed to claim native qualification.

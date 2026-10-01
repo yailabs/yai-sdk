@@ -97,3 +97,18 @@ client-local dirty buffers. SDK does not reconstruct missing Case state.
 
 The finite MVP is local Linux transport. Internet transports, authorization across
 OS users, semantic policy and frontend design are not implemented here.
+
+## Native peer credentials
+
+The local Unix transport admits native peer PID/UID facts. Linux uses
+`SO_PEERCRED`; macOS uses `getpeereid` plus `SOL_LOCAL/LOCAL_PEERPID`.
+Returned structure length and positive PID are checked before publication.
+Unsupported Unix platforms refuse; a failed query never substitutes discovery
+file values or caller identity. Same-user and discovery process checks remain
+mandatory.
+
+This does not port `LocalProcessIdentity`: its v1 schema, start ticks, canonical
+identity and live-process observation remain Linux-defined. Capture on macOS
+explicitly returns `process_identity_unsupported_platform`. A conforming native
+Host/start identity requires coordinated Core/SDK work; peer queries and a
+compilable desktop shell alone do not establish authenticated macOS Host use.

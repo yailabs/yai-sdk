@@ -418,7 +418,7 @@ pub struct PeerCredentials {
     pub uid: u32,
 }
 
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 pub fn peer_credentials(stream: &UnixStream) -> Result<PeerCredentials, String> {
     let mut credentials = libc::ucred {
         pid: 0,
@@ -441,10 +441,53 @@ pub fn peer_credentials(stream: &UnixStream) -> Result<PeerCredentials, String> 
             std::io::Error::last_os_error()
         ));
     }
+    if length as usize != std::mem::size_of::<libc::ucred>() || credentials.pid <= 0 {
+        return Err("host_peer_credentials_invalid".into());
+    }
     Ok(PeerCredentials {
         pid: credentials.pid as u32,
         uid: credentials.uid,
     })
+}
+
+#[cfg(target_os = "macos")]
+pub fn peer_credentials(stream: &UnixStream) -> Result<PeerCredentials, String> {
+    // Darwin reports effective credentials and the peer PID through separate native queries.
+    // Both must succeed; the caller still authenticates the advertised process/start identity.
+    let mut uid: libc::uid_t = 0;
+    let mut gid: libc::gid_t = 0;
+    let mut pid: libc::pid_t = 0;
+    let mut length = std::mem::size_of::<libc::pid_t>() as libc::socklen_t;
+    if unsafe { libc::getpeereid(stream.as_raw_fd(), &mut uid, &mut gid) } != 0 {
+        return Err(format!(
+            "host_peer_credentials_failed:{}",
+            std::io::Error::last_os_error()
+        ));
+    }
+    let result = unsafe {
+        libc::getsockopt(
+            stream.as_raw_fd(),
+            libc::SOL_LOCAL,
+            libc::LOCAL_PEERPID,
+            &mut pid as *mut _ as *mut libc::c_void,
+            &mut length,
+        )
+    };
+    if result != 0 {
+        return Err(format!(
+            "host_peer_credentials_failed:{}",
+            std::io::Error::last_os_error()
+        ));
+    }
+    if length as usize != std::mem::size_of::<libc::pid_t>() || pid <= 0 {
+        return Err("host_peer_credentials_invalid".into());
+    }
+    Ok(PeerCredentials { pid: pid as u32, uid })
+}
+
+#[cfg(all(unix, not(any(target_os = "linux", target_os = "macos"))))]
+pub fn peer_credentials(_stream: &UnixStream) -> Result<PeerCredentials, String> {
+    Err("host_peer_credentials_unsupported_platform".into())
 }
 
 #[cfg(unix)]
