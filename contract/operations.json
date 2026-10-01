@@ -491,6 +491,38 @@
       "authority": "current_case_authority"
     },
     {
+      "operation_id": "product.bootstrap.get",
+      "input_contract": "yai.product_bootstrap_get_input.v1",
+      "output_contract": "yai.product_bootstrap.v1",
+      "meaning": "Inspect local product bootstrap without granting Case authority",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "product.entitlement.record",
+      "input_contract": "yai.product_entitlement_record_input.v1",
+      "output_contract": "yai.product_bootstrap.v1",
+      "meaning": "Retain or remove an unverified entitlement claim without granting authority",
+      "impact": "operational_mutation",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "product.profile.initialize",
+      "input_contract": "yai.product_profile_initialize_input.v1",
+      "output_contract": "yai.product_bootstrap.v1",
+      "meaning": "Initialize a local product profile and optionally its Personal Tenant",
+      "impact": "canonical_mutation",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "product.workspace.select",
+      "input_contract": "yai.product_workspace_select_input.v1",
+      "output_contract": "yai.product_bootstrap.v1",
+      "meaning": "Select an existing authorized Tenant in the local product profile",
+      "impact": "operational_mutation",
+      "authority": "local_authenticated"
+    },
+    {
       "operation_id": "provider.case.bind",
       "input_contract": "yai.provider_case_bind_input.v1",
       "output_contract": "yai.case_provider_binding.v1",

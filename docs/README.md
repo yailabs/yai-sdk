@@ -33,3 +33,11 @@ do not duplicate Core or Studio project control. Git retains forensic history.
 Canonical Markdown uses hidden `docs:metadata` with the common YAI document roles.
 This SDK profile uses one owner per question and relative internal links. Exact
 contract definitions and checked projections are not independent prose owners.
+
+Product bootstrap workflows project `product.bootstrap.get`,
+`product.profile.initialize`, `product.workspace.select` and
+`product.entitlement.record`. Entitlement claims remain explicitly unverified;
+product account connectivity and YAI membership/Case authority are independent.
+The local profile revision fences stale selection or entitlement edits. A repeated
+exact selection or retained claim is idempotent. Clients must not infer a login,
+license grant or Participant role from these projections.

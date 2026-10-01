@@ -677,6 +677,143 @@ pub enum ReviewRequirement {
     #[serde(rename = "require_review")]
     RequireReview,
 }
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProductGrant {
+    pub valid_from_unix_ms: Option<u64>,
+    pub valid_until_unix_ms: Option<u64>,
+    pub max_major_version: Option<u64>,
+    pub updates_until_unix_ms: Option<u64>,
+    pub offline_until_unix_ms: Option<u64>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct EntitlementClaim {
+    pub schema: String,
+    pub product: String,
+    pub edition: String,
+    pub holder_ref: String,
+    pub issuer_ref: String,
+    pub evidence_ref: String,
+    pub installation_ref: Option<String>,
+    pub grants: Vec<ProductGrant>,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum EntitlementPosture {
+    #[default]
+    #[serde(rename = "missing")]
+    Missing,
+    #[serde(rename = "unverifiable")]
+    Unverifiable,
+    #[serde(rename = "invalid")]
+    Invalid,
+    #[serde(rename = "expired")]
+    Expired,
+    #[serde(rename = "not_yet_valid")]
+    NotYetValid,
+    #[serde(rename = "version_not_covered")]
+    VersionNotCovered,
+    #[serde(rename = "stale")]
+    Stale,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct EntitlementObservation {
+    pub posture: EntitlementPosture,
+    pub verification: String,
+    pub access_granted: bool,
+    pub observed_at_unix_ms: Option<u64>,
+    pub claim: Option<EntitlementClaim>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ProductProfile {
+    pub schema: String,
+    pub profile_ref: String,
+    pub installation_ref: String,
+    pub principal_ref: String,
+    pub selected_tenant_ref: Option<String>,
+    pub entitlement_claim: Option<EntitlementClaim>,
+    pub entitlement_observed_at_unix_ms: Option<u64>,
+    pub created_at_unix_ms: u64,
+    pub revision: u64,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum BootstrapPosture {
+    #[default]
+    #[serde(rename = "identity_required")]
+    IdentityRequired,
+    #[serde(rename = "profile_required")]
+    ProfileRequired,
+    #[serde(rename = "workspace_required")]
+    WorkspaceRequired,
+    #[serde(rename = "workspace_selection_required")]
+    WorkspaceSelectionRequired,
+    #[serde(rename = "workspace_unavailable")]
+    WorkspaceUnavailable,
+    #[serde(rename = "ready")]
+    Ready,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ProductAccess {
+    pub product: String,
+    pub version: String,
+    pub access_policy: String,
+    pub license_verification: String,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ProductAccount {
+    pub posture: String,
+    pub linkage: Option<String>,
+    pub reason: String,
+    pub sign_in_supported: bool,
+    pub sign_out_supported: bool,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ProductPrincipal {
+    pub posture: String,
+    pub principal_ref: Option<String>,
+    pub authentication_method: String,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ProductWorkspace {
+    pub tenant_ref: String,
+    pub display_name: String,
+    pub kind: String,
+    pub organization_ref: String,
+    pub membership: String,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProductInitializeInput {
+    pub create_personal_workspace: bool,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProductWorkspaceSelectInput {
+    pub tenant_ref: String,
+    pub expected_revision: u64,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProductEntitlementRecordInput {
+    pub claim: Option<EntitlementClaim>,
+    pub expected_revision: u64,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ProductBootstrapProjection {
+    pub schema: String,
+    pub posture: BootstrapPosture,
+    pub product: ProductAccess,
+    pub account: ProductAccount,
+    pub profile: Option<ProductProfile>,
+    pub local_home: String,
+    pub principal: ProductPrincipal,
+    pub entitlement: EntitlementObservation,
+    pub workspaces: Vec<ProductWorkspace>,
+    pub selected_workspace_ref: Option<String>,
+    pub selected_workspace_available: bool,
+    pub external_prerequisites: Vec<String>,
+    pub case_authority: String,
+}
 use crate::{ClientTransport, client::{Client, Error, Operation, Response}};
 pub struct Identity<'a, T>(pub(crate) &'a Client<T>);
 impl<T: ClientTransport> Client<T> {
@@ -1070,5 +1207,65 @@ impl Operation for ResourcesAttachProcess<'_> {
 impl<T: ClientTransport> Resources<'_, T> {
     pub fn attach_process(&self, correlation: &str, input: &ProcessAttachmentInput) -> Result<Response<StateMutationReceipt>, Error> {
         self.0.execute(correlation, &ResourcesAttachProcess(input))
+    }
+}
+pub struct Product<'a, T>(pub(crate) &'a Client<T>);
+impl<T: ClientTransport> Client<T> {
+    pub fn product(&self) -> Product<'_, T> { Product(self) }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductBootstrap<'a>(&'a EmptyInput);
+impl Operation for ProductBootstrap<'_> {
+    type Output = ProductBootstrapProjection;
+    const ID: &'static str = "product.bootstrap.get";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_bootstrap_get_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_bootstrap.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn bootstrap(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductBootstrapProjection>, Error> {
+        self.0.execute(correlation, &ProductBootstrap(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductInitialize<'a>(&'a ProductInitializeInput);
+impl Operation for ProductInitialize<'_> {
+    type Output = ProductBootstrapProjection;
+    const ID: &'static str = "product.profile.initialize";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_profile_initialize_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_bootstrap.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn initialize(&self, correlation: &str, input: &ProductInitializeInput) -> Result<Response<ProductBootstrapProjection>, Error> {
+        self.0.execute(correlation, &ProductInitialize(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductSelectWorkspace<'a>(&'a ProductWorkspaceSelectInput);
+impl Operation for ProductSelectWorkspace<'_> {
+    type Output = ProductBootstrapProjection;
+    const ID: &'static str = "product.workspace.select";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_workspace_select_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_bootstrap.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn select_workspace(&self, correlation: &str, input: &ProductWorkspaceSelectInput) -> Result<Response<ProductBootstrapProjection>, Error> {
+        self.0.execute(correlation, &ProductSelectWorkspace(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductRecordEntitlement<'a>(&'a ProductEntitlementRecordInput);
+impl Operation for ProductRecordEntitlement<'_> {
+    type Output = ProductBootstrapProjection;
+    const ID: &'static str = "product.entitlement.record";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_entitlement_record_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_bootstrap.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn record_entitlement(&self, correlation: &str, input: &ProductEntitlementRecordInput) -> Result<Response<ProductBootstrapProjection>, Error> {
+        self.0.execute(correlation, &ProductRecordEntitlement(input))
     }
 }

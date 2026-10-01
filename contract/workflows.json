@@ -520,6 +520,113 @@
         "automatic",
         "require_review"
       ]
+    },
+    "ProductGrant": {
+      "valid_from_unix_ms": "nullable:u64",
+      "valid_until_unix_ms": "nullable:u64",
+      "max_major_version": "nullable:u64",
+      "updates_until_unix_ms": "nullable:u64",
+      "offline_until_unix_ms": "nullable:u64"
+    },
+    "EntitlementClaim": {
+      "schema": "string",
+      "product": "string",
+      "edition": "string",
+      "holder_ref": "string",
+      "issuer_ref": "string",
+      "evidence_ref": "string",
+      "installation_ref": "nullable:string",
+      "grants": "array:ProductGrant"
+    },
+    "EntitlementPosture": {
+      "$enum": [
+        "missing",
+        "unverifiable",
+        "invalid",
+        "expired",
+        "not_yet_valid",
+        "version_not_covered",
+        "stale"
+      ]
+    },
+    "EntitlementObservation": {
+      "posture": "EntitlementPosture",
+      "verification": "string",
+      "access_granted": "bool",
+      "observed_at_unix_ms": "nullable:u64",
+      "claim": "nullable:EntitlementClaim"
+    },
+    "ProductProfile": {
+      "schema": "string",
+      "profile_ref": "string",
+      "installation_ref": "string",
+      "principal_ref": "string",
+      "selected_tenant_ref": "nullable:string",
+      "entitlement_claim": "nullable:EntitlementClaim",
+      "entitlement_observed_at_unix_ms": "nullable:u64",
+      "created_at_unix_ms": "u64",
+      "revision": "u64"
+    },
+    "BootstrapPosture": {
+      "$enum": [
+        "identity_required",
+        "profile_required",
+        "workspace_required",
+        "workspace_selection_required",
+        "workspace_unavailable",
+        "ready"
+      ]
+    },
+    "ProductAccess": {
+      "product": "string",
+      "version": "string",
+      "access_policy": "string",
+      "license_verification": "string"
+    },
+    "ProductAccount": {
+      "posture": "string",
+      "linkage": "nullable:string",
+      "reason": "string",
+      "sign_in_supported": "bool",
+      "sign_out_supported": "bool"
+    },
+    "ProductPrincipal": {
+      "posture": "string",
+      "principal_ref": "nullable:string",
+      "authentication_method": "string"
+    },
+    "ProductWorkspace": {
+      "tenant_ref": "string",
+      "display_name": "string",
+      "kind": "string",
+      "organization_ref": "string",
+      "membership": "string"
+    },
+    "ProductInitializeInput": {
+      "create_personal_workspace": "bool"
+    },
+    "ProductWorkspaceSelectInput": {
+      "tenant_ref": "string",
+      "expected_revision": "u64"
+    },
+    "ProductEntitlementRecordInput": {
+      "claim": "nullable:EntitlementClaim",
+      "expected_revision": "u64"
+    },
+    "ProductBootstrapProjection": {
+      "schema": "string",
+      "posture": "BootstrapPosture",
+      "product": "ProductAccess",
+      "account": "ProductAccount",
+      "profile": "nullable:ProductProfile",
+      "local_home": "string",
+      "principal": "ProductPrincipal",
+      "entitlement": "EntitlementObservation",
+      "workspaces": "array:ProductWorkspace",
+      "selected_workspace_ref": "nullable:string",
+      "selected_workspace_available": "bool",
+      "external_prerequisites": "array:string",
+      "case_authority": "string"
     }
   },
   "closed_types": [
@@ -531,7 +638,12 @@
     "WorkflowPatchReceipt",
     "HandoffOfferReceipt",
     "HandoffReceipt",
-    "StateMutationReceipt"
+    "StateMutationReceipt",
+    "ProductGrant",
+    "EntitlementClaim",
+    "ProductInitializeInput",
+    "ProductWorkspaceSelectInput",
+    "ProductEntitlementRecordInput"
   ],
   "operations": [
     {
@@ -758,6 +870,42 @@
       "output": "StateMutationReceipt",
       "input_contract": "yai.resource_attach_process_input.v1",
       "output_contract": "yai.case_state_mutation_result.v1"
+    },
+    {
+      "family": "product",
+      "method": "bootstrap",
+      "id": "product.bootstrap.get",
+      "input": "EmptyInput",
+      "output": "ProductBootstrapProjection",
+      "input_contract": "yai.product_bootstrap_get_input.v1",
+      "output_contract": "yai.product_bootstrap.v1"
+    },
+    {
+      "family": "product",
+      "method": "initialize",
+      "id": "product.profile.initialize",
+      "input": "ProductInitializeInput",
+      "output": "ProductBootstrapProjection",
+      "input_contract": "yai.product_profile_initialize_input.v1",
+      "output_contract": "yai.product_bootstrap.v1"
+    },
+    {
+      "family": "product",
+      "method": "select_workspace",
+      "id": "product.workspace.select",
+      "input": "ProductWorkspaceSelectInput",
+      "output": "ProductBootstrapProjection",
+      "input_contract": "yai.product_workspace_select_input.v1",
+      "output_contract": "yai.product_bootstrap.v1"
+    },
+    {
+      "family": "product",
+      "method": "record_entitlement",
+      "id": "product.entitlement.record",
+      "input": "ProductEntitlementRecordInput",
+      "output": "ProductBootstrapProjection",
+      "input_contract": "yai.product_entitlement_record_input.v1",
+      "output_contract": "yai.product_bootstrap.v1"
     }
   ],
   "generics": {

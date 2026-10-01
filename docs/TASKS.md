@@ -62,3 +62,11 @@ No release qualification is implied. Core semantics and Studio product tasks rem
 [Qualification](qualification.md) records the bounded local producer/consumer
 evidence. Remote transport, other language clients and customer-package legal
 qualification remain separate, unselected pressures.
+
+## YAI.PRODUCT.BOOTSTRAP.IDENTITY.0
+
+In progress: project the YAI-owned pre-Case product profile, entitlement observation,
+Principal and real Tenant Workspace membership through the public SDK. Four typed
+product workflows share the released operation inventory. No commercial verifier,
+account service or authority is implemented by the SDK. Standalone and real
+Core/CLI/Studio conformance must qualify this boundary before closure.

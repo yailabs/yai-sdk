@@ -458,3 +458,91 @@ export interface ProcessAttachmentInput {
 }
 export type ProcessAction = "terminate" | "suspend" | "resume";
 export type ReviewRequirement = "automatic" | "require_review";
+export interface ProductGrant {
+  valid_from_unix_ms?: number | null;
+  valid_until_unix_ms?: number | null;
+  max_major_version?: number | null;
+  updates_until_unix_ms?: number | null;
+  offline_until_unix_ms?: number | null;
+}
+export interface EntitlementClaim {
+  schema: string;
+  product: string;
+  edition: string;
+  holder_ref: string;
+  issuer_ref: string;
+  evidence_ref: string;
+  installation_ref?: string | null;
+  grants: Array<ProductGrant>;
+}
+export type EntitlementPosture = "missing" | "unverifiable" | "invalid" | "expired" | "not_yet_valid" | "version_not_covered" | "stale";
+export interface EntitlementObservation {
+  posture: EntitlementPosture;
+  verification: string;
+  access_granted: boolean;
+  observed_at_unix_ms?: number | null;
+  claim?: EntitlementClaim | null;
+}
+export interface ProductProfile {
+  schema: string;
+  profile_ref: string;
+  installation_ref: string;
+  principal_ref: string;
+  selected_tenant_ref?: string | null;
+  entitlement_claim?: EntitlementClaim | null;
+  entitlement_observed_at_unix_ms?: number | null;
+  created_at_unix_ms: number;
+  revision: number;
+}
+export type BootstrapPosture = "identity_required" | "profile_required" | "workspace_required" | "workspace_selection_required" | "workspace_unavailable" | "ready";
+export interface ProductAccess {
+  product: string;
+  version: string;
+  access_policy: string;
+  license_verification: string;
+}
+export interface ProductAccount {
+  posture: string;
+  linkage?: string | null;
+  reason: string;
+  sign_in_supported: boolean;
+  sign_out_supported: boolean;
+}
+export interface ProductPrincipal {
+  posture: string;
+  principal_ref?: string | null;
+  authentication_method: string;
+}
+export interface ProductWorkspace {
+  tenant_ref: string;
+  display_name: string;
+  kind: string;
+  organization_ref: string;
+  membership: string;
+}
+export interface ProductInitializeInput {
+  create_personal_workspace: boolean;
+}
+export interface ProductWorkspaceSelectInput {
+  tenant_ref: string;
+  expected_revision: number;
+}
+export interface ProductEntitlementRecordInput {
+  claim?: EntitlementClaim | null;
+  expected_revision: number;
+}
+export interface ProductBootstrapProjection {
+  schema: string;
+  posture: BootstrapPosture;
+  product: ProductAccess;
+  account: ProductAccount;
+  profile?: ProductProfile | null;
+  local_home: string;
+  principal: ProductPrincipal;
+  entitlement: EntitlementObservation;
+  workspaces: Array<ProductWorkspace>;
+  selected_workspace_ref?: string | null;
+  selected_workspace_available: boolean;
+  external_prerequisites: Array<string>;
+  case_authority: string;
+}

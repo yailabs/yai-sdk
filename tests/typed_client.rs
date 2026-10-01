@@ -174,3 +174,29 @@ fn partial_and_unavailable_do_not_become_success_or_erase_evidence() {
         assert_eq!(transport.calls.borrow().len(), 2);
     }
 }
+
+#[test]
+fn product_bootstrap_preserves_unknown_commercial_boundary() {
+    use yai_sdk::workflows::{ProductBootstrapProjection, BootstrapPosture, EntitlementPosture};
+    let value=serde_json::json!({
+        "schema":"yai.product_bootstrap.v1","posture":"identity_required",
+        "product":{"product":"yai","version":"0.1.0","access_policy":"not_enforced","license_verification":"unavailable"},
+        "account":{"posture":"unavailable","linkage":null,"reason":"account_service_not_configured","sign_in_supported":false,"sign_out_supported":false},
+        "profile":null,"local_home":"/tmp/qualified-profile",
+        "principal":{"posture":"not_enrolled","principal_ref":null,"authentication_method":"posix"},
+        "entitlement":{"posture":"missing","verification":"issuer_verifier_unavailable","access_granted":false,"observed_at_unix_ms":null,"claim":null},
+        "workspaces":[],"selected_workspace_ref":null,"selected_workspace_available":false,
+        "external_prerequisites":["product_account_service","trusted_entitlement_issuer_and_verifier"],
+        "case_authority":"independent_current_yai_admission"
+    });
+    let parsed:ProductBootstrapProjection=serde_json::from_value(value.clone()).unwrap();
+    assert_eq!(parsed.posture,BootstrapPosture::IdentityRequired);
+    assert_eq!(parsed.entitlement.posture,EntitlementPosture::Missing);
+    assert!(!parsed.entitlement.access_granted);assert!(parsed.profile.is_none());
+    for posture in ["unverifiable","invalid","expired","not_yet_valid","version_not_covered","stale"] {
+        let mut variant=value.clone();variant["entitlement"]["posture"]=serde_json::json!(posture);
+        let parsed:ProductBootstrapProjection=serde_json::from_value(variant).unwrap();assert!(!parsed.entitlement.access_granted);
+    }
+    let mut broken=value;broken.as_object_mut().unwrap().remove("principal");
+    assert!(serde_json::from_value::<ProductBootstrapProjection>(broken).is_err());
+}
