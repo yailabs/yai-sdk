@@ -538,6 +538,30 @@
       "authority": "local_authenticated"
     },
     {
+      "operation_id": "product.login.cancel",
+      "input_contract": "yai.product_login_cancel_input.v1",
+      "output_contract": "yai.product_login.v1",
+      "meaning": "Cancel this exact local browser-login wait without revoking an account or replaying exchange",
+      "impact": "operational_mutation",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "product.login.get",
+      "input_contract": "yai.product_login_get_input.v1",
+      "output_contract": "yai.product_login.v1",
+      "meaning": "Observe browser login and automatic callback independently of product access and Case authority",
+      "impact": "read",
+      "authority": "local_authenticated"
+    },
+    {
+      "operation_id": "product.login.start",
+      "input_contract": "yai.product_login_start_input.v1",
+      "output_contract": "yai.product_login.v1",
+      "meaning": "Start one PKCE-bound browser login using the existing installation credential owner",
+      "impact": "external_effect",
+      "authority": "local_authenticated"
+    },
+    {
       "operation_id": "product.profile.initialize",
       "input_contract": "yai.product_profile_initialize_input.v1",
       "output_contract": "yai.product_bootstrap.v1",

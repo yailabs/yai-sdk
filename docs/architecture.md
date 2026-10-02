@@ -59,7 +59,7 @@ the sole authority. Capability metadata grants no permission.
 `contract/workflows.json` owns the shared result envelope, invalidation event,
 common value projections and typed workflow descriptors. Deterministic generation
 produces Rust and TypeScript; `--check` rejects edits to either projection.
-`contract/operations.json` binds the released 108-operation inventory. Core
+`contract/operations.json` binds the released 111-operation inventory. Core
 conformance compares that inventory with the real catalog, while ordinary clients
 may use a compatible subset. This is contract ownership, not copied admission.
 

@@ -537,6 +537,26 @@ export interface ProductActivationStartInput {
 export interface ProductActivationPollInput {
   activation_ref: string;
 }
+export type ProductLoginClient = "cli" | "studio";
+export interface ProductLoginStartInput {
+  client: ProductLoginClient;
+  name: string;
+}
+export interface ProductLoginCancelInput {
+  login_ref: string;
+}
+export type ProductLoginPosture = "idle" | "awaiting_browser" | "exchanging" | "authenticated" | "cancelled" | "expired" | "unavailable" | "refused" | "interrupted" | "indeterminate";
+export type ProductLoginFailure = "service_unavailable" | "unsupported_contract" | "authorization_refused" | "entitlement_required" | "token_refused" | "entitlement_verification_refused" | "delivery_indeterminate" | "listener_interrupted" | "request_expired";
+export interface ProductLoginObservation {
+  schema: string;
+  login_ref?: string | null;
+  posture: ProductLoginPosture;
+  authorization_url?: string | null;
+  expires_at_unix_ms?: number | null;
+  callback_received: boolean;
+  failure?: ProductLoginFailure | null;
+  auth: ProductAuthObservation;
+}
 export type CommercialSessionPosture = "signed_out" | "activation_pending" | "authenticated" | "credential_unavailable";
 export type ActivationPosture = "pending" | "slow_down" | "activated" | "expired" | "denied" | "indeterminate";
 export type CommercialServicePosture = "not_observed" | "reachable" | "unavailable" | "credential_rejected" | "entitlement_refused" | "unsupported_contract";

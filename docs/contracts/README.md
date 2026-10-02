@@ -75,13 +75,28 @@ Wrong generation/population, non-finite scores, generated output and unsupported
 calibration refuse. A YVEX computational result does not admit a YAI Decision;
 the YAI consumer still owns disclosure, current-W validation and qualification.
 
-Commercial installation activation uses the product owner, never a Supabase
-password client or a local account database. `product().activation_start` accepts
-an installation name; Core returns a same-service browser URL and short-lived
-correlation code. The user signs into the real commercial account in that browser
-and explicitly approves the installation. `activation_poll` preserves the exact
-activation reference and returns pending/slow-down/activated/refused/indeterminate
-posture. A consumed exchange with a lost response is not automatically retried.
+Commercial account login uses the Product Auth owner, never a Supabase client or
+a local account database. `product().login_start` accepts `{client: studio|cli,
+name}` and returns `ProductLoginObservation` (`yai.product_login.v1`). Open its
+`authorization_url` in the system browser on the same machine as the Host.
+`product().login` observes automatic callback completion; `cancel_login` accepts
+the exact `login_ref` and cancels local waiting, not remote account access.
+Awaiting browser, exchanging, authenticated, cancelled, expired, unavailable,
+refused, interrupted and indeterminate are distinct typed postures. A validated
+callback sets `callback_received`; it is not a licensed-access or window-focus
+claim. A client disconnect observes the same pending attempt. After Host loss,
+waiting is interrupted and an already-started exchange is indeterminate; no
+automatic exchange retry occurs.
+
+Core owns the loopback listener, independent state and PKCE S256, fixed origin
+and issuer, 600-second request and one-use token exchange. The public web
+[candidate contract](https://github.com/yailabs/web/blob/841b76a96a5ebde349bfa8db420c9a177d210fa3/docs/native-account-login.md)
+uses `yai.native-session.v1` with a signed v2 entitlement; refresh deliberately
+still uses `yai.product-activation.v1`. Legacy `activation_start/poll` remain
+compatibility operations, not the selected product sign-in flow. No entered code,
+copied license or separate installation confirmation is required. Fully headless
+authentication is deferred; a browser on another machine cannot complete a local
+loopback callback.
 
 `auth`, `refresh_auth` and `sign_out` expose separate session, service and verified
 offline-access observations. Bearer/PKCE credentials, installation private keys
@@ -90,6 +105,13 @@ native credential owner. Sign-out is not entitlement revoke or Case deletion.
 Account references, commercial installation references and local YAI identity
 are distinct. A contract fixture is not live account activation; native Studio
 consumption and commercial issuer evidence require independent qualification.
+An authenticated v2 account can still have `licensed_progress_allowed: false`
+and `verification_refusal: unsupported_contract` for unadmitted draft policy.
+Do not navigate into licensed operation based on login posture alone. Required
+public configuration belongs to Core's `product-commerce.json` (service origin,
+pinned issuer/public keys, explicit loopback-HTTP development opt-in), not Studio
+Supabase environment variables. Missing configuration is `core_pending` with
+`commercial_service_not_configured`; 503 rollout refusal is not revocation.
 
 For bounded Case Work, `conversation.send` accepts an executor Participant and
 finite `work_limits` in the typed intent. Its acknowledgement names the one

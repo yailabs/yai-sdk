@@ -18,12 +18,20 @@ peer-credential queries; full native Host integration remains Linux-only.
 
 ## Product operational consumer slices
 
-Browser activation projects five Core-owned operations without credentials or
-Supabase objects: the released YAI inventory is 108 operations. Pending,
+Browser activation projects five compatibility operations without credentials or
+Supabase objects: the released YAI inventory is 111 operations. Pending,
 indeterminate, closed-input and identity controls pass independently of a real
 commercial issuer or Studio login journey. Core's isolated native qualification
 owns the actual vault/Application/CLI proof; SDK does not infer entitlement or
 Case authority from these DTOs.
+
+Three native-login projections add typed start/observe/cancel and automatic
+callback observation without exporting PKCE/state/code/token material. Standalone
+Rust tests, all-target workspace checks, generated workflow negative controls,
+TypeScript and documentation/package/legal guards pass. Closed-input/output
+tests distinguish account authentication from unsupported entitlement policy.
+These are client/conformance claims only: web `841b76a` remains a gated candidate;
+real browser/account/Home and other-OS credential runtime evidence are not inferred.
 
 Finite client conformance uses the exact public headers at YVEX `67a7905` and an
 SDK-authored C fixture, not YVEX inference. Default standalone tests cover byte

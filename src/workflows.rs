@@ -809,6 +809,83 @@ pub struct ProductActivationPollInput {
     pub activation_ref: String,
 }
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ProductLoginClient {
+    #[default]
+    #[serde(rename = "cli")]
+    Cli,
+    #[serde(rename = "studio")]
+    Studio,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProductLoginStartInput {
+    pub client: ProductLoginClient,
+    pub name: String,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProductLoginCancelInput {
+    pub login_ref: String,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ProductLoginPosture {
+    #[default]
+    #[serde(rename = "idle")]
+    Idle,
+    #[serde(rename = "awaiting_browser")]
+    AwaitingBrowser,
+    #[serde(rename = "exchanging")]
+    Exchanging,
+    #[serde(rename = "authenticated")]
+    Authenticated,
+    #[serde(rename = "cancelled")]
+    Cancelled,
+    #[serde(rename = "expired")]
+    Expired,
+    #[serde(rename = "unavailable")]
+    Unavailable,
+    #[serde(rename = "refused")]
+    Refused,
+    #[serde(rename = "interrupted")]
+    Interrupted,
+    #[serde(rename = "indeterminate")]
+    Indeterminate,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ProductLoginFailure {
+    #[default]
+    #[serde(rename = "service_unavailable")]
+    ServiceUnavailable,
+    #[serde(rename = "unsupported_contract")]
+    UnsupportedContract,
+    #[serde(rename = "authorization_refused")]
+    AuthorizationRefused,
+    #[serde(rename = "entitlement_required")]
+    EntitlementRequired,
+    #[serde(rename = "token_refused")]
+    TokenRefused,
+    #[serde(rename = "entitlement_verification_refused")]
+    EntitlementVerificationRefused,
+    #[serde(rename = "delivery_indeterminate")]
+    DeliveryIndeterminate,
+    #[serde(rename = "listener_interrupted")]
+    ListenerInterrupted,
+    #[serde(rename = "request_expired")]
+    RequestExpired,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProductLoginObservation {
+    pub schema: String,
+    pub login_ref: Option<String>,
+    pub posture: ProductLoginPosture,
+    pub authorization_url: Option<String>,
+    pub expires_at_unix_ms: Option<u64>,
+    pub callback_received: bool,
+    pub failure: Option<ProductLoginFailure>,
+    pub auth: ProductAuthObservation,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum CommercialSessionPosture {
     #[default]
     #[serde(rename = "signed_out")]
@@ -1364,6 +1441,48 @@ impl<T: ClientTransport> Resources<'_, T> {
 pub struct Product<'a, T>(pub(crate) &'a Client<T>);
 impl<T: ClientTransport> Client<T> {
     pub fn product(&self) -> Product<'_, T> { Product(self) }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductLoginStart<'a>(&'a ProductLoginStartInput);
+impl Operation for ProductLoginStart<'_> {
+    type Output = ProductLoginObservation;
+    const ID: &'static str = "product.login.start";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_login_start_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_login.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn login_start(&self, correlation: &str, input: &ProductLoginStartInput) -> Result<Response<ProductLoginObservation>, Error> {
+        self.0.execute(correlation, &ProductLoginStart(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductLogin<'a>(&'a EmptyInput);
+impl Operation for ProductLogin<'_> {
+    type Output = ProductLoginObservation;
+    const ID: &'static str = "product.login.get";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_login_get_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_login.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn login(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductLoginObservation>, Error> {
+        self.0.execute(correlation, &ProductLogin(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductCancelLogin<'a>(&'a ProductLoginCancelInput);
+impl Operation for ProductCancelLogin<'_> {
+    type Output = ProductLoginObservation;
+    const ID: &'static str = "product.login.cancel";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_login_cancel_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_login.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn cancel_login(&self, correlation: &str, input: &ProductLoginCancelInput) -> Result<Response<ProductLoginObservation>, Error> {
+        self.0.execute(correlation, &ProductCancelLogin(input))
+    }
 }
 #[derive(Serialize)]
 #[serde(transparent)]

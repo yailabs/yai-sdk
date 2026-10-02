@@ -615,6 +615,16 @@
     },
     "ProductActivationStartInput": { "name": "string" },
     "ProductActivationPollInput": { "activation_ref": "string" },
+    "ProductLoginClient": { "$enum": ["cli", "studio"] },
+    "ProductLoginStartInput": { "client": "ProductLoginClient", "name": "string" },
+    "ProductLoginCancelInput": { "login_ref": "string" },
+    "ProductLoginPosture": { "$enum": ["idle", "awaiting_browser", "exchanging", "authenticated", "cancelled", "expired", "unavailable", "refused", "interrupted", "indeterminate"] },
+    "ProductLoginFailure": { "$enum": ["service_unavailable", "unsupported_contract", "authorization_refused", "entitlement_required", "token_refused", "entitlement_verification_refused", "delivery_indeterminate", "listener_interrupted", "request_expired"] },
+    "ProductLoginObservation": {
+      "schema": "string", "login_ref": "nullable:string", "posture": "ProductLoginPosture",
+      "authorization_url": "nullable:string", "expires_at_unix_ms": "nullable:u64",
+      "callback_received": "bool", "failure": "nullable:ProductLoginFailure", "auth": "ProductAuthObservation"
+    },
     "CommercialSessionPosture": { "$enum": ["signed_out", "activation_pending", "authenticated", "credential_unavailable"] },
     "ActivationPosture": { "$enum": ["pending", "slow_down", "activated", "expired", "denied", "indeterminate"] },
     "CommercialServicePosture": { "$enum": ["not_observed", "reachable", "unavailable", "credential_rejected", "entitlement_refused", "unsupported_contract"] },
@@ -677,7 +687,8 @@
     "ProductEntitlementRecordInput",
     "CaseListInput",
     "ProductActivationStartInput", "ProductActivationPollInput", "ProductActivationObservation",
-    "VerifiedProductAccessObservation", "ProductAuthObservation"
+    "VerifiedProductAccessObservation", "ProductAuthObservation",
+    "ProductLoginStartInput", "ProductLoginCancelInput", "ProductLoginObservation"
   ],
   "operations": [
     {
@@ -904,6 +915,21 @@
       "output": "StateMutationReceipt",
       "input_contract": "yai.resource_attach_process_input.v1",
       "output_contract": "yai.case_state_mutation_result.v1"
+    },
+    {
+      "family": "product", "method": "login_start", "id": "product.login.start",
+      "input": "ProductLoginStartInput", "output": "ProductLoginObservation",
+      "input_contract": "yai.product_login_start_input.v1", "output_contract": "yai.product_login.v1"
+    },
+    {
+      "family": "product", "method": "login", "id": "product.login.get",
+      "input": "EmptyInput", "output": "ProductLoginObservation",
+      "input_contract": "yai.product_login_get_input.v1", "output_contract": "yai.product_login.v1"
+    },
+    {
+      "family": "product", "method": "cancel_login", "id": "product.login.cancel",
+      "input": "ProductLoginCancelInput", "output": "ProductLoginObservation",
+      "input_contract": "yai.product_login_cancel_input.v1", "output_contract": "yai.product_login.v1"
     },
     {
       "family": "product", "method": "activation_start", "id": "product.activation.start",

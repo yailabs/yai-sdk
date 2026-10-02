@@ -108,6 +108,25 @@ fn wrong_identity_and_malformed_success_are_not_successes() {
 }
 
 #[test]
+fn native_login_contract_has_no_callback_credentials_or_implicit_product_access() {
+    use workflows::{ProductLoginStartInput, ProductLoginClient, ProductLoginCancelInput, ProductLoginObservation, ProductLoginPosture};
+    let start = serde_json::to_value(ProductLoginStartInput {client:ProductLoginClient::Studio,name:"Studio".into()}).unwrap();
+    assert_eq!(start,serde_json::json!({"client":"studio","name":"Studio"}));
+    assert!(serde_json::from_value::<ProductLoginStartInput>(serde_json::json!({"client":"studio","name":"Studio","code_verifier":"private"})).is_err());
+    assert!(serde_json::from_value::<ProductLoginCancelInput>(serde_json::json!({"login_ref":"login:one","redirect_uri":"http://evil.invalid"})).is_err());
+    let mut value = serde_json::json!({"schema":"yai.product_login.v1","login_ref":"login:one",
+        "posture":"authenticated","authorization_url":null,"expires_at_unix_ms":600000,"callback_received":true,"failure":null,
+        "auth":{"schema":"yai.product_auth.v1","session":"authenticated","service":"unsupported_contract","account_ref":"account:one",
+            "commercial_installation_ref":"commercial-device:one","activation":null,"access":null,"verification_refusal":"unsupported_contract",
+            "online_access_refused":false,"licensed_progress_allowed":false,"credential_storage":"native_os_credential_store"}});
+    let observed: ProductLoginObservation = serde_json::from_value(value.clone()).unwrap();
+    assert_eq!(observed.posture,ProductLoginPosture::Authenticated);
+    assert!(!observed.auth.licensed_progress_allowed);
+    value["state"]=serde_json::json!("secret-state");
+    assert!(serde_json::from_value::<ProductLoginObservation>(value).is_err());
+}
+
+#[test]
 fn generated_workflow_refuses_foreign_schema_before_dispatch() {
     let transport = mock("ok");
     let client = Client::discover(&transport, "discovery:1").unwrap();
