@@ -30,8 +30,9 @@ unsupported instances. The YAI client domain consumes Core-governed semantics.
 The independent `yvex-sdk` domain projects YVEX-owned producer contracts; it does
 not grant Case authority or acquire Core semantics. Studio may compose both.
 
-Product activation initiates browser-based commercial account approval through
-Core, then observes the exact installation/activation identity. Client DTOs never
+Product login initiates ordinary browser account authentication through Core and
+observes its automatic local callback, without entered codes or separate device
+confirmation. Legacy pairing is compatibility-only. Client DTOs never
 contain bearer credentials, installation private keys or signed entitlement bytes.
 Account session, verified offline product access and Case authority are separate.
 
