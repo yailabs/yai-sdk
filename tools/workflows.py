@@ -22,6 +22,8 @@ def render(contract):
             inner = ty(nested, language)
             if kind == 'array':
                 return f'Vec<{inner}>' if language == 'rust' else f'Array<{inner}>'
+            if kind == 'map':
+                return f'std::collections::BTreeMap<String, {inner}>' if language == 'rust' else f'Record<string, {inner}>'
             if kind in ('optional', 'nullable'):
                 return f'Option<{inner}>' if language == 'rust' else (inner if kind == 'optional' else f'{inner} | null')
             raise ValueError(f'unknown type constructor: {kind}')

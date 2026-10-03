@@ -46,6 +46,14 @@ class ContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'unknown closed type'):
             generator.render(self.contract)
 
+    def test_product_policy_projects_typed_limits_not_marketing_logic(self):
+        rust, ts = generator.render(self.contract)
+        self.assertIn('pub limits: std::collections::BTreeMap<String, Option<u64>>', rust)
+        self.assertIn('limits: Record<string, number | null>', ts)
+        self.assertIn('pub policy: Option<ProductAccessPolicy>', rust)
+        self.assertIn('"unsupported_policy"', ts)
+        self.assertNotIn('2026-10-03', rust)  # Core, not SDK, admits revisions.
+
     def test_method_collision_refuses(self):
         operation = copy.deepcopy(self.contract['operations'][0])
         operation['id'] = 'different.operation'

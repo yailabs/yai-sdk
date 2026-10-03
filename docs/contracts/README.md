@@ -106,12 +106,25 @@ Account references, commercial installation references and local YAI identity
 are distinct. A contract fixture is not live account activation; native Studio
 consumption and commercial issuer evidence require independent qualification.
 An authenticated v2 account can still have `licensed_progress_allowed: false`
-and `verification_refusal: unsupported_contract` for unadmitted draft policy.
+and `verification_refusal: unsupported_policy` for unadmitted draft policy.
 Do not navigate into licensed operation based on login posture alone. Required
 public configuration belongs to Core's `product-commerce.json` (service origin,
 pinned issuer/public keys, explicit loopback-HTTP development opt-in), not Studio
 Supabase environment variables. Missing configuration is `core_pending` with
 `commercial_service_not_configured`; 503 rollout refusal is not revocation.
+
+`VerifiedProductAccessObservation` optionally carries an opaque `plan_ref` and
+a typed `ProductAccessPolicy`. The policy projects identity/revision, scope,
+commercial owner/assignment, capability grants and a map of quantitative limits.
+A null limit is unlimited; absent policy and unknown usage are not unlimited or
+zero. SDK does not admit revisions, derive grants from plan names or manufacture
+usage. The [Core policy owner](https://github.com/yailabs/yai/blob/main/docs/reference/product-access-policy.md)
+defines local admission. Member/pool vocabulary is representable, not evidence
+that pooled offline enforcement or future advanced features exist.
+
+The Core-required policy is not yet issued by web `841b76a`, which still signs
+the explicitly unadmitted quota draft. Typed projection and fixture verification
+do not qualify commercial login, a live final policy, Studio Home or billing.
 
 For bounded Case Work, `conversation.send` accepts an executor Participant and
 finite `work_limits` in the typed intent. Its acknowledgement names the one

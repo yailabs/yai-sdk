@@ -972,6 +972,30 @@ pub enum EntitlementVerificationRefusal {
     InvalidInstallationBinding,
     #[serde(rename = "invalid_claims")]
     InvalidClaims,
+    #[serde(rename = "unsupported_policy")]
+    UnsupportedPolicy,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ProductPolicyScope {
+    #[default]
+    #[serde(rename = "installation")]
+    Installation,
+    #[serde(rename = "member")]
+    Member,
+    #[serde(rename = "organization_pool")]
+    OrganizationPool,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProductAccessPolicy {
+    pub schema: String,
+    pub policy_id: String,
+    pub revision: String,
+    pub scope: ProductPolicyScope,
+    pub owner_id: String,
+    pub assignment_ref: Option<String>,
+    pub capabilities: Vec<String>,
+    pub limits: std::collections::BTreeMap<String, Option<u64>>,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -1004,6 +1028,10 @@ pub struct VerifiedProductAccessObservation {
     pub valid_until_unix_ms: u64,
     pub offline_until_unix_ms: u64,
     pub observed_at_unix_ms: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub plan_ref: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub policy: Option<ProductAccessPolicy>,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

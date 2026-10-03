@@ -630,7 +630,12 @@
     "CommercialServicePosture": { "$enum": ["not_observed", "reachable", "unavailable", "credential_rejected", "entitlement_refused", "unsupported_contract"] },
     "ProductAccessPosture": { "$enum": ["trial_active", "paid_active", "not_yet_valid", "expired", "revoked", "clock_rollback"] },
     "AcquiredAccessKind": { "$enum": ["trial", "subscription", "team"] },
-    "EntitlementVerificationRefusal": { "$enum": ["malformed", "unsupported_contract", "unsupported_issuer", "unsupported_key", "invalid_signature", "invalid_installation_binding", "invalid_claims"] },
+    "EntitlementVerificationRefusal": { "$enum": ["malformed", "unsupported_contract", "unsupported_issuer", "unsupported_key", "invalid_signature", "invalid_installation_binding", "invalid_claims", "unsupported_policy"] },
+    "ProductPolicyScope": { "$enum": ["installation", "member", "organization_pool"] },
+    "ProductAccessPolicy": {
+      "schema": "string", "policy_id": "string", "revision": "string", "scope": "ProductPolicyScope",
+      "owner_id": "string", "assignment_ref": "nullable:string", "capabilities": "array:string", "limits": "map:nullable:u64"
+    },
     "ProductActivationObservation": {
       "activation_ref": "string", "posture": "ActivationPosture", "user_code": "string",
       "verification_uri": "string", "verification_uri_complete": "string",
@@ -641,7 +646,8 @@
       "account_ref": "string", "commercial_installation_ref": "string", "grant_ref": "string",
       "attestation_ref": "string", "attestation_digest": "string", "issuer_ref": "string", "key_ref": "string",
       "kind": "AcquiredAccessKind", "issued_at_unix_ms": "u64", "not_before_unix_ms": "u64",
-      "valid_until_unix_ms": "u64", "offline_until_unix_ms": "u64", "observed_at_unix_ms": "u64"
+      "valid_until_unix_ms": "u64", "offline_until_unix_ms": "u64", "observed_at_unix_ms": "u64",
+      "plan_ref": "optional:string", "policy": "optional:ProductAccessPolicy"
     },
     "ProductAuthObservation": {
       "schema": "string", "session": "CommercialSessionPosture", "service": "CommercialServicePosture",
@@ -687,7 +693,7 @@
     "ProductEntitlementRecordInput",
     "CaseListInput",
     "ProductActivationStartInput", "ProductActivationPollInput", "ProductActivationObservation",
-    "VerifiedProductAccessObservation", "ProductAuthObservation",
+    "ProductAccessPolicy", "VerifiedProductAccessObservation", "ProductAuthObservation",
     "ProductLoginStartInput", "ProductLoginCancelInput", "ProductLoginObservation"
   ],
   "operations": [

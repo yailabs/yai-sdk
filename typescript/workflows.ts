@@ -562,7 +562,18 @@ export type ActivationPosture = "pending" | "slow_down" | "activated" | "expired
 export type CommercialServicePosture = "not_observed" | "reachable" | "unavailable" | "credential_rejected" | "entitlement_refused" | "unsupported_contract";
 export type ProductAccessPosture = "trial_active" | "paid_active" | "not_yet_valid" | "expired" | "revoked" | "clock_rollback";
 export type AcquiredAccessKind = "trial" | "subscription" | "team";
-export type EntitlementVerificationRefusal = "malformed" | "unsupported_contract" | "unsupported_issuer" | "unsupported_key" | "invalid_signature" | "invalid_installation_binding" | "invalid_claims";
+export type EntitlementVerificationRefusal = "malformed" | "unsupported_contract" | "unsupported_issuer" | "unsupported_key" | "invalid_signature" | "invalid_installation_binding" | "invalid_claims" | "unsupported_policy";
+export type ProductPolicyScope = "installation" | "member" | "organization_pool";
+export interface ProductAccessPolicy {
+  schema: string;
+  policy_id: string;
+  revision: string;
+  scope: ProductPolicyScope;
+  owner_id: string;
+  assignment_ref?: string | null;
+  capabilities: Array<string>;
+  limits: Record<string, number | null>;
+}
 export interface ProductActivationObservation {
   activation_ref: string;
   posture: ActivationPosture;
@@ -590,6 +601,8 @@ export interface VerifiedProductAccessObservation {
   valid_until_unix_ms: number;
   offline_until_unix_ms: number;
   observed_at_unix_ms: number;
+  plan_ref?: string;
+  policy?: ProductAccessPolicy;
 }
 export interface ProductAuthObservation {
   schema: string;

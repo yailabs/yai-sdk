@@ -20,7 +20,7 @@ and reacts to invalidations without reading stores or reconstructing authority.
 
 CURRENT: Linux local Rust client, compatibility negotiation, public projections,
 capability discovery, failure/indeterminate-delivery distinctions and conformance;
-37 typed workflow methods in 11 families, with 116 shared contract types projected
+37 typed workflow methods in 11 families, with 118 shared contract types projected
 mechanically to Rust and TypeScript. Remaining low-level operations and
 TypeScript-only projections remain explicit, not fictitious complete typed coverage.
 

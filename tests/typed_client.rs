@@ -127,6 +127,23 @@ fn native_login_contract_has_no_callback_credentials_or_implicit_product_access(
 }
 
 #[test]
+fn product_policy_projection_is_closed_and_does_not_grant_client_authority() {
+    use workflows::{ProductAccessPolicy, ProductPolicyScope, EntitlementVerificationRefusal};
+    let mut value = serde_json::json!({"schema":"yai.product_access_policy.v1",
+        "policy_id":"yai.individual.standard","revision":"2026-10-03","scope":"installation",
+        "owner_id":"account:fixture","assignment_ref":null,"capabilities":["yai.use"],
+        "limits":{"managed_work":2,"local_cases":null,"personal_installations":null}});
+    let projection: ProductAccessPolicy = serde_json::from_value(value.clone()).unwrap();
+    assert_eq!(projection.scope, ProductPolicyScope::Installation);
+    assert_eq!(projection.limits["managed_work"], Some(2));
+    assert_eq!(projection.limits["local_cases"], None);
+    value["access_token"] = serde_json::json!("forbidden");
+    assert!(serde_json::from_value::<ProductAccessPolicy>(value).is_err());
+    assert_eq!(serde_json::from_str::<EntitlementVerificationRefusal>("\"unsupported_policy\"").unwrap(),
+        EntitlementVerificationRefusal::UnsupportedPolicy);
+}
+
+#[test]
 fn generated_workflow_refuses_foreign_schema_before_dispatch() {
     let transport = mock("ok");
     let client = Client::discover(&transport, "discovery:1").unwrap();
