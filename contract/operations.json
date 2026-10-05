@@ -2,6 +2,10 @@
   "schema": "yai.application_capability_catalog.v1",
   "application_protocol": "yai.studio.application.v1",
   "operations": [
+    {"operation_id":"product.access.development.disable","input_contract":"yai.product_development_access_input.v1","output_contract":"yai.product_access_source.v1","meaning":"Disable local development without removing identity, credentials or Cases","impact":"operational_mutation","authority":"local_authenticated"},
+    {"operation_id":"product.access.development.enable","input_contract":"yai.product_development_access_input.v1","output_contract":"yai.product_access_source.v1","meaning":"Explicitly select local development only in a capable build; no Case authority granted","impact":"operational_mutation","authority":"local_authenticated"},
+    {"operation_id":"product.access.get","input_contract":"yai.product_access_source_get_input.v1","output_contract":"yai.product_access_source.v1","meaning":"Observe the canonical access source independently of account authentication","impact":"read","authority":"local_authenticated"},
+    {"operation_id":"product.account.profile.get","input_contract":"yai.product_account_profile_get_input.v1","output_contract":"yai.product_account_profile.v1","meaning":"Observe safe commercial profile availability; absent native service contract never fabricates identity","impact":"read","authority":"local_authenticated"},
     {
       "operation_id": "application.capabilities",
       "input_contract": "yai.application_capabilities_input.v1",

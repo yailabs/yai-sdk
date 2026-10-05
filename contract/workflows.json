@@ -3,6 +3,23 @@
   "application_protocol": "yai.studio.application.v1",
   "types": {
     "EmptyInput": {},
+    "ProductAccessSource": {"$enum":["commercial","local_development","unconfigured_pre_release"]},
+    "ProductAccessSourcePosture": {"$enum":["allowed","refused","not_enforced"]},
+    "AccountProfilePosture": {"$enum":["not_applicable","authentication_required","unavailable","current","stale","unsupported_contract"]},
+    "EmailVerificationPosture": {"$enum":["not_reported","verified","unverified"]},
+    "ProductDevelopmentAccessInput": {"expected_revision":"u64"},
+    "ProductAccountProfileObservation": {
+      "schema":"string","posture":"AccountProfilePosture","account_ref":"nullable:string",
+      "display_name":"nullable:string","email":"nullable:string","email_verification":"EmailVerificationPosture",
+      "observed_at_unix_ms":"nullable:u64","reason":"nullable:string"
+    },
+    "ProductAccessSourceObservation": {
+      "schema":"string","source":"ProductAccessSource","posture":"ProductAccessSourcePosture",
+      "operation_allowed":"bool","development_capable":"bool","development_enabled":"bool",
+      "profile_revision":"nullable:u64","commercial_limits_applied":"bool",
+      "commercial_auth":"nullable:ProductAuthObservation","account_profile":"ProductAccountProfileObservation",
+      "refusal":"nullable:string"
+    },
     "CaseRefInput": {
       "case_ref": "string"
     },
@@ -564,6 +581,7 @@
       "selected_tenant_ref": "nullable:string",
       "entitlement_claim": "nullable:EntitlementClaim",
       "entitlement_observed_at_unix_ms": "nullable:u64",
+      "local_development_enabled": "optional:bool",
       "created_at_unix_ms": "u64",
       "revision": "u64"
     },
@@ -662,6 +680,7 @@
       "product": "ProductAccess",
       "account": "ProductAccount",
       "commercial_auth": "nullable:ProductAuthObservation",
+      "access": "optional:ProductAccessSourceObservation",
       "profile": "nullable:ProductProfile",
       "local_home": "string",
       "principal": "ProductPrincipal",
@@ -677,6 +696,7 @@
     }
   },
   "closed_types": [
+    "ProductDevelopmentAccessInput", "ProductAccessSourceObservation", "ProductAccountProfileObservation",
     "CaseVersionProjection",
     "WorkCommit",
     "TransitionReceipt",
@@ -697,6 +717,10 @@
     "ProductLoginStartInput", "ProductLoginCancelInput", "ProductLoginObservation"
   ],
   "operations": [
+    {"family":"product","method":"access_status","id":"product.access.get","input":"EmptyInput","output":"ProductAccessSourceObservation","input_contract":"yai.product_access_source_get_input.v1","output_contract":"yai.product_access_source.v1"},
+    {"family":"product","method":"enable_development","id":"product.access.development.enable","input":"ProductDevelopmentAccessInput","output":"ProductAccessSourceObservation","input_contract":"yai.product_development_access_input.v1","output_contract":"yai.product_access_source.v1"},
+    {"family":"product","method":"disable_development","id":"product.access.development.disable","input":"ProductDevelopmentAccessInput","output":"ProductAccessSourceObservation","input_contract":"yai.product_development_access_input.v1","output_contract":"yai.product_access_source.v1"},
+    {"family":"product","method":"account_profile","id":"product.account.profile.get","input":"EmptyInput","output":"ProductAccountProfileObservation","input_contract":"yai.product_account_profile_get_input.v1","output_contract":"yai.product_account_profile.v1"},
     {
       "family": "identity",
       "method": "current",

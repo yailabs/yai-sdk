@@ -30,6 +30,31 @@ An incompatible identity refuses before ordinary operations.
 
 ## Operations and outcomes
 
+### Product Access source and authenticated profile
+
+The product workflow methods are `access_status`, `enable_development`,
+`disable_development` and `account_profile`. Their Application IDs are
+`product.access.get`, `product.access.development.enable`,
+`product.access.development.disable` and `product.account.profile.get`.
+Enable/disable take `ProductDevelopmentAccessInput { expected_revision }`;
+reads take `EmptyInput`. `ProductBootstrapProjection.access` additionally carries
+the same optional source observation for backward-compatible bootstrap consumption.
+
+`ProductAccessSourceObservation` reports `commercial`, `local_development` or
+`unconfigured_pre_release`, `allowed/refused/not_enforced`, serving build capability,
+explicit profile opt-in/revision, commercial quota applicability and precise refusal.
+`ProductAccountProfileObservation` reports `not_applicable`, `authentication_required`,
+`unavailable`, `current`, `stale` or `unsupported_contract`; optional holder/name/email,
+`not_reported/verified/unverified` email verification and observation/reason fields.
+Current authenticated native profile display is unavailable except holder reference;
+the browser-only account route is not a supported native fetch contract.
+
+Neither DTO exposes credentials, entitlement bytes or provider objects. Commercial
+profile unavailability is not an access refusal; local development is not a paid
+plan. `product_development_build_required` refuses an ordinary serving build even
+if a client requests development. Unknown operation/contract remains unsupported,
+not a local-preview fallback. Core product ALLOW still requires Case authority.
+
 Requests carry Application protocol, operation identity, correlation identity and
 the operation-specific input. Correlation is not an idempotency token. Effectful
 operations have domain-owned submission/plan identities, which clients preserve.

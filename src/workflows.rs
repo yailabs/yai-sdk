@@ -3,6 +3,84 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct EmptyInput {
 }
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ProductAccessSource {
+    #[default]
+    #[serde(rename = "commercial")]
+    Commercial,
+    #[serde(rename = "local_development")]
+    LocalDevelopment,
+    #[serde(rename = "unconfigured_pre_release")]
+    UnconfiguredPreRelease,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ProductAccessSourcePosture {
+    #[default]
+    #[serde(rename = "allowed")]
+    Allowed,
+    #[serde(rename = "refused")]
+    Refused,
+    #[serde(rename = "not_enforced")]
+    NotEnforced,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum AccountProfilePosture {
+    #[default]
+    #[serde(rename = "not_applicable")]
+    NotApplicable,
+    #[serde(rename = "authentication_required")]
+    AuthenticationRequired,
+    #[serde(rename = "unavailable")]
+    Unavailable,
+    #[serde(rename = "current")]
+    Current,
+    #[serde(rename = "stale")]
+    Stale,
+    #[serde(rename = "unsupported_contract")]
+    UnsupportedContract,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum EmailVerificationPosture {
+    #[default]
+    #[serde(rename = "not_reported")]
+    NotReported,
+    #[serde(rename = "verified")]
+    Verified,
+    #[serde(rename = "unverified")]
+    Unverified,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProductDevelopmentAccessInput {
+    pub expected_revision: u64,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProductAccountProfileObservation {
+    pub schema: String,
+    pub posture: AccountProfilePosture,
+    pub account_ref: Option<String>,
+    pub display_name: Option<String>,
+    pub email: Option<String>,
+    pub email_verification: EmailVerificationPosture,
+    pub observed_at_unix_ms: Option<u64>,
+    pub reason: Option<String>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProductAccessSourceObservation {
+    pub schema: String,
+    pub source: ProductAccessSource,
+    pub posture: ProductAccessSourcePosture,
+    pub operation_allowed: bool,
+    pub development_capable: bool,
+    pub development_enabled: bool,
+    pub profile_revision: Option<u64>,
+    pub commercial_limits_applied: bool,
+    pub commercial_auth: Option<ProductAuthObservation>,
+    pub account_profile: ProductAccountProfileObservation,
+    pub refusal: Option<String>,
+}
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct CaseRefInput {
     pub case_ref: String,
@@ -733,6 +811,8 @@ pub struct ProductProfile {
     pub selected_tenant_ref: Option<String>,
     pub entitlement_claim: Option<EntitlementClaim>,
     pub entitlement_observed_at_unix_ms: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub local_development_enabled: Option<bool>,
     pub created_at_unix_ms: u64,
     pub revision: u64,
 }
@@ -1055,6 +1135,8 @@ pub struct ProductBootstrapProjection {
     pub product: ProductAccess,
     pub account: ProductAccount,
     pub commercial_auth: Option<ProductAuthObservation>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub access: Option<ProductAccessSourceObservation>,
     pub profile: Option<ProductProfile>,
     pub local_home: String,
     pub principal: ProductPrincipal,
@@ -1072,6 +1154,234 @@ pub struct CaseListInput {
     pub tenant_id: Option<String>,
 }
 use crate::{ClientTransport, client::{Client, Error, Operation, Response}};
+pub struct Product<'a, T>(pub(crate) &'a Client<T>);
+impl<T: ClientTransport> Client<T> {
+    pub fn product(&self) -> Product<'_, T> { Product(self) }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductAccessStatus<'a>(&'a EmptyInput);
+impl Operation for ProductAccessStatus<'_> {
+    type Output = ProductAccessSourceObservation;
+    const ID: &'static str = "product.access.get";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_access_source_get_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_access_source.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn access_status(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductAccessSourceObservation>, Error> {
+        self.0.execute(correlation, &ProductAccessStatus(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductEnableDevelopment<'a>(&'a ProductDevelopmentAccessInput);
+impl Operation for ProductEnableDevelopment<'_> {
+    type Output = ProductAccessSourceObservation;
+    const ID: &'static str = "product.access.development.enable";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_development_access_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_access_source.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn enable_development(&self, correlation: &str, input: &ProductDevelopmentAccessInput) -> Result<Response<ProductAccessSourceObservation>, Error> {
+        self.0.execute(correlation, &ProductEnableDevelopment(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductDisableDevelopment<'a>(&'a ProductDevelopmentAccessInput);
+impl Operation for ProductDisableDevelopment<'_> {
+    type Output = ProductAccessSourceObservation;
+    const ID: &'static str = "product.access.development.disable";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_development_access_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_access_source.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn disable_development(&self, correlation: &str, input: &ProductDevelopmentAccessInput) -> Result<Response<ProductAccessSourceObservation>, Error> {
+        self.0.execute(correlation, &ProductDisableDevelopment(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductAccountProfile<'a>(&'a EmptyInput);
+impl Operation for ProductAccountProfile<'_> {
+    type Output = ProductAccountProfileObservation;
+    const ID: &'static str = "product.account.profile.get";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_account_profile_get_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_account_profile.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn account_profile(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductAccountProfileObservation>, Error> {
+        self.0.execute(correlation, &ProductAccountProfile(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductLoginStart<'a>(&'a ProductLoginStartInput);
+impl Operation for ProductLoginStart<'_> {
+    type Output = ProductLoginObservation;
+    const ID: &'static str = "product.login.start";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_login_start_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_login.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn login_start(&self, correlation: &str, input: &ProductLoginStartInput) -> Result<Response<ProductLoginObservation>, Error> {
+        self.0.execute(correlation, &ProductLoginStart(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductLogin<'a>(&'a EmptyInput);
+impl Operation for ProductLogin<'_> {
+    type Output = ProductLoginObservation;
+    const ID: &'static str = "product.login.get";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_login_get_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_login.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn login(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductLoginObservation>, Error> {
+        self.0.execute(correlation, &ProductLogin(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductCancelLogin<'a>(&'a ProductLoginCancelInput);
+impl Operation for ProductCancelLogin<'_> {
+    type Output = ProductLoginObservation;
+    const ID: &'static str = "product.login.cancel";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_login_cancel_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_login.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn cancel_login(&self, correlation: &str, input: &ProductLoginCancelInput) -> Result<Response<ProductLoginObservation>, Error> {
+        self.0.execute(correlation, &ProductCancelLogin(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductActivationStart<'a>(&'a ProductActivationStartInput);
+impl Operation for ProductActivationStart<'_> {
+    type Output = ProductAuthObservation;
+    const ID: &'static str = "product.activation.start";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_activation_start_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn activation_start(&self, correlation: &str, input: &ProductActivationStartInput) -> Result<Response<ProductAuthObservation>, Error> {
+        self.0.execute(correlation, &ProductActivationStart(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductActivationPoll<'a>(&'a ProductActivationPollInput);
+impl Operation for ProductActivationPoll<'_> {
+    type Output = ProductAuthObservation;
+    const ID: &'static str = "product.activation.poll";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_activation_poll_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn activation_poll(&self, correlation: &str, input: &ProductActivationPollInput) -> Result<Response<ProductAuthObservation>, Error> {
+        self.0.execute(correlation, &ProductActivationPoll(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductAuth<'a>(&'a EmptyInput);
+impl Operation for ProductAuth<'_> {
+    type Output = ProductAuthObservation;
+    const ID: &'static str = "product.auth.get";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth_get_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn auth(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductAuthObservation>, Error> {
+        self.0.execute(correlation, &ProductAuth(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductRefreshAuth<'a>(&'a EmptyInput);
+impl Operation for ProductRefreshAuth<'_> {
+    type Output = ProductAuthObservation;
+    const ID: &'static str = "product.auth.refresh";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth_refresh_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn refresh_auth(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductAuthObservation>, Error> {
+        self.0.execute(correlation, &ProductRefreshAuth(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductSignOut<'a>(&'a EmptyInput);
+impl Operation for ProductSignOut<'_> {
+    type Output = ProductAuthObservation;
+    const ID: &'static str = "product.auth.sign_out";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth_sign_out_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn sign_out(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductAuthObservation>, Error> {
+        self.0.execute(correlation, &ProductSignOut(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductBootstrap<'a>(&'a EmptyInput);
+impl Operation for ProductBootstrap<'_> {
+    type Output = ProductBootstrapProjection;
+    const ID: &'static str = "product.bootstrap.get";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_bootstrap_get_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_bootstrap.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn bootstrap(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductBootstrapProjection>, Error> {
+        self.0.execute(correlation, &ProductBootstrap(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductInitialize<'a>(&'a ProductInitializeInput);
+impl Operation for ProductInitialize<'_> {
+    type Output = ProductBootstrapProjection;
+    const ID: &'static str = "product.profile.initialize";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_profile_initialize_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_bootstrap.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn initialize(&self, correlation: &str, input: &ProductInitializeInput) -> Result<Response<ProductBootstrapProjection>, Error> {
+        self.0.execute(correlation, &ProductInitialize(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductSelectWorkspace<'a>(&'a ProductWorkspaceSelectInput);
+impl Operation for ProductSelectWorkspace<'_> {
+    type Output = ProductBootstrapProjection;
+    const ID: &'static str = "product.workspace.select";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_workspace_select_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_bootstrap.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn select_workspace(&self, correlation: &str, input: &ProductWorkspaceSelectInput) -> Result<Response<ProductBootstrapProjection>, Error> {
+        self.0.execute(correlation, &ProductSelectWorkspace(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProductRecordEntitlement<'a>(&'a ProductEntitlementRecordInput);
+impl Operation for ProductRecordEntitlement<'_> {
+    type Output = ProductBootstrapProjection;
+    const ID: &'static str = "product.entitlement.record";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_entitlement_record_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_bootstrap.v1");
+}
+impl<T: ClientTransport> Product<'_, T> {
+    pub fn record_entitlement(&self, correlation: &str, input: &ProductEntitlementRecordInput) -> Result<Response<ProductBootstrapProjection>, Error> {
+        self.0.execute(correlation, &ProductRecordEntitlement(input))
+    }
+}
 pub struct Identity<'a, T>(pub(crate) &'a Client<T>);
 impl<T: ClientTransport> Client<T> {
     pub fn identity(&self) -> Identity<'_, T> { Identity(self) }
@@ -1464,177 +1774,5 @@ impl Operation for ResourcesAttachProcess<'_> {
 impl<T: ClientTransport> Resources<'_, T> {
     pub fn attach_process(&self, correlation: &str, input: &ProcessAttachmentInput) -> Result<Response<StateMutationReceipt>, Error> {
         self.0.execute(correlation, &ResourcesAttachProcess(input))
-    }
-}
-pub struct Product<'a, T>(pub(crate) &'a Client<T>);
-impl<T: ClientTransport> Client<T> {
-    pub fn product(&self) -> Product<'_, T> { Product(self) }
-}
-#[derive(Serialize)]
-#[serde(transparent)]
-struct ProductLoginStart<'a>(&'a ProductLoginStartInput);
-impl Operation for ProductLoginStart<'_> {
-    type Output = ProductLoginObservation;
-    const ID: &'static str = "product.login.start";
-    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_login_start_input.v1");
-    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_login.v1");
-}
-impl<T: ClientTransport> Product<'_, T> {
-    pub fn login_start(&self, correlation: &str, input: &ProductLoginStartInput) -> Result<Response<ProductLoginObservation>, Error> {
-        self.0.execute(correlation, &ProductLoginStart(input))
-    }
-}
-#[derive(Serialize)]
-#[serde(transparent)]
-struct ProductLogin<'a>(&'a EmptyInput);
-impl Operation for ProductLogin<'_> {
-    type Output = ProductLoginObservation;
-    const ID: &'static str = "product.login.get";
-    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_login_get_input.v1");
-    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_login.v1");
-}
-impl<T: ClientTransport> Product<'_, T> {
-    pub fn login(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductLoginObservation>, Error> {
-        self.0.execute(correlation, &ProductLogin(input))
-    }
-}
-#[derive(Serialize)]
-#[serde(transparent)]
-struct ProductCancelLogin<'a>(&'a ProductLoginCancelInput);
-impl Operation for ProductCancelLogin<'_> {
-    type Output = ProductLoginObservation;
-    const ID: &'static str = "product.login.cancel";
-    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_login_cancel_input.v1");
-    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_login.v1");
-}
-impl<T: ClientTransport> Product<'_, T> {
-    pub fn cancel_login(&self, correlation: &str, input: &ProductLoginCancelInput) -> Result<Response<ProductLoginObservation>, Error> {
-        self.0.execute(correlation, &ProductCancelLogin(input))
-    }
-}
-#[derive(Serialize)]
-#[serde(transparent)]
-struct ProductActivationStart<'a>(&'a ProductActivationStartInput);
-impl Operation for ProductActivationStart<'_> {
-    type Output = ProductAuthObservation;
-    const ID: &'static str = "product.activation.start";
-    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_activation_start_input.v1");
-    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth.v1");
-}
-impl<T: ClientTransport> Product<'_, T> {
-    pub fn activation_start(&self, correlation: &str, input: &ProductActivationStartInput) -> Result<Response<ProductAuthObservation>, Error> {
-        self.0.execute(correlation, &ProductActivationStart(input))
-    }
-}
-#[derive(Serialize)]
-#[serde(transparent)]
-struct ProductActivationPoll<'a>(&'a ProductActivationPollInput);
-impl Operation for ProductActivationPoll<'_> {
-    type Output = ProductAuthObservation;
-    const ID: &'static str = "product.activation.poll";
-    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_activation_poll_input.v1");
-    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth.v1");
-}
-impl<T: ClientTransport> Product<'_, T> {
-    pub fn activation_poll(&self, correlation: &str, input: &ProductActivationPollInput) -> Result<Response<ProductAuthObservation>, Error> {
-        self.0.execute(correlation, &ProductActivationPoll(input))
-    }
-}
-#[derive(Serialize)]
-#[serde(transparent)]
-struct ProductAuth<'a>(&'a EmptyInput);
-impl Operation for ProductAuth<'_> {
-    type Output = ProductAuthObservation;
-    const ID: &'static str = "product.auth.get";
-    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth_get_input.v1");
-    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth.v1");
-}
-impl<T: ClientTransport> Product<'_, T> {
-    pub fn auth(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductAuthObservation>, Error> {
-        self.0.execute(correlation, &ProductAuth(input))
-    }
-}
-#[derive(Serialize)]
-#[serde(transparent)]
-struct ProductRefreshAuth<'a>(&'a EmptyInput);
-impl Operation for ProductRefreshAuth<'_> {
-    type Output = ProductAuthObservation;
-    const ID: &'static str = "product.auth.refresh";
-    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth_refresh_input.v1");
-    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth.v1");
-}
-impl<T: ClientTransport> Product<'_, T> {
-    pub fn refresh_auth(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductAuthObservation>, Error> {
-        self.0.execute(correlation, &ProductRefreshAuth(input))
-    }
-}
-#[derive(Serialize)]
-#[serde(transparent)]
-struct ProductSignOut<'a>(&'a EmptyInput);
-impl Operation for ProductSignOut<'_> {
-    type Output = ProductAuthObservation;
-    const ID: &'static str = "product.auth.sign_out";
-    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth_sign_out_input.v1");
-    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_auth.v1");
-}
-impl<T: ClientTransport> Product<'_, T> {
-    pub fn sign_out(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductAuthObservation>, Error> {
-        self.0.execute(correlation, &ProductSignOut(input))
-    }
-}
-#[derive(Serialize)]
-#[serde(transparent)]
-struct ProductBootstrap<'a>(&'a EmptyInput);
-impl Operation for ProductBootstrap<'_> {
-    type Output = ProductBootstrapProjection;
-    const ID: &'static str = "product.bootstrap.get";
-    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_bootstrap_get_input.v1");
-    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_bootstrap.v1");
-}
-impl<T: ClientTransport> Product<'_, T> {
-    pub fn bootstrap(&self, correlation: &str, input: &EmptyInput) -> Result<Response<ProductBootstrapProjection>, Error> {
-        self.0.execute(correlation, &ProductBootstrap(input))
-    }
-}
-#[derive(Serialize)]
-#[serde(transparent)]
-struct ProductInitialize<'a>(&'a ProductInitializeInput);
-impl Operation for ProductInitialize<'_> {
-    type Output = ProductBootstrapProjection;
-    const ID: &'static str = "product.profile.initialize";
-    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_profile_initialize_input.v1");
-    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_bootstrap.v1");
-}
-impl<T: ClientTransport> Product<'_, T> {
-    pub fn initialize(&self, correlation: &str, input: &ProductInitializeInput) -> Result<Response<ProductBootstrapProjection>, Error> {
-        self.0.execute(correlation, &ProductInitialize(input))
-    }
-}
-#[derive(Serialize)]
-#[serde(transparent)]
-struct ProductSelectWorkspace<'a>(&'a ProductWorkspaceSelectInput);
-impl Operation for ProductSelectWorkspace<'_> {
-    type Output = ProductBootstrapProjection;
-    const ID: &'static str = "product.workspace.select";
-    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_workspace_select_input.v1");
-    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_bootstrap.v1");
-}
-impl<T: ClientTransport> Product<'_, T> {
-    pub fn select_workspace(&self, correlation: &str, input: &ProductWorkspaceSelectInput) -> Result<Response<ProductBootstrapProjection>, Error> {
-        self.0.execute(correlation, &ProductSelectWorkspace(input))
-    }
-}
-#[derive(Serialize)]
-#[serde(transparent)]
-struct ProductRecordEntitlement<'a>(&'a ProductEntitlementRecordInput);
-impl Operation for ProductRecordEntitlement<'_> {
-    type Output = ProductBootstrapProjection;
-    const ID: &'static str = "product.entitlement.record";
-    const INPUT_CONTRACT: Option<&'static str> = Some("yai.product_entitlement_record_input.v1");
-    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.product_bootstrap.v1");
-}
-impl<T: ClientTransport> Product<'_, T> {
-    pub fn record_entitlement(&self, correlation: &str, input: &ProductEntitlementRecordInput) -> Result<Response<ProductBootstrapProjection>, Error> {
-        self.0.execute(correlation, &ProductRecordEntitlement(input))
     }
 }

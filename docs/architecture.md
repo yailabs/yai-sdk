@@ -59,9 +59,18 @@ the sole authority. Capability metadata grants no permission.
 `contract/workflows.json` owns the shared result envelope, invalidation event,
 common value projections and typed workflow descriptors. Deterministic generation
 produces Rust and TypeScript; `--check` rejects edits to either projection.
-`contract/operations.json` binds the released 111-operation inventory. Core
+`contract/operations.json` binds the released 115-operation inventory. Core
 conformance compares that inventory with the real catalog, while ordinary clients
 may use a compatible subset. This is contract ownership, not copied admission.
+
+Product Access projects commercial, explicit local-development and retained
+unconfigured pre-release sources without manufacturing an account or entitlement.
+Core alone enforces the default-off compiled development capability plus durable
+profile opt-in; SDK reports the serving instance, not its own build or settings.
+Commercial profile display is independent of licence validity. The closed safe
+profile DTO preserves the authenticated account reference and typed absence until
+the commercial service publishes a versioned native-safe profile boundary.
+Name/email/verification are never inferred from Principal, Tenant or local labels.
 
 The typed `Client<T>` sits above `ClientTransport`, fences operation schema and
 response identity, and preserves raw received outcomes. `BoundLocalTransport`

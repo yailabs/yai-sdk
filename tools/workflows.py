@@ -110,6 +110,8 @@ def render(contract):
                      f'    pub fn {family}(&self) -> {name}<\'_, T> {{ {name}(self) }}', '}'])
         for op in operations:
             opname = name + ''.join(part.title() for part in op['method'].split('_'))
+            if opname in types:
+                raise ValueError(f'operation wrapper collides with public type: {opname}')
             rust.extend(['#[derive(Serialize)]', '#[serde(transparent)]',
                          f'struct {opname}<\'a>(&\'a {op["input"]});',
                          f'impl Operation for {opname}<\'_> {{',

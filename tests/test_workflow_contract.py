@@ -26,6 +26,23 @@ class ContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'unknown public type'):
             generator.render(self.contract)
 
+    def test_operation_wrapper_type_collision_refuses(self):
+        self.contract['operations'][0]['family'] = 'product'
+        self.contract['operations'][0]['method'] = 'access'
+        with self.assertRaisesRegex(ValueError, 'collides with public type'):
+            generator.render(self.contract)
+
+    def test_development_access_and_profile_are_explicit_not_entitlements(self):
+        rust, ts = generator.render(self.contract)
+        self.assertIn('pub development_capable: bool', rust)
+        self.assertIn('pub development_enabled: bool', rust)
+        self.assertIn('pub commercial_auth: Option<ProductAuthObservation>', rust)
+        self.assertIn('"local_development"', ts)
+        self.assertIn('"not_applicable"', ts)
+        self.assertIn('pub display_name: Option<String>', rust)
+        self.assertIn('pub email_verification: EmailVerificationPosture', rust)
+        self.assertNotIn('Francesco', rust)
+
     def test_duplicate_operation_refuses(self):
         self.contract['operations'].append(self.contract['operations'][0])
         with self.assertRaisesRegex(ValueError, 'duplicate operation'):

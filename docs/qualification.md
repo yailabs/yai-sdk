@@ -18,6 +18,15 @@ peer-credential queries; full native Host integration remains Linux-only.
 
 ## Product operational consumer slices
 
+Local-development/profile projections add four operations (115 released total).
+Closed DTO and workflow tests cover source distinction, absent commercial profile,
+null unknown facts, credential-field rejection and generator wrapper/type collision.
+These are standalone client conformance, not development-mode enforcement or
+remote profile evidence. Core's dual-build/isolated Host qualification owns enable,
+ordinary-build refusal, restart, disable and retained authority. Studio must add its
+own explicit dispositions and consume the published truth; SDK tests do not qualify
+that UI or the missing native commercial account-profile endpoint.
+
 Browser activation projects five compatibility operations without credentials or
 Supabase objects: the released YAI inventory is 111 operations. Pending,
 indeterminate, closed-input and identity controls pass independently of a real
