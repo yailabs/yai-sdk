@@ -858,3 +858,44 @@ export interface ManagementInvocation<O extends ManagementOperation = Management
 }
 export interface ManagementObservation<T> { request_id: string; device_identity: string; authenticated_peer: string; value: T; }
 export interface ManagementFailure { code: string; dispatch_state: DispatchState; reason?: string; request_id?: string; }
+export interface IdentityObservation {
+  schema: string;
+  device_identity: string;
+  display_name: string;
+  protocol: string;
+  pairing_available: boolean;
+}
+export interface HostCandidate {
+  endpoint: string;
+  identity: IdentityObservation;
+  certificate_sha256: string;
+}
+export type PairingPosture = "pending" | "approved" | "revoked" | "expired" | "refused";
+export interface PairingObservation {
+  schema: string;
+  request_id: string;
+  posture: PairingPosture;
+  scope: string;
+  expires_at_unix_ms: number;
+  reason: string | null;
+}
+export type ConnectionTransport = "https" | "local";
+export type ConnectionPosture = "unpaired" | "pending" | "approved" | "revoked" | "expired" | "refused";
+export interface ConnectionProfile {
+  profile_ref: string;
+  transport: ConnectionTransport;
+  endpoint: string;
+  device_identity: string;
+  peer_identity: string;
+  display_name: string;
+  client_name: string;
+  pairing_posture: ConnectionPosture;
+  expires_at_unix_ms: number | null;
+}
+export interface DiscoveredHost {
+  service_name: string;
+  endpoint: string;
+  display_name: string;
+  advertised_device_identity: string | null;
+  trusted: boolean;
+}

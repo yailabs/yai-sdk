@@ -300,3 +300,36 @@ requires `/usr/bin/sleep`, absent on this Mac, and process identity remains
 Linux-only. The isolated Studio native suite reports 8 pass, 1 ignored,
 1 failure at its existing `less` alternate-screen expectation. These broader
 boundaries are retained and are not suppressed to claim native qualification.
+
+## Native network management — 2026-10-06
+
+The SDK projects producer `network-management.md` identity/pairing schemas and
+preserves the 36 product operation meanings. Generated TypeScript contains safe
+connection/profile/discovery records only. Rust owns TLS, native credentials and
+protected local companion transport. Standalone loopback tests prove exact pin
+verification before bearer dispatch, body/framing bounds, redirect refusal,
+redacted errors, and revocation distinct from transport failure.
+
+`YVEX_SDK_TEST_NATIVE_CREDENTIALS=1 python3 tests/test_network_native.py` passed
+against a disposable real producer listener and the actual desktop Secret
+Service. Fresh processes restored one uniquely generated test credential;
+approved HTTPS and same-user UDS observed 36 operations; exact job receipt
+recovery, revocation, outage and explicit new pairing identity passed. Generated
+credentials were deleted. No operator credentials were enumerated or reused.
+
+Producer `tests/integration/product_management_sessions.py` also passed with
+`YVEX_SESSION_MANAGEMENT_TRANSPORT=https-sdk`, `YVEX_SDK_CONNECTIONS_EXAMPLE` set
+to the built `connections` example, and explicit `YVEX_TEST_FIXTURE_CAPACITY=1`.
+This used a tiny compiled CPU model and actual native-vault credential: Engine
+load, Session create, one-token generation, fork/reset/close/unload, exact lost
+acknowledgement recovery with one Turn, stale Session lifetime and restarted Host
+fences all passed. Idle cancellation truthfully failed; active cancellation is a
+separate producer-native control. The declared 128 GiB admission fixture is not
+physical memory evidence. No Spark, real model quality, YAI Case execution or
+human acceptance is inferred.
+
+DNS-SD client browsing is bounded to ten seconds/64 hints; advertised labels and
+fingerprints do not establish trust. Interface-scoped link-local IPv6 addresses
+are omitted rather than losing scope. Real LAN discovery and operator deployment
+remain distinct qualification exits. Shared safe metadata and credentials are
+implemented through the SDK; YAI CLI adoption remains with its concurrent owner.

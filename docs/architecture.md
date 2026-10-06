@@ -151,3 +151,36 @@ identity and live-process observation remain Linux-defined. Capture on macOS
 explicitly returns `process_identity_unsupported_platform`. A conforming native
 Host/start identity requires coordinated Core/SDK work; peer queries and a
 compilable desktop shell alone do not establish authenticated macOS Host use.
+
+## Native YVEX network connections
+
+The public YVEX product client retains its 36 operations across three transports:
+explicitly pinned HTTPS, same-user public Unix companion, and advanced restricted
+SSH. The transport does not promote management into YAI inference, provider trust,
+Case authority, or a computational Host instance. DNS-SD returns untrusted hints;
+a probe observes a certificate, explicit trust retains its exact DER SHA-256,
+and the producer separately approves a product-management grant. TLS signatures
+are verified and redirects, ambient proxies and cookies are not used.
+
+`management::connections::ConnectionManager` is the shared native client owner.
+Safe profiles live under the absolute XDG config root (or HOME/.config), in
+`yvex/management-connections.v1`; secrets live only in the platform keyring under
+`org.yailabs.yvex.management.v1`. The `native-credentials` feature selects Secret
+Service on Linux and Keychain on macOS. No plaintext fallback exists. The current
+safe registry lock/local companion implementation is qualified on Linux; Windows
+registry locking remains explicitly unsupported. A native caller may supply a
+qualified store through `CredentialStore`; injected stores are not a production
+security claim. Profiles are immutable Host/client identity bindings. Forgetting
+a local profile does not revoke the producer grant.
+
+The Unix companion uses the producer's documented protected socket and OS peer
+UID. It checks exact service identity before dispatch through a producer-owned
+request precondition, avoiding stale-server mutation after restart. Detecting a
+missing companion never starts a Host and never falls back from a failed remote
+connection. Core's commercial credentials and YAI authority are not involved.
+
+The SDK connection example and Studio consume the same native owner. This proves
+reusable client/profile semantics; it does not claim that the separately owned
+YAI CLI has integrated these new network APIs. The producer YVEX CLI owns local
+service approval/revocation. Private commercial profile or credential code is
+not imported.

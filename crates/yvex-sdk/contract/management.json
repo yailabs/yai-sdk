@@ -1052,6 +1052,6 @@
     "request_schema_path": "docs/contracts/schemas/product-management-request.v2.schema.json",
     "request_schema_sha256": "72c576995acaf89504532e30bc09bdd51d8cc655f7f7aa04848f916a25ce3667",
     "response_schema_path": "docs/contracts/schemas/product-management-response.v2.schema.json",
-    "response_schema_sha256": "fc27d04720bb53a862d823dd21aa51aa293d7f84bf9909528bedda0e7eb35605"
+    "response_schema_sha256": "7c3dda5e09a45d64f46e72ba3710e2635cee5af1921db291abf89439d9df32b6"
   }
 }

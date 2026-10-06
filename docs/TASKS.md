@@ -101,3 +101,12 @@ product workflows share the released operation inventory. No commercial verifier
 account service or authority is implemented by the SDK. Standalone checks and actual Core/CLI/native Studio consumption qualify this
 boundary; see [qualification](qualification.md). Production account and issuer
 services remain external, with no fabricated activation result.
+
+The selected compute-control-plane SDK slice now adds pinned HTTPS, explicit
+producer-approved pairing, native protected shared connection profiles, untrusted
+DNS-SD hints and automatic same-user public companion detection. Existing
+management operations, remote finite protocol and YAI operation inventory stay
+separate. Standalone TLS controls, real producer HTTPS/UDS plus native-vault
+cross-process restoration, and real tiny compiled CPU lifecycle passed. Native
+Studio integration, operator LAN/Spark deployment and human product acceptance
+remain their owners' evidence; publication does not imply those exits.

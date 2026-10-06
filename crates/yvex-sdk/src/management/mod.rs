@@ -1,5 +1,10 @@
 //! Identity-bound public product management. Mutations are prepared before
 //! dispatch and return producer-owned Jobs. Transport loss never retries work.
+pub mod connections;
+pub mod discovery;
+pub mod local;
+pub mod network;
+mod network_types;
 mod types;
 pub use types::*;
 
@@ -159,8 +164,13 @@ struct Response {
     reason: Option<String>,
 }
 
+enum Transport {
+    Ssh(SshConnection),
+    Https(network::HttpsConnection),
+    Local(local::LocalConnection),
+}
 pub struct Client {
-    connection: SshConnection,
+    connection: Transport,
     timeout: Duration,
 }
 impl Client {
@@ -169,9 +179,28 @@ impl Client {
             .validate()
             .map_err(|_| Error::local("invalid_connection"))?;
         Ok(Self {
-            connection,
+            connection: Transport::Ssh(connection),
             timeout: Duration::from_secs(15),
         })
+    }
+    pub fn https(connection: network::HttpsConnection) -> Self {
+        Self {
+            connection: Transport::Https(connection),
+            timeout: Duration::from_secs(15),
+        }
+    }
+    pub fn local(connection: local::LocalConnection) -> Self {
+        Self {
+            connection: Transport::Local(connection),
+            timeout: Duration::from_secs(15),
+        }
+    }
+    fn identities(&self) -> (&str, &str) {
+        match &self.connection {
+            Transport::Ssh(c) => (&c.expected_device_identity, &c.expected_peer_identity),
+            Transport::Https(c) => (c.device_identity(), c.peer_identity()),
+            Transport::Local(c) => (c.device_identity(), c.peer_identity()),
+        }
     }
     pub fn with_timeout(mut self, timeout: Duration) -> Result<Self, Error> {
         if timeout.is_zero() || timeout > Duration::from_secs(120) {
@@ -215,27 +244,29 @@ impl Client {
         cancel: &AtomicBool,
     ) -> Result<Observation<Value>, Error> {
         let bytes = request.encoded()?;
-        let output = ssh::invoke(
-            &self.connection,
-            bytes,
-            self.timeout,
-            cancel,
-            MAX_RESPONSE_BYTES,
-        )
-        .map_err(|failure| {
-            let code = match failure.kind {
-                ssh::FailureKind::Unavailable => "transport_unavailable",
-                ssh::FailureKind::Timeout => "timeout",
-                ssh::FailureKind::Cancelled => "transport_cancelled",
-                ssh::FailureKind::ResponseTooLarge => "response_too_large",
-            };
-            (if failure.started {
-                Error::uncertain(code)
-            } else {
-                Error::local(code)
-            })
-            .correlated(&request.request_id)
-        })?;
+        let output = match &self.connection {
+            Transport::Https(c) => c.invoke(&bytes, self.timeout, cancel),
+            Transport::Local(c) => c.invoke(&bytes, self.timeout, cancel),
+            Transport::Ssh(connection) => {
+                ssh::invoke(connection, bytes, self.timeout, cancel, MAX_RESPONSE_BYTES).map_err(
+                    |failure| {
+                        let code = match failure.kind {
+                            ssh::FailureKind::Unavailable => "transport_unavailable",
+                            ssh::FailureKind::Timeout => "timeout",
+                            ssh::FailureKind::Cancelled => "transport_cancelled",
+                            ssh::FailureKind::ResponseTooLarge => "response_too_large",
+                        };
+                        (if failure.started {
+                            Error::uncertain(code)
+                        } else {
+                            Error::local(code)
+                        })
+                        .correlated(&request.request_id)
+                    },
+                )
+            }
+        }
+        .map_err(|e| e.correlated(&request.request_id))?;
         self.decode(&output, request)
             .map_err(|e| e.correlated(&request.request_id))
     }
@@ -243,7 +274,10 @@ impl Client {
         if bytes.len() > MAX_RESPONSE_BYTES {
             return Err(Error::uncertain("response_too_large"));
         }
-        if bytes.last() != Some(&b'\n') || bytes[..bytes.len() - 1].contains(&b'\n') {
+        if matches!(self.connection, Transport::Ssh(_))
+            && (bytes.last() != Some(&b'\n')
+                || bytes[..bytes.len().saturating_sub(1)].contains(&b'\n'))
+        {
             return Err(Error::uncertain("invalid_response"));
         }
         let r: Response =
@@ -271,8 +305,8 @@ impl Client {
         if r.request_id.as_deref() != Some(&request.request_id) {
             return Err(Error::uncertain("correlation_mismatch"));
         }
-        if r.device_identity.as_deref() != Some(&self.connection.expected_device_identity)
-            || r.authenticated_peer.as_deref() != Some(&self.connection.expected_peer_identity)
+        if r.device_identity.as_deref() != Some(self.identities().0)
+            || r.authenticated_peer.as_deref() != Some(self.identities().1)
         {
             return Err(Error::uncertain("identity_mismatch"));
         }
@@ -347,7 +381,7 @@ mod tests {
     }
     fn response(request: &Invocation, data: Value) -> Value {
         json!({"schema":RESPONSE_SCHEMA,"request_id":request.request_id,
-        "device_identity":client().connection.expected_device_identity,"authenticated_peer":client().connection.expected_peer_identity,
+        "device_identity":client().identities().0,"authenticated_peer":client().identities().1,
         "status":"ok","data":data})
     }
     fn bytes(value: Value) -> Vec<u8> {

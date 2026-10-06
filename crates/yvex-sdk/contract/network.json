@@ -1,0 +1,82 @@
+{
+  "authority": "YVEX docs/contracts/network-management.md; safe connection registry is SDK-owned",
+  "types": {
+    "IdentityObservation": {
+      "schema": "string",
+      "device_identity": "string",
+      "display_name": "string",
+      "protocol": "string",
+      "pairing_available": "bool"
+    },
+    "HostCandidate": {
+      "endpoint": "string",
+      "identity": "IdentityObservation",
+      "certificate_sha256": "string"
+    },
+    "PairingPosture": {
+      "$enum": [
+        "pending",
+        "approved",
+        "revoked",
+        "expired",
+        "refused"
+      ]
+    },
+    "PairingObservation": {
+      "schema": "string",
+      "request_id": "string",
+      "posture": "PairingPosture",
+      "scope": "string",
+      "expires_at_unix_ms": "u64",
+      "reason": "nullable:string"
+    },
+    "ConnectionTransport": {
+      "$enum": [
+        "https",
+        "local"
+      ]
+    },
+    "ConnectionPosture": {
+      "$enum": [
+        "unpaired",
+        "pending",
+        "approved",
+        "revoked",
+        "expired",
+        "refused"
+      ]
+    },
+    "ConnectionProfile": {
+      "profile_ref": "string",
+      "transport": "ConnectionTransport",
+      "endpoint": "string",
+      "device_identity": "string",
+      "peer_identity": "string",
+      "display_name": "string",
+      "client_name": "string",
+      "pairing_posture": "ConnectionPosture",
+      "expires_at_unix_ms": "nullable:u64"
+    },
+    "DiscoveredHost": {
+      "service_name": "string",
+      "endpoint": "string",
+      "display_name": "string",
+      "advertised_device_identity": "nullable:string",
+      "trusted": "bool"
+    }
+  },
+  "producer_schemas": {
+    "identity": {
+      "path": "docs/contracts/schemas/network-management-identity.v1.schema.json",
+      "sha256": "8c681b8343ff93a5d05f8816346a387d78879f168cc066c7bee93b6cb3d22f60"
+    },
+    "pairing-request": {
+      "path": "docs/contracts/schemas/network-management-pairing-request.v1.schema.json",
+      "sha256": "318f04cc298a2ae1932d91e6d7df710bb3e9157eb83e84462803c936c5824ea5"
+    },
+    "pairing": {
+      "path": "docs/contracts/schemas/network-management-pairing.v1.schema.json",
+      "sha256": "0ac144f132c6b31809099b41c61b52b80bdcf76c259b9f40fffa1895f4aada3c"
+    }
+  }
+}

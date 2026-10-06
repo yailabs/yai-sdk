@@ -91,6 +91,9 @@ def main() -> int:
     compare(producer, client)
     compare_finite_schemas(args.yvex_root)
     compare_product_schemas(args.yvex_root)
+    network = json.loads((ROOT / "crates/yvex-sdk/contract/network.json").read_text())
+    for name, record in network["producer_schemas"].items():
+        require(hashlib.sha256((args.yvex_root / record["path"]).read_bytes()).hexdigest() == record["sha256"], f"network {name} schema drift")
     negative = json.loads(json.dumps(producer))
     negative["catalogs"]["remote_management_operations"].append("model.load")
     try:
