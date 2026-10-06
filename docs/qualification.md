@@ -333,3 +333,11 @@ fingerprints do not establish trust. Interface-scoped link-local IPv6 addresses
 are omitted rather than losing scope. Real LAN discovery and operator deployment
 remain distinct qualification exits. Shared safe metadata and credentials are
 implemented through the SDK; YAI CLI adoption remains with its concurrent owner.
+
+Native Studio HTTPS/local qualification exposed transient profile-registry
+contention between independent snapshot reads. SDK metadata reads now share an
+OS read lock; exclusive updates and contended reads wait at most one second on
+the native worker. Three regression controls pass: twelve parallel get/list
+readers while another reader holds the registry, a short exclusive writer, and a
+finite stalled-lock refusal. This waits only for local metadata access; no
+pairing, management submission or lost-response retry occurs.

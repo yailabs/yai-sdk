@@ -101,7 +101,7 @@ impl ConnectionManager {
         })
     }
     pub fn list(&self) -> Result<Vec<ConnectionProfile>, Error> {
-        let _guard = self.lock()?;
+        let _guard = self.read_lock()?;
         let mut profiles = Vec::new();
         for entry in
             fs::read_dir(&self.root).map_err(|_| Error::local("profile_storage_unavailable"))?
@@ -120,7 +120,7 @@ impl ConnectionManager {
         Ok(profiles)
     }
     pub fn get(&self, id: &str) -> Result<ConnectionProfile, Error> {
-        let _guard = self.lock()?;
+        let _guard = self.read_lock()?;
         self.load(id)
     }
     /// An explicit caller confirmation of an out-of-band fingerprint. It stores
@@ -340,8 +340,19 @@ impl ConnectionManager {
             .map_err(|_| Error::local("profile_storage_unavailable"))?;
         Ok(())
     }
+    fn read_lock(&self) -> Result<ProfileLock, Error> {
+        ProfileLock::new(
+            &self.root.join("registry.lock"),
+            false,
+            Duration::from_secs(1),
+        )
+    }
     fn lock(&self) -> Result<ProfileLock, Error> {
-        ProfileLock::new(&self.root.join("registry.lock"))
+        ProfileLock::new(
+            &self.root.join("registry.lock"),
+            true,
+            Duration::from_secs(1),
+        )
     }
 }
 #[cfg(unix)]
@@ -418,7 +429,7 @@ fn safe_file(path: &Path) -> Result<(), Error> {
 }
 struct ProfileLock(fs::File);
 impl ProfileLock {
-    fn new(path: &Path) -> Result<Self, Error> {
+    fn new(path: &Path, exclusive: bool, wait: Duration) -> Result<Self, Error> {
         let mut options = fs::OpenOptions::new();
         options.read(true).write(true).create(true);
         #[cfg(unix)]
@@ -433,8 +444,30 @@ impl ProfileLock {
         #[cfg(unix)]
         {
             use std::os::fd::AsRawFd;
-            if unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) } != 0 {
-                return Err(Error::local("profile_storage_busy"));
+            let operation = if exclusive {
+                libc::LOCK_EX
+            } else {
+                libc::LOCK_SH
+            };
+            let deadline = std::time::Instant::now() + wait;
+            loop {
+                if unsafe { libc::flock(file.as_raw_fd(), operation | libc::LOCK_NB) } == 0 {
+                    break;
+                }
+                let error = std::io::Error::last_os_error();
+                if !matches!(
+                    error.kind(),
+                    std::io::ErrorKind::WouldBlock | std::io::ErrorKind::Interrupted
+                ) {
+                    return Err(Error::local("profile_storage_unavailable"));
+                }
+                let remaining = deadline.saturating_duration_since(std::time::Instant::now());
+                if remaining.is_zero() {
+                    return Err(Error::local("profile_storage_busy"));
+                }
+                // Only local metadata lock acquisition waits. No credential,
+                // pairing or management operation is dispatched or retried here.
+                std::thread::sleep(remaining.min(Duration::from_millis(5)));
             }
         }
         #[cfg(not(unix))]
@@ -450,5 +483,96 @@ impl Drop for ProfileLock {
             use std::os::fd::AsRawFd;
             unsafe { libc::flock(self.0.as_raw_fd(), libc::LOCK_UN) };
         }
+    }
+}
+
+#[cfg(all(test, unix))]
+mod tests {
+    use super::*;
+    struct NoCredentials;
+    impl CredentialStore for NoCredentials {
+        fn put(&self, _: &str, _: &[u8]) -> Result<(), Error> {
+            panic!("read must not touch credentials")
+        }
+        fn get(&self, _: &str) -> Result<Zeroizing<Vec<u8>>, Error> {
+            panic!("read must not touch credentials")
+        }
+        fn delete(&self, _: &str) -> Result<(), Error> {
+            panic!("read must not touch credentials")
+        }
+    }
+    fn manager() -> (tempfile::TempDir, Arc<ConnectionManager>, String) {
+        let directory = tempfile::tempdir().unwrap();
+        let manager = Arc::new(
+            ConnectionManager::with_store(
+                directory.path().join("profiles"),
+                Arc::new(NoCredentials),
+            )
+            .unwrap(),
+        );
+        let id = "1".repeat(64);
+        manager
+            .save(&ConnectionProfile {
+                profile_ref: id.clone(),
+                transport: ConnectionTransport::Local,
+                endpoint: "unix:/fixture".into(),
+                device_identity: format!("tls-sha256:{}", "2".repeat(64)),
+                peer_identity: "local-user:1".into(),
+                display_name: "Fixture".into(),
+                client_name: "Test".into(),
+                pairing_posture: ConnectionPosture::Approved,
+                expires_at_unix_ms: None,
+            })
+            .unwrap();
+        (directory, manager, id)
+    }
+    #[test]
+    fn parallel_snapshot_reads_share_the_registry_lock() {
+        let (_directory, manager, id) = manager();
+        let held = manager.read_lock().unwrap();
+        let workers: Vec<_> = (0..12)
+            .map(|_| {
+                let manager = manager.clone();
+                let id = id.clone();
+                std::thread::spawn(move || {
+                    for _ in 0..20 {
+                        assert_eq!(manager.get(&id).unwrap().profile_ref, id);
+                        assert_eq!(manager.list().unwrap().len(), 1);
+                    }
+                })
+            })
+            .collect();
+        for worker in workers {
+            worker.join().unwrap();
+        }
+        drop(held);
+    }
+    #[test]
+    fn ordinary_reads_wait_for_short_metadata_write_without_retrying_work() {
+        let (_directory, manager, id) = manager();
+        let held = manager.lock().unwrap();
+        let worker = std::thread::spawn(move || manager.get(&id).unwrap());
+        std::thread::sleep(Duration::from_millis(50));
+        drop(held);
+        assert_eq!(
+            worker.join().unwrap().pairing_posture,
+            ConnectionPosture::Approved
+        );
+    }
+    #[test]
+    fn stalled_lock_wait_has_a_finite_bound() {
+        let (_directory, manager, _id) = manager();
+        let held = manager.lock().unwrap();
+        let began = std::time::Instant::now();
+        let error = ProfileLock::new(
+            &manager.root.join("registry.lock"),
+            false,
+            Duration::from_millis(30),
+        )
+        .err()
+        .unwrap();
+        assert_eq!(error.code, "profile_storage_busy");
+        assert!(began.elapsed() < Duration::from_millis(300));
+        drop(held);
     }
 }
