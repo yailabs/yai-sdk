@@ -40,6 +40,10 @@ projects Case Work intent/step observation into 25 typed workflows and 84
 shared types. SDK standalone conformance is separate from YAI's real-model
 and Studio interaction evidence; the previous platform Task is not reopened.
 
+## YVEX.STUDIO.COMPUTE.CONTROL.PLANE.0
+
+**State: IN PROGRESS.** Public YVEX product-management projection/client slice, preserving management v1 and separate remote finite computation. Producer owns lifecycle/grants/durable mutation identity; SDK owns bounded typed transport and exact observation without automatic replay. YAI Application semantics and inventory are unchanged.
+
 ## Completed platform delivery
 
 1. Reconcile admitted operations and public contract ownership; implement typed

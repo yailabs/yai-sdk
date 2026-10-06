@@ -21,7 +21,9 @@ history or semantic implementation is copied.
 The Cargo workspace contains the existing `yai-sdk` client and a separate
 `yvex-sdk` crate. Neither depends on the other. The former speaks the YAI local
 Application contract. The latter exposes YVEX's versioned,
-read-only, identity-pinned OpenSSH management contract. Its canonical producer
+identity-pinned OpenSSH management contracts. Version 1 remains read-only;
+version 2 adds explicitly granted product lifecycle operations and durable Job
+observation. Its canonical producer
 is YVEX's public [remote-management contract](https://github.com/yailabs/yvex/blob/main/docs/contracts/remote-management.md),
 not a second SDK-owned model/runtime registry. It does not expose the private
 YVEX Unix wire or wrap human CLI output. Adding a Rust type does not establish
@@ -60,7 +62,8 @@ See [consumer setup and current packaging boundary](guides/yvex.md#finite-decisi
 
 Control flows from clients into the owning service; facts flow back from YVEX
 through the provider adapter to YAI where a Case result is involved. Studio
-may read YVEX operator facts directly, but any Case-affecting action remains
+may operate YVEX lifecycle and explicitly separate diagnostic generation through
+public management; any Case-affecting action remains
 on the governed YAI Application path. YAI CLI and SDK are sibling clients of
 YAI owners; YVEX CLI and SDK are sibling projections of YVEX owners.
 

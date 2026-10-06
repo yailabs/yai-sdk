@@ -1,10 +1,12 @@
 //! Independent YVEX client domain: management v1, OpenAI projections, remote
 //! finite computation and optional native finite client. No YAI semantics.
 //!
-//! Management remains read-only. Remote finite computation requires a separate
-//! explicit grant. Model/runtime lifecycle mutation is not represented here.
+//! Management v1 remains read-only. Product management v2 and remote finite
+//! computation each require their own explicit grant and preserve separate
+//! operation/recovery contracts. Neither grants YAI Case authority.
 
 pub mod finite;
+pub mod management;
 pub mod openai;
 mod ssh;
 

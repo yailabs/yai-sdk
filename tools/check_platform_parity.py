@@ -12,7 +12,7 @@ import sys
 import tempfile
 
 from check_yvex_sdk_parity import compare as compare_yvex
-from check_yvex_sdk_parity import compare_finite_schemas
+from check_yvex_sdk_parity import compare_finite_schemas, compare_product_schemas
 
 SDK_ROOT = Path(__file__).resolve().parents[1]
 
@@ -60,6 +60,20 @@ def compare_studio_yvex(client: dict, studio: dict) -> None:
         if disposition["state"] == "supported" and not disposition.get("ui_evidence"):
             raise ValueError(f"Studio YVEX support lacks UI evidence: {operation}")
 
+    product = client.get("product_management")
+    if product:
+        projected = native.get("product_management", {})
+        if projected.get("request_schema") != product["request_schema"] or projected.get("response_schema") != product["response_schema"]:
+            raise ValueError("Studio product management schema drift")
+        dispositions = projected.get("operation_dispositions", {})
+        if set(dispositions) != {row["operation"] for row in product["operations"]}:
+            raise ValueError("YVEX product management Studio disposition gap")
+        for operation, disposition in dispositions.items():
+            if disposition.get("state") not in {"supported", "deferred", "not_ui_relevant"}:
+                raise ValueError(f"Studio product management disposition invalid: {operation}")
+            if disposition["state"] == "supported" and not disposition.get("ui_evidence"):
+                raise ValueError(f"Studio product management support lacks evidence: {operation}")
+
 
 def main() -> int:
     parser = argparse.ArgumentParser()
@@ -82,6 +96,7 @@ def main() -> int:
                          "--example", "capabilities"], SDK_ROOT)
     compare_yvex(yvex, sdk_yvex)
     compare_finite_schemas(args.yvex_root)
+    compare_product_schemas(args.yvex_root)
     studio = read_json(args.studio_root / "component.json")
     compare_studio_yvex(sdk_yvex, studio)
 

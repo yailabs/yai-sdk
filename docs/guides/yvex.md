@@ -172,3 +172,74 @@ key/pin controls; it does not run YVEX or a model. The optional cross-repository
 parity lane checks both published schema layouts and refuses finite-schema drift
 separately from management-operation drift. Exon→DGX with a resident finite engine
 requires the actual approved listener, enrollment and exact model evidence.
+
+
+## Product management v2
+
+`yvex_sdk::management` is the separate product-management client. An existing
+v1 `management` key remains read-only; the producer must explicitly enroll the
+peer with `product-management`. The same independently approved `SshConnection`
+mechanics apply. This permission does not grant finite computation or YAI Case
+authority. Studio does not invoke a remote shell command or parse CLI output.
+
+The reviewed [management projection](../../crates/yvex-sdk/contract/management.json)
+projects producer operations into Rust and `@yai/sdk/yvex` TypeScript types through
+`tools/yvex_management.py`. These types describe Models, exact Sources, registry
+observations, acquired representations, Builds, Packages, Hosts, Engines,
+Sessions, Jobs and events. There are no speculative Training types or operations.
+Training can later add a capability and exact lineage into these existing owners.
+
+The client exposes domain facades (`models`, `acquisitions`, `builds`, `packages`,
+`hosts`, `engines`, `sessions`, `generations`, `jobs`, `observe`, `registries`,
+`sources`, `profiles`). Reads return validated typed observations. Operational methods prepare
+an invocation; its identity is available before dispatch:
+
+```rust,ignore
+use yvex_sdk::management::{Client, EngineLoadInput};
+let client = Client::new(approved_connection)?;
+let request = client.engines().prepare_load(&EngineLoadInput {
+    profile: exact_profile,
+    host_instance: observed_host_instance,
+    context_capacity: None,
+})?;
+let request_id = request.request_id().to_owned(); // retain before dispatch
+let admitted_job = client.execute(&request)?;
+```
+
+The authenticated response preserves the approved device, enrolled peer and
+request identity. Runtime writes additionally fence the exact observed Host
+instance; destructive Session operations and generation fence Session identity.
+An engine alias or generation number alone is insufficient across Host restart.
+Source resume/cancellation fence their exact acquisition operation and generation.
+
+A response timeout, malformed/foreign response or transport cancellation after
+SSH starts is `outcome_unavailable`. It does not prove that work stopped. The SDK
+never retries. Reobserve `jobs().get` using the retained request ID. An absent
+receipt does not authorize resubmission. The producer owns retention and refuses
+new admission when retention is full rather than silently reusing identities.
+Client disconnect does not cancel a durable Job; cancellation is a separate
+explicit producer operation. The finite-computation client retains its own
+contract, which does not have these durable receipts.
+
+`job.list` returns bounded summaries without prompts or result bodies. `job.get`
+returns the exact receipt, including current result/progress where the owner
+provides it. Generation results retain public typed output channels, completion
+and metrics. A YVEX Session is computational state, not a YAI Conversation.
+Direct management generation never commits a Case Turn or grants Case authority.
+Registry authentication is observed through redacted host-owned account facts;
+acquisition accepts only an opaque credential reference provisioned by that Host.
+Requests accept no raw registry tokens. Profiles retain exact package identity;
+removal fences the expected package under the producer registry transaction.
+Source cleanup uses acquisition identity/generation and explicit confirmation. No training capability is inferred.
+
+The executable `management_product` example takes approved SSH configuration,
+a retained request JSON file and an optional client timeout. This is a public
+protocol client, not a production credential installer. Replies are bounded to
+1 MiB and requests to 128 KiB. Malformed typed payloads are rejected before
+reaching consumer presentation. Capability discovery determines support; a
+runtime name or product version is not qualification evidence.
+
+`make check-management-remote` runs isolated real SSH with a synthetic protocol
+peer. It qualifies transport/identity/refusal and exact read-after-loss behavior,
+not YVEX model execution. Producer lifecycle qualification and native Studio
+acceptance remain independently required.

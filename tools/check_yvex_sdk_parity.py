@@ -31,6 +31,20 @@ def compare(producer: dict, client: dict) -> None:
     require(isinstance(owned, list) and len(owned) == len(set(owned)), "producer operation inventory invalid")
     require(isinstance(projected, list) and len(projected) == len(set(projected)), "SDK operation inventory invalid")
     require(sorted(owned) == sorted(projected), f"YVEX SDK drift: producer={sorted(owned)} SDK={sorted(projected)}")
+    product_owned = producer["catalogs"].get("remote_product_management_operations")
+    product_client = client.get("product_management")
+    if product_owned is not None or product_client is not None:
+        require(isinstance(product_owned, list) and isinstance(product_client, dict), "product management publication missing")
+        require(product_client.get("request_schema") == "yvex.management.request.v2" and
+                product_client.get("response_schema") == "yvex.management.response.v2", "product management schema drift")
+        require(product_client.get("grant") == "product-management", "product management grant drift")
+        require(product_client.get("automatic_retry") is False and product_client.get("mutation_recovery") == "job.get",
+                "product management recovery drift")
+        require(product_client.get("runtime_qualified") is False, "SDK cannot qualify deployed product management")
+        product_projected = product_client.get("operations", [])
+        require(len({row["operation"] for row in product_projected}) == len(product_projected), "duplicate product operation")
+        require(sorted(product_owned, key=lambda row: row["operation"]) == sorted(product_projected, key=lambda row: row["operation"]), "product management operation/kind drift")
+        require(all(row.get("kind") in {"read", "job", "control"} for row in product_projected), "invalid product operation kind")
     # Finite computation is a distinct protocol/grant, not another management
     # v1 read. Its forced entry and wire schemas remain producer-owned.
     remote = client["finite_decision"]["remote"]
@@ -53,6 +67,16 @@ def compare_finite_schemas(producer_root: pathlib.Path) -> None:
         require(json.loads(data)["$id"] == contract[f"{side}_schema"], f"finite {side} identity drift")
 
 
+def compare_product_schemas(producer_root: pathlib.Path) -> None:
+    contract = json.loads((ROOT / "crates/yvex-sdk/contract/management.json").read_text())
+    for side in ("request", "response"):
+        record = contract["producer_schemas"]
+        data = (producer_root / record[f"{side}_schema_path"]).read_bytes()
+        require(hashlib.sha256(data).hexdigest() == record[f"{side}_schema_sha256"],
+                f"product management {side} layout drift requires reviewed client disposition")
+        require(json.loads(data)["$id"] == contract[f"{side}_schema"], f"product management {side} identity drift")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--yvex-root", type=pathlib.Path, required=True)
@@ -66,6 +90,7 @@ def main() -> int:
     client = json.loads(result.stdout)
     compare(producer, client)
     compare_finite_schemas(args.yvex_root)
+    compare_product_schemas(args.yvex_root)
     negative = json.loads(json.dumps(producer))
     negative["catalogs"]["remote_management_operations"].append("model.load")
     try:
@@ -84,7 +109,7 @@ def main() -> int:
         pass
     else:
         raise AssertionError("controlled finite schema delta did not fail parity")
-    print(f"PASS YVEX→SDK parity: {len(client['operations'])} management reads, separate finite computation, exact schemas; management/finite deltas refused")
+    print(f"PASS YVEX→SDK parity: {len(client['operations'])} management v1 reads, product management and separate finite computation, exact schemas; management/finite deltas refused")
     return 0
 
 

@@ -8,6 +8,9 @@
   "exports": {
     "./projections": {
       "types": "./typescript/projections.ts"
+    },
+    "./yvex": {
+      "types": "./typescript/yvex.ts"
     }
   },
   "files": [
@@ -17,7 +20,7 @@
     "PROVENANCE.md"
   ],
   "scripts": {
-    "check": "tsc --noEmit --strict --noUnusedLocals --noUnusedParameters --target ES2022 --module ESNext typescript/projections.ts"
+    "check": "tsc --noEmit --strict --noUnusedLocals --noUnusedParameters --target ES2022 --module ESNext typescript/projections.ts typescript/yvex.ts"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
@@ -26,6 +29,9 @@
     "*": {
       "projections": [
         "typescript/projections.ts"
+      ],
+      "yvex": [
+        "typescript/yvex.ts"
       ]
     }
   }

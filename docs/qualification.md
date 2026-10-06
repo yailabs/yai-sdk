@@ -16,6 +16,24 @@ The v0.1.0 SDK is a supported client contract, not an implementation of Core
 semantics. This record qualifies Linux same-user local IPC and bounded macOS
 peer-credential queries; full native Host integration remains Linux-only.
 
+## Product management v2 client — 2026-10-06
+
+The client-owned slice of `YVEX.STUDIO.COMPUTE.CONTROL.PLANE.0` adds the separate
+explicit `product-management` grant, 36 reviewed operations, generated Rust and
+TypeScript domain projections, typed failures, prepared mutation identities and
+exact durable Job observation. Management v1 and finite remote computation remain
+independent. YAI's 115-operation inventory is unchanged.
+
+Evidence classes remain separate. Rust unit controls qualify input bounds,
+Host/Session/acquisition fences, exact reply/job identity, revoked/refused versus
+unavailable outcomes, sensitive-diagnostic redaction and nullable observations.
+The isolated SSH lane qualifies one dispatch per prepared invocation, synthetic
+receipt observation after reply loss and wrong-key/pin rejection. It runs no
+YVEX model and establishes no runtime performance, Spark connectivity or native
+Studio product acceptance. Cross-repository producer/schema/disposition parity
+is necessary in addition to the standalone checks.
+
+
 ## Product operational consumer slices
 
 ### Remote finite client checkpoint 2026-10-06

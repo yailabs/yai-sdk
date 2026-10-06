@@ -10,6 +10,14 @@ fn main() {
             "producer_response_schema": RESPONSE_SCHEMA,
             "operations": MANAGEMENT_OPERATIONS,
             "openai_capacity_profile": PROFILE,
+            "product_management": {
+                "request_schema": yvex_sdk::management::REQUEST_SCHEMA,
+                "response_schema": yvex_sdk::management::RESPONSE_SCHEMA,
+                "grant": yvex_sdk::management::GRANT,
+                "operations": yvex_sdk::management::OPERATIONS.iter().map(|(operation,kind)|
+                    serde_json::json!({"operation":operation,"kind":kind})).collect::<Vec<_>>(),
+                "automatic_retry": false, "mutation_recovery": "job.get", "runtime_qualified": false
+            },
             "finite_decision": {
                 "client_schema": yvex_sdk::finite::CLIENT_SCHEMA,
                 "producer_schema": yvex_sdk::finite::PRODUCER_SCHEMA,

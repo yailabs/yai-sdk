@@ -1,8 +1,10 @@
 .PHONY: check check-platform-parity check-finite-native check-finite-remote qualify-distribution
 check:
+	python3 tools/yvex_management.py --check
 	python3 tools/workflows.py --check
 	python3 tests/test_workflow_contract.py
 	python3 tests/test_finite_remote_contract.py
+	python3 tests/test_management_contract.py
 	cargo test --locked --workspace --all-targets
 	npm ci --ignore-scripts
 	npm run check
@@ -17,6 +19,9 @@ check-platform-parity:
 	python3 tools/check_platform_parity.py --yai-bin "$(YAI_BIN)" --studio-root "$(STUDIO_ROOT)" --yvex-root "$(YVEX_ROOT)"
 
 # Public headers supplied explicitly; isolated synthetic ABI peer, never inference.
+check-management-remote:
+	python3 tests/test_management_remote.py
+
 check-finite-remote:
 	python3 tests/test_finite_remote.py
 
