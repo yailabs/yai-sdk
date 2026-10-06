@@ -18,13 +18,18 @@ projections, compatibility and conformance; Studio owns presentation and local
 UI state. This repository is independently MIT licensed; no private repository
 history or semantic implementation is copied.
 
-The Cargo workspace contains the existing `yai-sdk` client and a separate
-`yvex-sdk` crate. Neither depends on the other. The former speaks the YAI local
-Application contract. The latter exposes YVEX's versioned,
-identity-pinned OpenSSH management contracts. Version 1 remains read-only;
-version 2 adds explicitly granted product lifecycle operations and durable Job
-observation. Its canonical producer
-is YVEX's public [remote-management contract](https://github.com/yailabs/yvex/blob/main/docs/contracts/remote-management.md),
+The Cargo workspace contains the `yai-sdk` Application client and a `yvex-sdk`
+0.1 compatibility facade. Canonical `yvex-sdk` 0.2 lives in YVEX's independent
+`sdk/rust` workspace and owns its public client implementation, transport and
+contract descriptors. It imports no YAI or Studio semantics. The facade reexports
+that exact pinned dependency and forwards features; it has no second implementation.
+YVEX also owns `@yvex/sdk` TypeScript projections; `@yai/sdk/yvex` is a compatibility
+reexport. An independent YVEX client needs no YAI package.
+
+The public management client supports pinned HTTPS, protected same-user Unix and
+advanced restricted SSH transports. Version 1 remains read-only; version 2 adds
+explicitly granted product lifecycle operations and durable Job observation.
+Its canonical producer is YVEX's public [remote-management contract](https://github.com/yailabs/yvex/blob/main/docs/contracts/remote-management.md),
 not a second SDK-owned model/runtime registry. It does not expose the private
 YVEX Unix wire or wrap human CLI output. Adding a Rust type does not establish
 live YVEX service availability.
@@ -55,7 +60,7 @@ from verified installed public YVEX headers and call
 private transport, model input construction and execution. SDK owns byte bounds,
 copied projections and exact population/generation/result checks. Without the
 native client, it refuses explicitly; it does not implement a substitute scorer.
-The [ABI projection](../crates/yvex-sdk/contract/finite.json) follows YVEX's declaration
+The [ABI projection](https://github.com/yailabs/yvex/blob/main/sdk/rust/contract/finite.json) follows YVEX's declaration
 signatures and schema-v1 records, not producer Git equality. Native compilation
 and synthetic ABI conformance are not real-model or YAI Fast Search qualification.
 See [consumer setup and current packaging boundary](guides/yvex.md#finite-decision-public-c-client).
@@ -133,8 +138,9 @@ Reconnect or host-instance change requires resynchronization and must preserve
 client-local dirty buffers. SDK does not reconstruct missing Case state.
 
 The YAI Application MVP uses local Linux transport. The independent YVEX domain
-also supports restricted identity-pinned SSH management and finite computation;
-deployed listener/model qualification is separate. Internet YAI Application
+supports pinned HTTPS, the public Unix companion and restricted SSH management,
+plus separately scoped finite computation; deployed listener/model qualification
+is separate. Internet YAI Application
 transport, semantic policy and frontend design are not implemented here.
 
 ## Native peer credentials
@@ -162,7 +168,8 @@ a probe observes a certificate, explicit trust retains its exact DER SHA-256,
 and the producer separately approves a product-management grant. TLS signatures
 are verified and redirects, ambient proxies and cookies are not used.
 
-`management::connections::ConnectionManager` is the shared native client owner.
+Canonical YVEX `management::connections::ConnectionManager` is the shared native
+client owner. The facade exposes the same implementation, not another registry.
 Safe profiles live under the absolute XDG config root (or HOME/.config), in
 `yvex/management-connections.v1`; secrets live only in the platform keyring under
 `org.yailabs.yvex.management.v1`. The `native-credentials` feature selects Secret

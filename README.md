@@ -15,17 +15,23 @@ publication: {html: true, pdf: false, index: true}
 The `yai-sdk` crate lets a client discover capabilities, inspect authorized Cases and submit
 supported actions to a running YAI Core. Core admits the operation; the SDK does
 not implement Case semantics, policy, persistence or scheduling. Studio consumes
-this same boundary for Case work. A separate `yvex-sdk` crate in this repository
-projects YVEX-owned operator facts; it does not admit Case actions or make YVEX
-dependent on YAI. A YAI Case invocation still crosses YAI governance and its
+this same boundary for Case work. YVEX owns its independent public Rust client
+(`yvex-sdk` 0.2) and TypeScript projections (`@yvex/sdk`) in the
+[YVEX repository](https://github.com/yailabs/yvex/tree/main/sdk).
+This repository retains a `yvex-sdk` 0.1 compatibility facade and the
+`@yai/sdk/yvex` type reexport. Neither duplicates the YVEX implementation nor
+admits Case actions. A YAI Case invocation still crosses YAI governance and its
 provider boundary, even when YVEX performs the computation.
 
 The current YAI client is **Rust on Linux, same-user local Unix transport**.
-The current YVEX client is **Rust with pinned OpenSSH remote management v1**:
-read-only `device.describe` and `host.status` only. This is not model management,
-generation, or a remote YVEX lifecycle API. The TypeScript package exports YAI
-contract types only, not a runtime client. Internet YAI transport and a
-provider-plugin API are not supported.
+The canonical YVEX Rust client supports **public management v2** over pinned
+HTTPS, the protected same-user Unix companion, or advanced restricted SSH.
+Its 36 product operations cover Models, Sources, Builds, Packages, Hosts,
+Engines, Sessions, direct diagnostic generation, Jobs and observations according
+to producer capability discovery. Management v1 read compatibility and separately
+granted finite computation remain distinct. TypeScript packages expose public
+contract types, not browser transports or credential storage. Internet YAI
+Application transport and a provider-plugin API are not supported.
 
 ## Add and connect
 
@@ -89,13 +95,13 @@ guides, conformance, qualification, project control and release policy.
 - [API reference](docs/reference/README.md): typed workflows and complete operation inventory.
 - [Development](docs/development/README.md): standalone checks and public fixtures.
 - [Qualification](docs/qualification.md): actual evidence, not inferred support.
-- [YVEX client guide](docs/guides/yvex.md): exact pinning, read-only operations and ownership.
+- [YVEX client guide](docs/guides/yvex.md): independent client ownership, lifecycle, trust and recovery.
 
 ## Versions and licensing
 
 Core, Studio, SDK and YVEX use independent SemVer. Each Rust crate keeps its
 own package version; `yai.client.v1`, Application/capability schemas and
-`yvex.management.request.v1` evolve independently. Compatibility never
+`yvex.management.request.v1` / `yvex.management.request.v2` evolve independently. Compatibility never
 requires matching Git commits. See
 [release policy](docs/releases/README.md).
 

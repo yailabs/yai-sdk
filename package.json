@@ -20,7 +20,7 @@
     "PROVENANCE.md"
   ],
   "scripts": {
-    "check": "tsc --noEmit --strict --noUnusedLocals --noUnusedParameters --target ES2022 --module ESNext typescript/projections.ts typescript/yvex.ts"
+    "check": "tsc --noEmit --strict --noUnusedLocals --noUnusedParameters --target ES2022 --module ESNext --moduleResolution Bundler typescript/projections.ts typescript/yvex.ts"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
@@ -34,5 +34,8 @@
         "typescript/yvex.ts"
       ]
     }
+  },
+  "dependencies": {
+    "@yvex/sdk": "git+https://github.com/yailabs/yvex.git#c57d333bb3a3f63d9c0d720c8016455cdeb7da41"
   }
 }

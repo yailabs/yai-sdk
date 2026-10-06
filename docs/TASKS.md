@@ -19,7 +19,7 @@ publication: {html: true, pdf: false, index: true}
 | PLATFORM.SDK.PARITY.REFOUNDATION.0 | COMPLETE | Separate YVEX SDK domain, bounded Core capacity adapter, read-only Studio dual consumption, distributed contract/disposition parity and local Core/Host installed identity qualified at the published-contract scope; deployed YVEX management, producer version identity and real governed model result remain external/unqualified. |
 | SDK.MACOS.PEER.CREDENTIALS.0 | COMPLETE | Native PID/UID queries, invalid transport refusal and Studio desktop compilation qualified on macOS; 38 Rust workspace tests pass on Linux. Process/start identity and full native Host integration remain Linux-only/unqualified; [bounded evidence](qualification.md#macos-peer-credentials-2026-10-01). |
 
-The completed platform delivery checked 98 YAI operation descriptors, two YVEX
+At its historical checkpoint, the completed platform delivery checked 98 YAI operation descriptors, two YVEX
 read-only management operations and two Studio dispositions, including negative
 owner-delta controls. This qualifies contract/disposition parity, not runtime
 generation. The current installed Core executable matches its running Host;
@@ -39,6 +39,23 @@ Current downstream projection of the selected YAI
 projects Case Work intent/step observation into 25 typed workflows and 84
 shared types. SDK standalone conformance is separate from YAI's real-model
 and Studio interaction evidence; the previous platform Task is not reopened.
+
+## YVEX.PLATFORM.CONTROL.PLANE.CONVERGENCE.0
+
+**State: SDK-OWNED SLICE QUALIFIED.** Canonical YVEX public client ownership moves to the YVEX
+producer repository without YAI semantic dependencies. This repository preserves
+compatibility composition and exact pinned public types; it does not retain a
+second YVEX implementation. Qualification covers independent client consumption,
+protocol/state/recovery conformance and existing YAI consumers.
+
+Canonical Rust 0.2 and `@yvex/sdk` now own implementation and projections in YVEX;
+the local 0.1 compatibility crate forwards features and reexports that dependency.
+Facade contract tests resolve the exact Cargo dependency rather than reading
+removed descriptor/source copies. Local workspace and 21 contract controls pass;
+published YVEX `c57d333bb3a3f63d9c0d720c8016455cdeb7da41` is pinned by
+Cargo and npm, with workspace and TypeScript qualification repeated from Git.
+This state does not close Studio visual acceptance or the real Spark/Case vertical.
+See [migration qualification](qualification.md#canonical-yvex-client-facade--2026-10-06).
 
 ## YVEX.STUDIO.COMPUTE.CONTROL.PLANE.0
 
@@ -90,8 +107,8 @@ selection or real DGX finite-model/Fast Search exits. Approved deployed listener
 YAI finite grant and resident exact model evidence remain external prerequisites.
 
 [Qualification](qualification.md) records the bounded local producer/consumer
-evidence. Remote transport, other language clients and customer-package legal
-qualification remain separate, unselected pressures.
+evidence. Network YAI Application transport, additional runtime language clients
+and customer-package legal qualification remain separate, unselected pressures.
 
 ## YAI.PRODUCT.BOOTSTRAP.IDENTITY.0
 

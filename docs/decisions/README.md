@@ -29,3 +29,17 @@ their refusal tests. TypeScript remains contracts-only until a transport is earn
 This avoids both a client-side second engine and a public API consisting only of
 untyped operation strings. It does not introduce provider plugins, direct YVEX
 control, internet transport or a second server lifecycle.
+
+## SDK-D02 — YVEX owns its independent public client
+
+Accepted for `YVEX.PLATFORM.CONTROL.PLANE.CONVERGENCE.0`. Canonical Rust transport,
+contracts and generated TypeScript projections belong to the public YVEX
+repository. An independent YVEX client must not require YAI or Studio merely to
+operate model, build, runtime or Session lifecycle.
+
+Retain the historical `yvex-sdk` 0.1 package as a thin reexport of canonical 0.2,
+and `@yai/sdk/yvex` as a type reexport of `@yvex/sdk`. Preserve compatibility entry
+points and examples without retaining a duplicate implementation. Explicit exact
+pins and producer/client conformance govern consumption. YAI Application contracts,
+Case authority and the independently versioned finite-computation boundary remain
+unchanged. Publication and real runtime evidence are separate from this decision.

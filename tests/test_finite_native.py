@@ -9,7 +9,10 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
-GUARD = "crates/yvex-sdk/build_support/check_finite_abi.py"
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"tools"))
+from yvex_owner import yvex_root
+GUARD = str(yvex_root()/"build_support/check_finite_abi.py")
 
 
 def main():

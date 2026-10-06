@@ -7,12 +7,15 @@ import sys
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"tools"))
+from yvex_owner import yvex_root
+
 sys.path.insert(0, str(ROOT/"tools"))
 from check_yvex_sdk_parity import compare
 
 class FiniteRemoteContract(unittest.TestCase):
     def setUp(self):
-        contract = json.loads((ROOT/"crates/yvex-sdk/contract/finite-remote.json").read_text())
+        contract = json.loads((yvex_root() / "contract/finite-remote.json").read_text())
         self.producer = {"schema":"yvex.operator.registry.v1",
             "catalogs":{"remote_management_operations":["device.describe","host.status"]},
             "operations":[{"operation_id":contract["producer_entry_operation"],

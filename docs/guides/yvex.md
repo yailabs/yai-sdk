@@ -1,5 +1,5 @@
 <!-- docs:metadata
-title: Inspect a YVEX device
+title: Use the YVEX platform client
 id: yai-sdk.guides.yvex
 document: guide
 status: current
@@ -8,16 +8,33 @@ audience: [developer, engineer]
 publication: {html: true, pdf: false, index: true}
 -->
 
-# Inspect a YVEX device
+# Use the YVEX platform client
 
 [Guides](README.md) · [Architecture](../architecture.md)
 
-The `yvex-sdk` Rust crate is a separate client domain in this public SDK
-repository. It represents facts that originate in YVEX, not YAI Case truth.
-Management v1 retains the enrolled, read-only `device.describe` and
-`host.status` operations. The separately granted remote finite-decision client
-is described below. Neither discovers an untrusted machine, enrolls a peer,
-starts YVEX, loads a model, invokes chat generation or inspects a Case.
+The canonical Rust `yvex-sdk` 0.2 client and TypeScript `@yvex/sdk` projections
+are owned by [YVEX](https://github.com/yailabs/yvex/tree/main/sdk).
+An independent client does not need YAI or Studio. This repository retains
+`yvex-sdk` 0.1 and `@yai/sdk/yvex` compatibility reexports for existing consumers.
+The examples below are facade consumers of the same canonical implementation.
+
+For a new Rust client, pin a reviewed published YVEX revision:
+
+```toml
+[dependencies]
+yvex-sdk = { git = "https://github.com/yailabs/yvex", rev = "PINNED_REVIEWED_YVEX_REV", version = "0.2.0" }
+```
+
+TypeScript clients consume public DTOs from `@yvex/sdk`; this does not provide a
+browser transport or credential store. Native Rust owns network and protected
+credential handling. Product management v2 supports lifecycle operations through
+pinned HTTPS, the protected local Unix companion or advanced restricted SSH.
+Discover capabilities before presenting an operation; permission and runtime
+readiness are separate from capability support. Direct YVEX generation is outside
+a YAI Case and does not admit a Case action.
+
+Management v1 retains the enrolled, read-only `device.describe` and `host.status`
+operations. Separately granted finite computation is documented below.
 
 The same crate also has an `openai` module for the public
 `yvex.openai.compat.v3` model-catalog and exact-request capacity preflight
@@ -27,16 +44,20 @@ accounting, and passes the complete request bytes unchanged to preflight.
 This is a producer extension, not an alternative YAI admission chain or a
 promise that an engine can subsequently execute the request.
 
-An operator must independently approve the exact Ed25519 host key and enroll
+## Compatibility: read-only SSH management v1
+
+For this advanced compatibility transport, an operator independently approves the exact Ed25519 host key and enroll
 the client key on the YVEX machine. OpenSSH verifies that key against a private
 known-hosts file. The SDK then checks the returned device and peer identities
 and request correlation. A reachable address or self-reported JSON identity
 is not a trust anchor. The [YVEX contract](https://github.com/yailabs/yvex/blob/main/docs/contracts/remote-management.md)
 owns the listener, forced-command and enrollment requirements.
 
+Existing consumers may retain the compatibility package from this repository:
+
 ```toml
 [dependencies]
-yvex-sdk = { git = "https://github.com/yailabs/yai-sdk", rev = "PINNED_REVIEWED_REV" }
+yvex-sdk = { git = "https://github.com/yailabs/yai-sdk", rev = "PINNED_REVIEWED_REV", version = "0.1.0" }
 ```
 
 Construct `SshConnection` with absolute paths to the pinned known-hosts file
@@ -55,7 +76,7 @@ persist the enrolled private client key in a Case. The SDK's Rust
 YVEX runtime state. A revoked registration cannot be used as current trust.
 
 ```sh
-cargo run --locked -p yvex-sdk --example management -- \
+cargo run --locked -p yvex-sdk@0.1.0 --example management -- \
   /absolute/pinned_known_hosts /absolute/enrolled_client_key \
   machine.example 2222 yvex ssh-ed25519:sha256:DEVICE_HEX \
   ssh-ed25519:sha256:PEER_HEX host.status
@@ -96,13 +117,14 @@ need Python 3, Clang/libclang and a C compiler; bindings are generated at build
 time, never hand-maintained ABI structs. `YVEX_SDK_PYTHON` may select the build
 Python. This is not a Python inference runtime.
 
-At producer reference `67a7905`, ordinary YVEX `make install` publishes only the
-executable product, not this native client prefix. This SDK does not silently
+At the historical producer checkpoint `67a7905`, ordinary YVEX `make install`
+published only the executable product, not this native client prefix. This SDK does not silently
 copy a sibling checkout, manufacture a library or claim a supported producer
-installer. Real client installation/runtime qualification therefore remains an
-explicit producer packaging dependency until its owner supplies the prefix.
+installer. That checkpoint did not qualify installation/runtime use of the native prefix.
+Current installation and runtime evidence must come from the selected producer;
+the historical observation is not a claim about every newer YVEX installer.
 The [public contract](https://github.com/yailabs/yvex/blob/67a7905ea9deb98b0704629a1f979634e19007fb/docs/contracts/c-api.md)
-and [declaration projection](../../crates/yvex-sdk/contract/finite.json) own compatibility;
+and [declaration projection](https://github.com/yailabs/yvex/blob/main/sdk/rust/contract/finite.json) own compatibility;
 source revisions identify evidence rather than requiring matching repository HEADs.
 
 The [finite example](../../crates/yvex-sdk/examples/finite.rs) takes a socket and
@@ -159,7 +181,7 @@ fields remain explicitly inspectable, not automatically logged.
 The [remote example](../../crates/yvex-sdk/examples/finite_remote.rs) accepts:
 
 ```sh
-cargo run --locked -p yvex-sdk --example finite_remote -- \
+cargo run --locked -p yvex-sdk@0.1.0 --example finite_remote -- \
   /absolute/pins /absolute/enrolled_key DGX_ADDRESS FINITE_PORT YVEX_USER \
   ssh-ed25519:sha256:DEVICE_HEX ssh-ed25519:sha256:PEER_HEX \
   /absolute/admitted-producer-identity.json /absolute/bounded-request.json 5000
@@ -176,15 +198,19 @@ requires the actual approved listener, enrollment and exact model evidence.
 
 ## Product management v2
 
-`yvex_sdk::management` is the separate product-management client. An existing
-v1 `management` key remains read-only; the producer must explicitly enroll the
-peer with `product-management`. The same independently approved `SshConnection`
-mechanics apply. This permission does not grant finite computation or YAI Case
-authority. Studio does not invoke a remote shell command or parse CLI output.
+`yvex_sdk::management` is the canonical product-management client. Use
+`management::connections::ConnectionManager` for remembered HTTPS/local
+connections and native credential handling. LAN discovery returns untrusted
+hints. Explicit server trust and producer authorization remain separate steps;
+a reachable endpoint does not grant permission. Advanced restricted SSH remains
+available through `SshConnection`. An existing v1 `management` key stays read-only;
+the producer must explicitly admit `product-management` permission. That permission
+does not grant finite computation or YAI Case authority. Studio consumes the public
+protocol rather than invoking a remote shell command or parsing CLI output.
 
-The reviewed [management projection](../../crates/yvex-sdk/contract/management.json)
-projects producer operations into Rust and `@yai/sdk/yvex` TypeScript types through
-`tools/yvex_management.py`. These types describe Models, exact Sources, registry
+The reviewed [management projection](https://github.com/yailabs/yvex/blob/main/sdk/rust/contract/management.json)
+generates canonical Rust and `@yvex/sdk` TypeScript types through YVEX's
+`sdk/tools/generate.py`. This repository reexports those declarations. These types describe Models, exact Sources, registry
 observations, acquired representations, Builds, Packages, Hosts, Engines,
 Sessions, Jobs and events. There are no speculative Training types or operations.
 Training can later add a capability and exact lineage into these existing owners.
@@ -213,7 +239,7 @@ An engine alias or generation number alone is insufficient across Host restart.
 Source resume/cancellation fence their exact acquisition operation and generation.
 
 A response timeout, malformed/foreign response or transport cancellation after
-SSH starts is `outcome_unavailable`. It does not prove that work stopped. The SDK
+dispatch begins is `outcome_unavailable`. It does not prove that work stopped. The SDK
 never retries. Reobserve `jobs().get` using the retained request ID. An absent
 receipt does not authorize resubmission. The producer owns retention and refuses
 new admission when retention is full rather than silently reusing identities.
@@ -243,3 +269,23 @@ runtime name or product version is not qualification evidence.
 peer. It qualifies transport/identity/refusal and exact read-after-loss behavior,
 not YVEX model execution. Producer lifecycle qualification and native Studio
 acceptance remain independently required.
+
+## Observation and reviewed Build plans
+
+An unavailable Host or catalog does not mean zero Engines, Sessions, models or
+events. Preserve producer posture, typed reason and safe `last_known` Host facts;
+label retained facts as last known. Do not promote them into current admission.
+Management capability, transport connectivity and a runtime Host observation are
+independent facts.
+
+`RuntimeProfile.readiness`, when present, distinguishes `ready`, `blocked`,
+`incompatible`, `unavailable` and `unknown`. Use that producer classification;
+never derive it from blocker prose. Older producers expose `launchable`, which
+can establish launchability but cannot supply the richer classification.
+
+A dry-run Build is an observable Job. Retain its exact request identity and
+observe completion. A returned `BuildResult.plan_id` can be supplied as
+`BuildInput.expected_plan` on an explicitly confirmed execution, so the producer
+refuses a changed plan. A legacy result without that field is not a fenced review;
+disclose the limitation. Neither plan observation nor lost execution response
+permits automatic resubmission.

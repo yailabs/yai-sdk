@@ -46,7 +46,7 @@ make check-platform-parity \
 
 The checker compares YAI's live Application catalog with the SDK operation
 projection, Studio's YAI operation dispositions, YVEX's canonical remote
-operation registry with the separate YVEX SDK manifest, and Studio's native
+operation registry with the canonical YVEX-owned SDK manifest, and Studio's native
 YVEX dispositions. Controlled owner deltas must fail. This is contract and
 consumer-disposition parity, not installed compatibility or real-model evidence.
 No sibling checkout is an implicit package dependency; release consumers pin
@@ -55,3 +55,19 @@ reviewed SDK revisions, while local source overrides are explicit and temporary.
 Keep temporary profiles, logs, installed dependencies and build products out of
 Git. Never use an operator Case for destructive test setup. Publication follows
 focused review and qualification; the legal gate remains independent.
+
+## YVEX compatibility facade
+
+Edit YVEX management contracts and client code in their canonical public owner,
+`yailabs/yvex/sdk`, then update the reviewed dependency pins in this repository.
+Do not regenerate a second implementation or copy DTOs into the facade.
+`tools/yvex_management.py --check` validates the compatibility reexports and the
+resolved canonical contract owner. Projection generation is checked in YVEX. `tools/yvex_owner.py` resolves the exact locked Cargo
+dependency through `cargo metadata`; it never guesses a sibling checkout.
+The facade's examples and contract tests exercise that resolved implementation.
+
+Use `cargo test --locked --workspace --all-targets` for both YAI and compatibility
+consumers. Because both canonical and facade packages are named `yvex-sdk`, use
+`-p yvex-sdk@0.1.0` when selecting this repository's compatibility examples.
+The independent producer owns its `0.2.0` client tests. TypeScript compilation
+checks `@yai/sdk/yvex` against `@yvex/sdk`, without maintaining duplicate records.

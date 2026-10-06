@@ -27,8 +27,10 @@ TypeScript-only projections remain explicit, not fictitious complete typed cover
 Neither a convenience method nor a discovered capability promises permission.
 The client must handle current disclosure, stale state, unavailable producers and
 unsupported instances. The YAI client domain consumes Core-governed semantics.
-The independent `yvex-sdk` domain projects YVEX-owned producer contracts; it does
-not grant Case authority or acquire Core semantics. Studio may compose both.
+YVEX's independently owned `yvex-sdk` 0.2 and `@yvex/sdk` project its producer
+contracts. This repository retains only compatibility facades for historical
+YAI consumers. They do not grant Case authority or acquire Core semantics.
+Studio may compose the YAI client with the canonical YVEX client directly.
 
 Product login initiates ordinary browser account authentication through Core and
 observes its automatic local callback, without entered codes or separate device
@@ -36,5 +38,5 @@ confirmation. Legacy pairing is compatibility-only. Client DTOs never
 contain bearer credentials, installation private keys or signed entitlement bytes.
 Account session, verified offline product access and Case authority are separate.
 
-This milestone does not promise network transport, portable OS support, model
+This milestone does not promise network YAI Application transport, portable OS support, model
 quality, calibration, human acceptance or customer-binary distribution readiness.

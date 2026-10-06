@@ -12,6 +12,8 @@ import sys
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
+from yvex_owner import yvex_root
+
 
 
 def require(condition: bool, message: str) -> None:
@@ -59,7 +61,7 @@ def compare(producer: dict, client: dict) -> None:
 
 
 def compare_finite_schemas(producer_root: pathlib.Path) -> None:
-    contract = json.loads((ROOT / "crates/yvex-sdk/contract/finite-remote.json").read_text())
+    contract = json.loads((yvex_root() / "contract/finite-remote.json").read_text())
     for side in ("request", "response"):
         data = (producer_root / contract[f"{side}_schema_path"]).read_bytes()
         require(hashlib.sha256(data).hexdigest() == contract[f"{side}_schema_sha256"],
@@ -68,7 +70,7 @@ def compare_finite_schemas(producer_root: pathlib.Path) -> None:
 
 
 def compare_product_schemas(producer_root: pathlib.Path) -> None:
-    contract = json.loads((ROOT / "crates/yvex-sdk/contract/management.json").read_text())
+    contract = json.loads((yvex_root() / "contract/management.json").read_text())
     for side in ("request", "response"):
         record = contract["producer_schemas"]
         data = (producer_root / record[f"{side}_schema_path"]).read_bytes()
@@ -83,7 +85,7 @@ def main() -> int:
     args = parser.parse_args()
     producer = json.loads((args.yvex_root / "config/operator/registry.json").read_text(encoding="utf-8"))
     result = subprocess.run(
-        ["cargo", "run", "--locked", "--quiet", "-p", "yvex-sdk", "--example", "capabilities"],
+        ["cargo", "run", "--locked", "--quiet", "-p", "yvex-sdk@0.1.0", "--example", "capabilities"],
         cwd=ROOT, capture_output=True, text=True, check=False,
     )
     require(result.returncode == 0, f"YVEX SDK manifest failed: {result.stderr}")
@@ -91,7 +93,7 @@ def main() -> int:
     compare(producer, client)
     compare_finite_schemas(args.yvex_root)
     compare_product_schemas(args.yvex_root)
-    network = json.loads((ROOT / "crates/yvex-sdk/contract/network.json").read_text())
+    network = json.loads((yvex_root() / "contract/network.json").read_text())
     for name, record in network["producer_schemas"].items():
         require(hashlib.sha256((args.yvex_root / record["path"]).read_bytes()).hexdigest() == record["sha256"], f"network {name} schema drift")
     negative = json.loads(json.dumps(producer))

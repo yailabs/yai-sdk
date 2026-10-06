@@ -16,6 +16,28 @@ The v0.1.0 SDK is a supported client contract, not an implementation of Core
 semantics. This record qualifies Linux same-user local IPC and bounded macOS
 peer-credential queries; full native Host integration remains Linux-only.
 
+## Canonical YVEX client facade — 2026-10-06
+
+The active platform-convergence slice moves canonical `yvex-sdk` 0.2 Rust
+implementation and `@yvex/sdk` TypeScript projections into YVEX's public SDK
+owner. The local `yvex-sdk` 0.1 package preserves imports and feature forwarding
+through a compatibility facade; `@yai/sdk/yvex` reexports canonical types.
+No YAI semantic dependency is introduced into the canonical YVEX client.
+
+Local `cargo test --locked --workspace --all-targets` and 21 workflow/management/
+finite contract controls pass during migration. Tests resolve the exact Cargo
+client dependency and check canonical declarations rather than removed local
+copies. Final lockfiles resolve published YVEX
+`c57d333bb3a3f63d9c0d720c8016455cdeb7da41` over Git; workspace and TypeScript
+checks pass again without local source overrides.
+`python3 tools/docs.py`, `python3 tools/check.py`, `npm run check` and
+`git diff --check` pass for the reconciled facade documentation and projections.
+
+Existing network/native-vault/CPU-model evidence below retains its original
+scope. The facade migration does not itself prove Spark reachability, a governed
+Case response, native Studio visual quality or human acceptance. No real vertical
+completion is claimed by these checks.
+
 ## Product management v2 client — 2026-10-06
 
 The client-owned slice of `YVEX.STUDIO.COMPUTE.CONTROL.PLANE.0` adds the separate

@@ -6,6 +6,9 @@ from pathlib import Path
 import sys
 import unittest
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"tools"))
+from yvex_owner import yvex_root
+
 sys.path.insert(0,str(ROOT/'tools'))
 from check_yvex_sdk_parity import compare
 sys.path.insert(0,str(ROOT/'tests'))
@@ -14,7 +17,7 @@ from test_finite_remote_contract import FiniteRemoteContract
 class ManagementContract(unittest.TestCase):
     def setUp(self):
         legacy=FiniteRemoteContract();legacy.setUp();self.producer=legacy.producer;self.client=legacy.client
-        self.contract=json.loads((ROOT/'crates/yvex-sdk/contract/management.json').read_text())
+        self.contract=json.loads((yvex_root() / 'contract/management.json').read_text())
         operations=[{k:r[k] for k in ('operation','kind')} for r in self.contract['operations']]
         self.producer['catalogs']['remote_product_management_operations']=operations
         self.client['product_management']={'request_schema':'yvex.management.request.v2','response_schema':'yvex.management.response.v2','grant':'product-management','operations':copy.deepcopy(operations),'automatic_retry':False,'mutation_recovery':'job.get','runtime_qualified':False}
