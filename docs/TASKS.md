@@ -76,6 +76,15 @@ real finite inference, governed Case results and Studio interaction remain
 independent consumer/producer evidence. [Current conformance](qualification.md#product-operational-consumer-slices)
 records the bounded SDK scope.
 
+The resumed System-1 Task adds the separate public remote finite client at producer
+contract `803dd98d`. SDK owns restricted SSH, typed strict parsing, exact admitted
+lineage/population and correlation, bounded loss/cancellation semantics and no
+automatic retry. Default builds need no native YVEX installation for remote use.
+The YAI operation inventory remains 115; no Studio/UI disposition is promoted.
+Standalone and real-SSH synthetic conformance do not close the Core Participant
+selection or real DGX finite-model/Fast Search exits. Approved deployed listener,
+YAI finite grant and resident exact model evidence remain external prerequisites.
+
 [Qualification](qualification.md) records the bounded local producer/consumer
 evidence. Remote transport, other language clients and customer-package legal
 qualification remain separate, unselected pressures.

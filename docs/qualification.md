@@ -18,6 +18,38 @@ peer-credential queries; full native Host integration remains Linux-only.
 
 ## Product operational consumer slices
 
+### Remote finite client checkpoint 2026-10-06
+
+Producer authority is YVEX `803dd98d4c54d7a26cb3c08def6b350be51b7179`,
+`finite.decision.execute`, `yvex.finite.request.v1` / `yvex.finite.response.v1`.
+Closed decoding checks exact correlation, both SSH peer identities, alias,
+resident generation, six admitted computational-lineage identities, ordered
+candidate IDs, raw/uncalibrated score semantics and finite work counters.
+Default SDK builds exercise this client without a C archive; local native absence
+still refuses and is not silently converted into remote dispatch.
+
+`cargo test --locked -p yvex-sdk --all-targets` passes 18 Rust tests including
+wire, identity, population, request-byte and score negatives, early cancellation,
+blocked stdin timeout, bounded oversized output and concurrent large-response
+draining. `make check-finite-remote` passes 15 real-SSH synthetic protocol controls
+plus wrong-host-pin and unenrolled-key refusal. Its exact audit observes one
+dispatch per invocation and fresh request IDs, including reply loss and timeout:
+no retry occurs. Cancellation after start and producer errors preserve unknown
+computational outcome; they do not assert producer cancellation or zero work.
+The fixture runs no YVEX process/model and grants no YAI authority.
+
+Standalone negative delta tests refuse a missing/changed finite entry/schema,
+management-scope contamination and runtime/retry promotion. Cross-repository
+parity separately checks published request/response checksums; a changed layout
+requires explicit reviewed client disposition. The two management reads and 115
+YAI operations remain separate/unchanged. No new Studio implementation is claimed.
+
+Actual approved DGX listener, YAI key/grant and exact resident finite engine are
+not yet supplied to this consumer. Real SDK→YVEX model execution, YAI qualification,
+Participant/current-W Fast Search, installed product result and latency/resource
+claims remain unearned. Synthetic counters are fixture inputs, not measurements.
+No search-quality, Human, Canary, release or commercial promotion follows.
+
 Local-development/profile projections add four operations (115 released total).
 Closed DTO and workflow tests cover source distinction, absent commercial profile,
 null unknown facts, credential-field rejection and generator wrapper/type collision.

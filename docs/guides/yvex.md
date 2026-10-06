@@ -14,10 +14,10 @@ publication: {html: true, pdf: false, index: true}
 
 The `yvex-sdk` Rust crate is a separate client domain in this public SDK
 repository. It represents facts that originate in YVEX, not YAI Case truth.
-Its current supported remote scope is deliberately small: the enrolled,
-read-only `device.describe` and `host.status` operations from YVEX management
-v1. It does not discover an untrusted machine for you, enroll a peer, start
-YVEX, load a model, invoke generation or inspect a Case.
+Management v1 retains the enrolled, read-only `device.describe` and
+`host.status` operations. The separately granted remote finite-decision client
+is described below. Neither discovers an untrusted machine, enrolls a peer,
+starts YVEX, loads a model, invokes chat generation or inspects a Case.
 
 The same crate also has an `openai` module for the public
 `yvex.openai.compat.v3` model-catalog and exact-request capacity preflight
@@ -115,3 +115,60 @@ compiles an SDK-only synthetic C peer in a disposable prefix and tests bindings,
 result/refusal handling and declaration-drift rejection. It never loads a model,
 starts a YVEX host or qualifies System-1/Fast Search. Ordinary standalone checks
 continue without external headers or private repositories.
+
+## Remote finite decision
+
+The [producer contract](https://github.com/yailabs/yvex/blob/803dd98d4c54d7a26cb3c08def6b350be51b7179/docs/contracts/finite-decision-remote.md)
+and its linked request/response schemas own `finite.decision.execute`.
+`finite::remote::RemoteClient` uses an approved `SshConnection` on a dedicated
+restricted listener enrolled with `--scope finite-decision`. Management-only
+keys do not acquire compute permission. This path does not require
+`finite-decision-native`, installed headers/archive or a local YVEX socket.
+`execute_local` remains exclusively local.
+
+Construct `remote::ProducerIdentity` from independently admitted exact source,
+logical-model, binding, tokenizer, physical-program and input-policy identities.
+Neither an alias nor generation alone is sufficient. The caller owns producer
+qualification, disclosure and YAI Participant policy. Passing these expected
+identities to the SDK is not itself a qualification fact.
+
+```rust,ignore
+use yvex_sdk::finite::remote::{Invocation, RemoteClient};
+let client = RemoteClient::new(approved_connection, admitted_identity)?
+    .with_timeout(std::time::Duration::from_secs(5))?;
+let invocation = Invocation::new(bounded_finite_request)?;
+// Retain invocation.request_id before dispatch. This is correlation, NOT replay safety.
+let observation = client.execute(&invocation)?;
+```
+
+`execute_cancellable(&invocation, &AtomicBool)` permits explicit local transport
+cancellation. `NotDispatched` is reserved for pre-dispatch client rejection or an
+authenticated explicit producer refusal. Once SSH starts, transport/pin/auth
+failure, timeout, cancellation, malformed/foreign response and native producer
+error are conservatively `OutcomeUnavailable`. This does not certify that the
+model never ran or that its lease retired immediately. Only an accepted exact
+success is `Completed`. No durable receipt/cache exists; reusing a request ID
+may execute again. Caller policy must decide any new independent invocation.
+
+Returned observations preserve correlation, peer identities and the existing
+`ResultObservation`, including producer-authored time/resource counters and
+uncalibrated raw/relative scores. No question/context or untrusted native error
+text is rendered in ordinary error diagnostics. Structured reason/name/owner
+fields remain explicitly inspectable, not automatically logged.
+
+The [remote example](../../crates/yvex-sdk/examples/finite_remote.rs) accepts:
+
+```sh
+cargo run --locked -p yvex-sdk --example finite_remote -- \
+  /absolute/pins /absolute/enrolled_key DGX_ADDRESS FINITE_PORT YVEX_USER \
+  ssh-ed25519:sha256:DEVICE_HEX ssh-ed25519:sha256:PEER_HEX \
+  /absolute/admitted-producer-identity.json /absolute/bounded-request.json 5000
+```
+
+`make check-finite-remote` uses disposable keys and an isolated real OpenSSH
+listener with a forced synthetic public-protocol peer. It proves client transport,
+one dispatch per invocation, mismatched identities/refusal/loss and untrusted
+key/pin controls; it does not run YVEX or a model. The optional cross-repository
+parity lane checks both published schema layouts and refuses finite-schema drift
+separately from management-operation drift. Exon→DGX with a resident finite engine
+requires the actual approved listener, enrollment and exact model evidence.

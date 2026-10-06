@@ -4,6 +4,8 @@
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
+pub mod remote;
+
 include!(concat!(env!("OUT_DIR"), "/finite_limits.rs"));
 pub const CLIENT_SCHEMA: &str = "platform.sdk.yvex.finite.v1";
 pub const NATIVE_CLIENT_COMPILED: bool = cfg!(feature = "finite-decision-native");

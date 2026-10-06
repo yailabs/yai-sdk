@@ -12,6 +12,7 @@ import sys
 import tempfile
 
 from check_yvex_sdk_parity import compare as compare_yvex
+from check_yvex_sdk_parity import compare_finite_schemas
 
 SDK_ROOT = Path(__file__).resolve().parents[1]
 
@@ -80,6 +81,7 @@ def main() -> int:
     sdk_yvex = run_json(["cargo", "run", "--locked", "--quiet", "-p", "yvex-sdk",
                          "--example", "capabilities"], SDK_ROOT)
     compare_yvex(yvex, sdk_yvex)
+    compare_finite_schemas(args.yvex_root)
     studio = read_json(args.studio_root / "component.json")
     compare_studio_yvex(sdk_yvex, studio)
 

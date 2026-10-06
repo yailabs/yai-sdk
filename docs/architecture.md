@@ -27,6 +27,19 @@ not a second SDK-owned model/runtime registry. It does not expose the private
 YVEX Unix wire or wrap human CLI output. Adding a Rust type does not establish
 live YVEX service availability.
 
+`yvex-sdk::finite::remote` separately consumes the public
+`yvex.finite.request.v1` / `yvex.finite.response.v1` computation protocol over
+restricted SSH, with explicit finite-decision enrollment rather than management
+permission. It reuses the semantic-neutral finite input/result projection and
+the approved `SshConnection` trust substrate. Exact configured source, model,
+binding, tokenizer, program and input-policy identities must match alongside
+correlation, alias, generation and ordered candidate IDs. There is no native
+library requirement for this remote client, no private socket forwarding and no
+lifecycle mutation. Bounded concurrent pipe I/O prevents transport deadlock;
+timeout/cancellation/reply loss conservatively preserve unknown computational
+outcome. Correlation is not deduplication; no call is retried automatically.
+This client is not a YAI realization-selection or qualification owner.
+
 The `yvex-sdk::openai` module separately interprets YVEX's public profile-v3
 catalog and exact-request preflight reports. It takes a caller-owned HTTP fetch
 callback, so YAI retains endpoint locality, credentials, transport policy and
@@ -116,8 +129,10 @@ Case updates invalidate views and carry exact Case/generation/cursor identity.
 Reconnect or host-instance change requires resynchronization and must preserve
 client-local dirty buffers. SDK does not reconstruct missing Case state.
 
-The finite MVP is local Linux transport. Internet transports, authorization across
-OS users, semantic policy and frontend design are not implemented here.
+The YAI Application MVP uses local Linux transport. The independent YVEX domain
+also supports restricted identity-pinned SSH management and finite computation;
+deployed listener/model qualification is separate. Internet YAI Application
+transport, semantic policy and frontend design are not implemented here.
 
 ## Native peer credentials
 

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import pathlib
 import subprocess
@@ -30,6 +31,26 @@ def compare(producer: dict, client: dict) -> None:
     require(isinstance(owned, list) and len(owned) == len(set(owned)), "producer operation inventory invalid")
     require(isinstance(projected, list) and len(projected) == len(set(projected)), "SDK operation inventory invalid")
     require(sorted(owned) == sorted(projected), f"YVEX SDK drift: producer={sorted(owned)} SDK={sorted(projected)}")
+    # Finite computation is a distinct protocol/grant, not another management
+    # v1 read. Its forced entry and wire schemas remain producer-owned.
+    remote = client["finite_decision"]["remote"]
+    finite = [row for row in producer["operations"] if row.get("operation_id") == "finite.remote.protocol"]
+    require(len(finite) == 1, "remote finite producer entry missing/duplicated")
+    require(finite[0].get("input_schema") == remote.get("request_schema"), "finite request schema drift")
+    require(finite[0].get("result_schema") == remote.get("response_schema"), "finite response schema drift")
+    require(remote.get("operation") == "finite.decision.execute", "finite execution operation drift")
+    require(remote.get("transport") == "restricted_ssh" and remote.get("automatic_retry") is False,
+            "finite trust/replay posture drift")
+    require(remote.get("runtime_qualified") is False, "SDK type presence cannot qualify runtime")
+
+
+def compare_finite_schemas(producer_root: pathlib.Path) -> None:
+    contract = json.loads((ROOT / "crates/yvex-sdk/contract/finite-remote.json").read_text())
+    for side in ("request", "response"):
+        data = (producer_root / contract[f"{side}_schema_path"]).read_bytes()
+        require(hashlib.sha256(data).hexdigest() == contract[f"{side}_schema_sha256"],
+                f"finite {side} layout drift requires reviewed client disposition")
+        require(json.loads(data)["$id"] == contract[f"{side}_schema"], f"finite {side} identity drift")
 
 
 def main() -> int:
@@ -44,6 +65,7 @@ def main() -> int:
     require(result.returncode == 0, f"YVEX SDK manifest failed: {result.stderr}")
     client = json.loads(result.stdout)
     compare(producer, client)
+    compare_finite_schemas(args.yvex_root)
     negative = json.loads(json.dumps(producer))
     negative["catalogs"]["remote_management_operations"].append("model.load")
     try:
@@ -52,7 +74,17 @@ def main() -> int:
         pass
     else:
         raise AssertionError("controlled producer delta did not fail parity")
-    print(f"PASS YVEX→SDK parity: {len(client['operations'])} exact management operations; added-operation negative refused")
+    finite_negative = json.loads(json.dumps(producer))
+    for row in finite_negative["operations"]:
+        if row.get("operation_id") == "finite.remote.protocol":
+            row["result_schema"] = "yvex.finite.response.unsupported"
+    try:
+        compare(finite_negative, client)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("controlled finite schema delta did not fail parity")
+    print(f"PASS YVEX→SDK parity: {len(client['operations'])} management reads, separate finite computation, exact schemas; management/finite deltas refused")
     return 0
 
 

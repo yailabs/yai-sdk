@@ -1,19 +1,18 @@
-//! Independent YVEX client domain: management v1, OpenAI projections and the
-//! optional public native finite-decision client. No YAI semantic dependency.
+//! Independent YVEX client domain: management v1, OpenAI projections, remote
+//! finite computation and optional native finite client. No YAI semantics.
 //!
-//! The current remote contract is deliberately read-only: device identity and
-//! host status. Model/runtime mutation is not represented by this crate.
+//! Management remains read-only. Remote finite computation requires a separate
+//! explicit grant. Model/runtime lifecycle mutation is not represented here.
 
 pub mod finite;
 pub mod openai;
+mod ssh;
 
 use serde::{Deserialize, Serialize};
-use std::io::{Read, Write};
+use std::io::Write;
 use std::path::PathBuf;
-use std::process::{Command, Stdio};
 use std::time::Duration;
 use tempfile::NamedTempFile;
-use wait_timeout::ChildExt;
 
 pub const REQUEST_SCHEMA: &str = "yvex.management.request.v1";
 pub const RESPONSE_SCHEMA: &str = "yvex.management.response.v1";
@@ -212,84 +211,18 @@ impl ManagementClient {
         .map_err(|_| ClientError::InvalidResponse)?;
         request.push(b'\n');
 
-        // OpenSSH owns host-key verification. No remote command is passed: the
-        // enrolled key selects YVEX's forced management command on the server.
-        let mut child = Command::new("ssh")
-            .arg("-T")
-            .arg("-F")
-            .arg("/dev/null")
-            .arg("-o")
-            .arg("BatchMode=yes")
-            .arg("-o")
-            .arg("PreferredAuthentications=publickey")
-            .arg("-o")
-            .arg("PasswordAuthentication=no")
-            .arg("-o")
-            .arg("KbdInteractiveAuthentication=no")
-            .arg("-o")
-            .arg("GSSAPIAuthentication=no")
-            .arg("-o")
-            .arg("ClearAllForwardings=yes")
-            .arg("-o")
-            .arg("ForwardAgent=no")
-            .arg("-o")
-            .arg("StrictHostKeyChecking=yes")
-            .arg("-o")
-            .arg("IdentitiesOnly=yes")
-            .arg("-o")
-            .arg("ConnectionAttempts=1")
-            .arg("-o")
-            .arg("ConnectTimeout=5")
-            .arg("-o")
-            .arg(format!(
-                "UserKnownHostsFile={}",
-                self.connection.pinned_known_hosts.display()
-            ))
-            .arg("-i")
-            .arg(&self.connection.enrolled_client_key)
-            .arg("-p")
-            .arg(self.connection.port.to_string())
-            .arg(format!(
-                "{}@{}",
-                self.connection.user, self.connection.address
-            ))
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::null())
-            .spawn()
-            .map_err(|_| ClientError::TransportUnavailable)?;
-        if child.stdin.take().unwrap().write_all(&request).is_err() {
-            let _ = child.kill();
-            let _ = child.wait();
-            return Err(ClientError::TransportUnavailable);
-        }
-        let status = match child.wait_timeout(self.timeout) {
-            Ok(Some(status)) => status,
-            Ok(None) => {
-                let _ = child.kill();
-                let _ = child.wait();
-                return Err(ClientError::Timeout);
-            }
-            Err(_) => {
-                let _ = child.kill();
-                let _ = child.wait();
-                return Err(ClientError::TransportUnavailable);
-            }
-        };
-        if !status.success() {
-            return Err(ClientError::TransportUnavailable);
-        }
-        let mut output = Vec::new();
-        child
-            .stdout
-            .take()
-            .unwrap()
-            .take((MAX_RESPONSE_BYTES + 1) as u64)
-            .read_to_end(&mut output)
-            .map_err(|_| ClientError::TransportUnavailable)?;
-        if output.len() > MAX_RESPONSE_BYTES {
-            return Err(ClientError::ResponseTooLarge);
-        }
+        let output = ssh::invoke(
+            &self.connection,
+            request,
+            self.timeout,
+            &std::sync::atomic::AtomicBool::new(false),
+            MAX_RESPONSE_BYTES,
+        )
+        .map_err(|e| match e.kind {
+            ssh::FailureKind::Timeout => ClientError::Timeout,
+            ssh::FailureKind::ResponseTooLarge => ClientError::ResponseTooLarge,
+            _ => ClientError::TransportUnavailable,
+        })?;
         parse_response(&output, &request_id, &self.connection)
     }
 }
