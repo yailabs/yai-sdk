@@ -3,6 +3,240 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct EmptyInput {
 }
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FastSearchInput {
+    pub working_state: serde_json::Value,
+    pub max_candidates: usize,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FastSearchCandidate {
+    pub candidate_id: String,
+    pub candidate_kind: String,
+    pub description: String,
+    pub semantic_refs: Vec<String>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FastSearchDecisionBudget {
+    pub max_candidates: usize,
+    pub max_result_bytes: usize,
+    pub max_compute_millis: u64,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FastSearchDecisionRequest {
+    pub schema: String,
+    pub request_id: String,
+    pub case_id: String,
+    pub case_generation: u64,
+    pub participant_id: String,
+    pub task_id: String,
+    pub working_state_id: String,
+    pub decision_kind: String,
+    pub candidates: Vec<FastSearchCandidate>,
+    pub budget: FastSearchDecisionBudget,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FastSearchChoice {
+    pub candidate: FastSearchCandidate,
+    pub origin: serde_json::Value,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum FastSearchPreparationPosture {
+    #[default]
+    #[serde(rename = "ready_for_optional_producer")]
+    ReadyForOptionalProducer,
+    #[serde(rename = "deterministic_fallback_no_choice")]
+    DeterministicFallbackNoChoice,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FastSearchNavigation {
+    pub schema: String,
+    pub navigation_id: String,
+    pub working_state_id: String,
+    pub posture: FastSearchPreparationPosture,
+    pub choices: Vec<FastSearchChoice>,
+    pub omitted_optional_choices: usize,
+    pub decision_request: Option<FastSearchDecisionRequest>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FastSearchScore {
+    pub candidate_id: String,
+    pub value: i64,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum FastSearchPosture {
+    #[default]
+    #[serde(rename = "scored")]
+    Scored,
+    #[serde(rename = "deterministic_fallback")]
+    DeterministicFallback,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum FiniteDispatchPosture {
+    #[default]
+    #[serde(rename = "not_attempted")]
+    NotAttempted,
+    #[serde(rename = "not_dispatched")]
+    NotDispatched,
+    #[serde(rename = "completed")]
+    Completed,
+    #[serde(rename = "outcome_unavailable")]
+    OutcomeUnavailable,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FiniteComputationObservation {
+    pub dispatch: FiniteDispatchPosture,
+    pub request_ref: Option<String>,
+    pub result_ref: Option<String>,
+    pub engine_generation: Option<u64>,
+    pub producer_compute_nanoseconds: Option<u64>,
+    pub caller_nanoseconds: Option<u64>,
+    pub token_count: Option<u64>,
+    pub model_forward_count: Option<u64>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FiniteProviderTransport {
+    pub user: String,
+    pub pinned_known_hosts: String,
+    pub enrolled_client_key: String,
+    pub device_identity: String,
+    pub authenticated_peer: String,
+    pub source_identity: String,
+    pub logical_model_identity: String,
+    pub binding_identity: String,
+    pub tokenizer_identity: String,
+    pub physical_program_identity: String,
+    pub input_policy_identity: String,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FiniteProviderRegisterInput {
+    pub tenant_id: String,
+    pub provider_key: String,
+    pub adapter: String,
+    pub endpoint: String,
+    pub model_id: String,
+    pub credential_ref: String,
+    pub locality: String,
+    pub finite_transport: FiniteProviderTransport,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FiniteProviderTarget {
+    pub schema: String,
+    pub target_id: String,
+    pub integrity_digest: String,
+    pub tenant_id: String,
+    pub provider_key: String,
+    pub adapter: String,
+    pub endpoint: String,
+    pub model_id: String,
+    pub credential_ref: String,
+    pub locality: String,
+    pub extension_adapter_id: Option<String>,
+    pub finite_transport: FiniteProviderTransport,
+    pub created_by_principal_id: String,
+    pub created_at_unix_ms: u64,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FiniteQualifyInput {
+    pub target_ref: String,
+    pub working_state: serde_json::Value,
+    pub max_candidates: usize,
+    pub expected_generation: u64,
+    pub valid_for_ms: u64,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FiniteQualifyResult {
+    pub schema: String,
+    pub compatible: bool,
+    pub qualification_ref: Option<String>,
+    pub navigation_ref: String,
+    pub decision_request_ref: String,
+    pub computations: Vec<FiniteComputationObservation>,
+    pub reason: String,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FastSearchRanking {
+    pub schema: String,
+    pub ranking_id: String,
+    pub navigation_id: String,
+    pub distribution_id: String,
+    pub ordered_candidate_ids: Vec<String>,
+    pub preferred_candidate_id: Option<String>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FiniteProducerIdentity {
+    pub capability_id: String,
+    pub producer_id: String,
+    pub producer_version: String,
+    pub model_id: Option<String>,
+    pub composition_id: Option<String>,
+    pub profile_id: Option<String>,
+    pub state_generation: Option<String>,
+    pub evidence_refs: Vec<String>,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CognitiveStepTier {
+    #[default]
+    #[serde(rename = "deterministic")]
+    Deterministic,
+    #[serde(rename = "system_one")]
+    SystemOne,
+    #[serde(rename = "general_llm")]
+    GeneralLlm,
+    #[serde(rename = "unavailable")]
+    Unavailable,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum FiniteProducerPosture {
+    #[default]
+    #[serde(rename = "no_public_qualified_producer")]
+    NoPublicQualifiedProducer,
+    #[serde(rename = "qualified")]
+    Qualified,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FastSearchRoute {
+    pub schema: String,
+    pub request_ref: Option<String>,
+    pub participant_ref: String,
+    pub selected_tier: CognitiveStepTier,
+    pub producer_posture: FiniteProducerPosture,
+    pub reason: String,
+    pub general_llm_equivalent_qualified: bool,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FastSearchResult {
+    pub schema: String,
+    pub posture: FastSearchPosture,
+    pub navigation: FastSearchNavigation,
+    pub route: FastSearchRoute,
+    pub binding_ref: Option<String>,
+    pub qualification_ref: Option<String>,
+    pub target_ref: Option<String>,
+    pub ranking: Option<FastSearchRanking>,
+    pub producer: Option<FiniteProducerIdentity>,
+    pub score_semantics: Option<String>,
+    pub score_scale: Option<u64>,
+    pub scores: Vec<FastSearchScore>,
+    pub computation: FiniteComputationObservation,
+    pub reason: String,
+}
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ProductAccessSource {
     #[default]
@@ -1154,6 +1388,56 @@ pub struct CaseListInput {
     pub tenant_id: Option<String>,
 }
 use crate::{ClientTransport, client::{Client, Error, Operation, Response}};
+pub struct Provider<'a, T>(pub(crate) &'a Client<T>);
+impl<T: ClientTransport> Client<T> {
+    pub fn provider(&self) -> Provider<'_, T> { Provider(self) }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProviderRegisterFinite<'a>(&'a FiniteProviderRegisterInput);
+impl Operation for ProviderRegisterFinite<'_> {
+    type Output = FiniteProviderTarget;
+    const ID: &'static str = "provider.finite.register";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.finite_provider_register_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.provider_target.v2");
+}
+impl<T: ClientTransport> Provider<'_, T> {
+    pub fn register_finite(&self, correlation: &str, input: &FiniteProviderRegisterInput) -> Result<Response<FiniteProviderTarget>, Error> {
+        self.0.execute(correlation, &ProviderRegisterFinite(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProviderQualifyFinite<'a>(&'a FiniteQualifyInput);
+impl Operation for ProviderQualifyFinite<'_> {
+    type Output = FiniteQualifyResult;
+    const ID: &'static str = "provider.finite.qualify";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.finite_qualify_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.finite_qualify_result.v1");
+}
+impl<T: ClientTransport> Provider<'_, T> {
+    pub fn qualify_finite(&self, correlation: &str, input: &FiniteQualifyInput) -> Result<Response<FiniteQualifyResult>, Error> {
+        self.0.execute(correlation, &ProviderQualifyFinite(input))
+    }
+}
+pub struct Cognitive<'a, T>(pub(crate) &'a Client<T>);
+impl<T: ClientTransport> Client<T> {
+    pub fn cognitive(&self) -> Cognitive<'_, T> { Cognitive(self) }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct CognitiveFastSearch<'a>(&'a FastSearchInput);
+impl Operation for CognitiveFastSearch<'_> {
+    type Output = FastSearchResult;
+    const ID: &'static str = "semantic.fast_search.execute";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.fast_search_prepare_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.fast_search_result.v1");
+}
+impl<T: ClientTransport> Cognitive<'_, T> {
+    pub fn fast_search(&self, correlation: &str, input: &FastSearchInput) -> Result<Response<FastSearchResult>, Error> {
+        self.0.execute(correlation, &CognitiveFastSearch(input))
+    }
+}
 pub struct Product<'a, T>(pub(crate) &'a Client<T>);
 impl<T: ClientTransport> Client<T> {
     pub fn product(&self) -> Product<'_, T> { Product(self) }

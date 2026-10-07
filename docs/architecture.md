@@ -80,7 +80,7 @@ the sole authority. Capability metadata grants no permission.
 `contract/workflows.json` owns the shared result envelope, invalidation event,
 common value projections and typed workflow descriptors. Deterministic generation
 produces Rust and TypeScript; `--check` rejects edits to either projection.
-`contract/operations.json` binds the released 115-operation inventory. Core
+`contract/operations.json` binds the released 118-operation inventory. Core
 conformance compares that inventory with the real catalog, while ordinary clients
 may use a compatible subset. This is contract ownership, not copied admission.
 
@@ -92,6 +92,18 @@ Commercial profile display is independent of licence validity. The closed safe
 profile DTO preserves the authenticated account reference and typed absence until
 the commercial service publishes a versioned native-safe profile boundary.
 Name/email/verification are never inferred from Principal, Tenant or local labels.
+
+The YAI cognitive workflow projects `semantic.fast_search.execute` through
+`client.cognitive().fast_search`: typed current navigation/request, raw fixed-point
+scores, ranking and safe producer/computation identity. `provider().register_finite`
+and `provider().qualify_finite` enter the existing Core provider/qualification
+owners. Credential fields are **local path references only**, never key material.
+Opaque current W and typed origin JSON remain Core-owned semantic input, not SDK
+reconstruction. Model-free preparation stays a separate unchanged operation.
+The SDK does not select a tier, qualify a producer or implement a Fast Search
+budget. It reports `scored` versus `deterministic_fallback`, exact reason and
+dispatch posture. A lost response remains indeterminate without automatic retry.
+These contracts do not qualify the current DGX Laya realization within five seconds.
 
 The typed `Client<T>` sits above `ClientTransport`, fences operation schema and
 response identity, and preserves raw received outcomes. `BoundLocalTransport`

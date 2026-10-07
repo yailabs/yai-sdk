@@ -83,6 +83,18 @@ No release qualification is implied. Core semantics and Studio product tasks rem
 
 ## Active downstream product delivery
 
+### System-1 conditional consumer closure
+
+The existing `YAI.SYSTEM.ONE.FAST.SEARCH.INTEGRATION.0` now projects three new
+Core-owned operations: finite target registration, exact current-frontier
+qualification and scored Fast Search execution (118-operation inventory).
+The public YAI domain has typed workflow inputs, navigation/request/score/ranking
+and safe diagnostic results. The YVEX computational domain is unchanged.
+Standalone projection/conformance controls do not qualify real Laya performance;
+Core owns Participant selection and the unchanged five-second realization fence.
+Studio operation disposition and UI consumption remain a precise downstream
+handoff, not work duplicated here. No new Task or completed platform reopening.
+
 The temporary Core-owned `YAI.PRODUCT.OPERATIONAL.CONVERGENCE.0` Task Pack
 includes `YAI.PRODUCT.COMMERCIAL.ACCESS.0`,
 `YAI.SYSTEM.ONE.FAST.SEARCH.INTEGRATION.0` and the existing Real Case Task.

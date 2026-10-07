@@ -400,3 +400,19 @@ the native worker. Three regression controls pass: twelve parallel get/list
 readers while another reader holds the registry, a short exclusive writer, and a
 finite stalled-lock refusal. This waits only for local metadata access; no
 pairing, management submission or lost-response retry occurs.
+
+## YAI finite navigation consumer — 2026-10-07
+
+The YAI domain projects `provider.finite.register`, `provider.finite.qualify` and
+`semantic.fast_search.execute` (118 operation dispositions, 147 shared types,
+44 typed workflows). Standalone `make check` passes Rust/TypeScript conformance,
+workflow generation, independent packaging, MIT/legal and documentation gates.
+Three new controls retain budget fallback without fabricated scores, prohibit
+automatic retry after a lost response, and reject private/unknown contract fields.
+
+This is public client/representation evidence, not real finite-model qualification.
+Core owns trust, current-W qualification, Participant binding, compute/result
+budgets, post-result fences and navigation meaning. A completed computation can
+remain `deterministic_fallback`; `outcome_unavailable` never authorizes retry.
+The observed real DGX Laya realization is still incompatible with Fast Search v1's
+5000 ms bound. Studio adoption and a compatible real producer are separate exits.

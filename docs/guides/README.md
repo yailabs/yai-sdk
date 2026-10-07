@@ -59,7 +59,28 @@ evidence, not SDK authority or an implicit model invocation. The
 [conformance example](../../examples/conformance.rs) checks all published operation
 contract identities on a real Host without requiring its source checkout.
 
-## Observe and resynchronize
+## Consume finite navigation
+
+Use `client.provider().register_finite(correlation, &FiniteProviderRegisterInput)`
+for an explicitly approved public computational target. The input carries public
+lineage and native SSH credential **references**, not secrets or a model activation.
+Core separately owns trust, exact current-W qualification through
+`client.provider().qualify_finite` and Participant cognitive binding.
+
+`client.cognitive().fast_search(correlation, &FastSearchInput)` consumes current W
+already obtained from Core. Observe response state before data. `scored` carries
+the exact navigation/request, signed fixed-point raw scores, scale, ranking,
+binding/qualification and safe computation references. Those scores are
+uncalibrated; never label them confidence. `deterministic_fallback` carries a precise
+reason and may retain completed computational evidence without a qualified ranking.
+`outcome_unavailable` does not mean no compute or permit retry. A stale/unauthorized
+Core result does not authorize using an older frontier.
+
+These are YAI semantic workflows, not calls clients should replace with direct
+YVEX scoring. Studio must reconcile the three new operation dispositions. Current
+real-model Fast Search qualification remains external to SDK conformance.
+
+## Observe and resynchronize (Host)
 
 For a configured provider, [models](../../examples/models.rs) uses only the
 YAI registered-target operation:

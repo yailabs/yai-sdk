@@ -3,6 +3,71 @@
   "application_protocol": "yai.studio.application.v1",
   "types": {
     "EmptyInput": {},
+    "FastSearchInput": {"working_state":"json","max_candidates":"usize"},
+    "FastSearchCandidate": {"candidate_id":"string","candidate_kind":"string","description":"string","semantic_refs":"array:string"},
+    "FastSearchDecisionBudget": {"max_candidates":"usize","max_result_bytes":"usize","max_compute_millis":"u64"},
+    "FastSearchDecisionRequest": {
+      "schema":"string","request_id":"string","case_id":"string","case_generation":"u64","participant_id":"string",
+      "task_id":"string","working_state_id":"string","decision_kind":"string","candidates":"array:FastSearchCandidate","budget":"FastSearchDecisionBudget"
+    },
+    "FastSearchChoice": {"candidate":"FastSearchCandidate","origin":"json"},
+    "FastSearchPreparationPosture": {"$enum":["ready_for_optional_producer","deterministic_fallback_no_choice"]},
+    "FastSearchNavigation": {
+      "schema":"string","navigation_id":"string","working_state_id":"string","posture":"FastSearchPreparationPosture",
+      "choices":"array:FastSearchChoice","omitted_optional_choices":"usize","decision_request":"nullable:FastSearchDecisionRequest"
+    },
+    "FastSearchScore": {"candidate_id":"string","value":"i64"},
+    "FastSearchPosture": {"$enum":["scored","deterministic_fallback"]},
+    "FiniteDispatchPosture": {"$enum":["not_attempted","not_dispatched","completed","outcome_unavailable"]},
+    "FiniteComputationObservation": {
+      "dispatch":"FiniteDispatchPosture","request_ref":"nullable:string","result_ref":"nullable:string",
+      "engine_generation":"nullable:u64","producer_compute_nanoseconds":"nullable:u64",
+      "caller_nanoseconds":"nullable:u64","token_count":"nullable:u64","model_forward_count":"nullable:u64"
+    },
+    "FiniteProviderTransport": {
+      "user":"string","pinned_known_hosts":"string","enrolled_client_key":"string",
+      "device_identity":"string","authenticated_peer":"string","source_identity":"string",
+      "logical_model_identity":"string","binding_identity":"string","tokenizer_identity":"string",
+      "physical_program_identity":"string","input_policy_identity":"string"
+    },
+    "FiniteProviderRegisterInput": {
+      "tenant_id":"string","provider_key":"string","adapter":"string","endpoint":"string",
+      "model_id":"string","credential_ref":"string","locality":"string","finite_transport":"FiniteProviderTransport"
+    },
+    "FiniteProviderTarget": {
+      "schema":"string","target_id":"string","integrity_digest":"string","tenant_id":"string",
+      "provider_key":"string","adapter":"string","endpoint":"string","model_id":"string",
+      "credential_ref":"string","locality":"string","extension_adapter_id":"nullable:string",
+      "finite_transport":"FiniteProviderTransport","created_by_principal_id":"string","created_at_unix_ms":"u64"
+    },
+    "FiniteQualifyInput": {
+      "target_ref":"string","working_state":"json","max_candidates":"usize","expected_generation":"u64","valid_for_ms":"u64"
+    },
+    "FiniteQualifyResult": {
+      "schema":"string","compatible":"bool","qualification_ref":"nullable:string","navigation_ref":"string",
+      "decision_request_ref":"string","computations":"array:FiniteComputationObservation","reason":"string"
+    },
+    "FastSearchRanking": {
+      "schema":"string","ranking_id":"string","navigation_id":"string","distribution_id":"string",
+      "ordered_candidate_ids":"array:string","preferred_candidate_id":"nullable:string"
+    },
+    "FiniteProducerIdentity": {
+      "capability_id":"string","producer_id":"string","producer_version":"string","model_id":"nullable:string",
+      "composition_id":"nullable:string","profile_id":"nullable:string","state_generation":"nullable:string","evidence_refs":"array:string"
+    },
+    "CognitiveStepTier": {"$enum":["deterministic","system_one","general_llm","unavailable"]},
+    "FiniteProducerPosture": {"$enum":["no_public_qualified_producer","qualified"]},
+    "FastSearchRoute": {
+      "schema":"string","request_ref":"nullable:string","participant_ref":"string","selected_tier":"CognitiveStepTier",
+      "producer_posture":"FiniteProducerPosture","reason":"string","general_llm_equivalent_qualified":"bool"
+    },
+    "FastSearchResult": {
+      "schema":"string","posture":"FastSearchPosture","navigation":"FastSearchNavigation","route":"FastSearchRoute",
+      "binding_ref":"nullable:string","qualification_ref":"nullable:string","target_ref":"nullable:string",
+      "ranking":"nullable:FastSearchRanking","producer":"nullable:FiniteProducerIdentity","score_semantics":"nullable:string",
+      "score_scale":"nullable:u64","scores":"array:FastSearchScore",
+      "computation":"FiniteComputationObservation","reason":"string"
+    },
     "ProductAccessSource": {"$enum":["commercial","local_development","unconfigured_pre_release"]},
     "ProductAccessSourcePosture": {"$enum":["allowed","refused","not_enforced"]},
     "AccountProfilePosture": {"$enum":["not_applicable","authentication_required","unavailable","current","stale","unsupported_contract"]},
@@ -696,6 +761,10 @@
     }
   },
   "closed_types": [
+    "FastSearchCandidate", "FastSearchDecisionBudget", "FastSearchDecisionRequest", "FastSearchChoice", "FastSearchNavigation", "FastSearchScore",
+    "FastSearchInput", "FiniteProviderTransport", "FiniteProviderRegisterInput", "FiniteProviderTarget",
+    "FiniteQualifyInput", "FiniteQualifyResult", "FiniteComputationObservation", "FastSearchResult",
+    "FastSearchRanking", "FastSearchRoute", "FiniteProducerIdentity",
     "ProductDevelopmentAccessInput", "ProductAccessSourceObservation", "ProductAccountProfileObservation",
     "CaseVersionProjection",
     "WorkCommit",
@@ -717,6 +786,9 @@
     "ProductLoginStartInput", "ProductLoginCancelInput", "ProductLoginObservation"
   ],
   "operations": [
+    {"id":"provider.finite.register","family":"provider","method":"register_finite","input":"FiniteProviderRegisterInput","output":"FiniteProviderTarget","input_contract":"yai.finite_provider_register_input.v1","output_contract":"yai.provider_target.v2"},
+    {"id":"provider.finite.qualify","family":"provider","method":"qualify_finite","input":"FiniteQualifyInput","output":"FiniteQualifyResult","input_contract":"yai.finite_qualify_input.v1","output_contract":"yai.finite_qualify_result.v1"},
+    {"id":"semantic.fast_search.execute","family":"cognitive","method":"fast_search","input":"FastSearchInput","output":"FastSearchResult","input_contract":"yai.fast_search_prepare_input.v1","output_contract":"yai.fast_search_result.v1"},
     {"family":"product","method":"access_status","id":"product.access.get","input":"EmptyInput","output":"ProductAccessSourceObservation","input_contract":"yai.product_access_source_get_input.v1","output_contract":"yai.product_access_source.v1"},
     {"family":"product","method":"enable_development","id":"product.access.development.enable","input":"ProductDevelopmentAccessInput","output":"ProductAccessSourceObservation","input_contract":"yai.product_development_access_input.v1","output_contract":"yai.product_access_source.v1"},
     {"family":"product","method":"disable_development","id":"product.access.development.disable","input":"ProductDevelopmentAccessInput","output":"ProductAccessSourceObservation","input_contract":"yai.product_development_access_input.v1","output_contract":"yai.product_access_source.v1"},
