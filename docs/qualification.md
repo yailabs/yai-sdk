@@ -16,6 +16,43 @@ The v0.1.0 SDK is a supported client contract, not an implementation of Core
 semantics. This record qualifies Linux same-user local IPC and bounded macOS
 peer-credential queries; full native Host integration remains Linux-only.
 
+## Finite compatibility validation tooling — 2026-10-07
+
+The Core-owned `YAI.SYSTEM.ONE.FAST.SEARCH.INTEGRATION.0` continuation starts
+from SDK `911e8813ec16fc28d1419218ac1ca671880ecf55`, without changing client APIs,
+schemas, package versions, dependencies or the 115-operation YAI inventory.
+The facade migration leaves both `yvex-sdk` 0.1 and its canonical 0.2 dependency
+in Cargo resolution. Unversioned `-p yvex-sdk` is ambiguous and prevents the
+platform and SSH/native qualification entrypoints from running. Those consumer
+selectors now explicitly choose the workspace facade `yvex-sdk@0.1.0`.
+Dependency unit tests cannot be invoked as workspace members: native fixture
+qualification continues through its public facade example and declaration guard,
+not a fabricated canonical-dependency test PASS.
+
+Platform parity now distinguishes the retained legacy common SDK pin from the
+independently owned YVEX client. A canonical Studio declaration must name the
+approved YVEX repository and exact commit, matching **both** native Cargo and
+TypeScript package pins. YAI's unrelated revision need not be equal. Exact
+request/response schemas, operation/disposition sets and controlled deltas still
+fail closed. Six package-identity tests include ambiguous-selector regression,
+independent pins, unapproved repository, missing/mismatched native/TypeScript pin,
+contract mismatch and retained legacy refusal.
+
+Full standalone `make check`, Rust workspace, TypeScript/package/documentation
+checks and 15 finite / 11 management real-SSH **synthetic** controls pass.
+These tests do not call DGX or qualify a real model. Cross-repository comparison
+passes the unchanged 115 YAI operations with a controlled negative. Concurrent
+Studio work adds `host.control`, `host.restart`, `host.start`, `host.stop` beyond
+the facade's pinned 36-operation producer cut; full current-worktree parity
+correctly refuses that foreign delta. It is neither dropped nor modified here.
+Public headers/native installation qualification is not newly run in this slice.
+
+Core separately retains its acquired real finite SDK computation and a fresh
+producer-state error `-8`; warm Fast Search compatibility and production scoring
+remain unearned. No new YAI semantic-result contract or Studio scoring handoff
+is created by these tooling corrections. Detailed raw observations live with
+the [Core budget checkpoint](https://github.com/yailabs/yai/blob/main/docs/evaluation/case-active-execution.md#realization-budget-continuation).
+
 ## Canonical YVEX client facade — 2026-10-06
 
 The active platform-convergence slice moves canonical `yvex-sdk` 0.2 Rust

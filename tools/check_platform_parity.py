@@ -6,10 +6,12 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import tomllib
 
 from check_yvex_sdk_parity import compare as compare_yvex
 from check_yvex_sdk_parity import compare_finite_schemas, compare_product_schemas
@@ -47,8 +49,17 @@ def compare_yai(catalog: dict, sdk: dict) -> None:
 
 def compare_studio_yvex(client: dict, studio: dict) -> None:
     native = studio["yvex_client"]
-    if native["sdk_revision"] != studio["sdk"]["revision"]:
-        raise ValueError("Studio YVEX/YAI SDK revisions diverge")
+    repository = native.get("sdk_repository", "https://github.com/yailabs/yai-sdk.git")
+    if repository == "https://github.com/yailabs/yai-sdk.git":
+        if native["sdk_revision"] != studio["sdk"]["revision"]:
+            raise ValueError("Studio legacy YVEX/YAI SDK revisions diverge")
+    elif repository == "https://github.com/yailabs/yvex.git":
+        if not re.fullmatch(r"[0-9a-f]{40}", native.get("sdk_revision", "")):
+            raise ValueError("Studio canonical YVEX revision is not exact")
+        # Independent published clients may have different compatible pins.
+        # The schemas/operation dispositions below still compare exactly.
+    else:
+        raise ValueError("Studio YVEX SDK repository is unsupported")
     if native["management_request_schema"] != client["producer_request_schema"] or \
        native["management_response_schema"] != client["producer_response_schema"]:
         raise ValueError("Studio YVEX contract schema drift")
@@ -75,6 +86,20 @@ def compare_studio_yvex(client: dict, studio: dict) -> None:
                 raise ValueError(f"Studio product management support lacks evidence: {operation}")
 
 
+def compare_studio_yvex_pin(studio: dict, manifest: dict, package: dict) -> None:
+    """Check both native/TS consumer pins, not an unrelated YAI repository SHA."""
+    native = studio["yvex_client"]
+    if native.get("sdk_repository") != "https://github.com/yailabs/yvex.git":
+        return
+    dependency = manifest.get("dependencies", {}).get("yvex-sdk", {})
+    if not isinstance(dependency, dict) or dependency.get("git") != native["sdk_repository"] or \
+       dependency.get("rev") != native["sdk_revision"]:
+        raise ValueError("Studio canonical YVEX native pin diverges from component")
+    expected = f"git+{native['sdk_repository']}#{native['sdk_revision']}"
+    if package.get("dependencies", {}).get("@yvex/sdk") != expected:
+        raise ValueError("Studio canonical YVEX TypeScript pin diverges from component")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--yai-bin", type=Path, required=True)
@@ -92,13 +117,17 @@ def main() -> int:
     compare_yai(yai, sdk_yai)
 
     yvex = read_json(args.yvex_root / "config/operator/registry.json")
-    sdk_yvex = run_json(["cargo", "run", "--locked", "--quiet", "-p", "yvex-sdk",
+    sdk_yvex = run_json(["cargo", "run", "--locked", "--quiet", "-p", "yvex-sdk@0.1.0",
                          "--example", "capabilities"], SDK_ROOT)
     compare_yvex(yvex, sdk_yvex)
     compare_finite_schemas(args.yvex_root)
     compare_product_schemas(args.yvex_root)
     studio = read_json(args.studio_root / "component.json")
     compare_studio_yvex(sdk_yvex, studio)
+    if studio["yvex_client"].get("sdk_repository") == "https://github.com/yailabs/yvex.git":
+        compare_studio_yvex_pin(studio,
+            tomllib.loads((args.studio_root / "src-tauri/Cargo.toml").read_text()),
+            read_json(args.studio_root / "package.json"))
 
     studio_env = {**os.environ, "YAI_STUDIO_TEST_BINARY": str(args.yai_bin.resolve())}
     check = subprocess.run(["node", "tests/studio/capability-parity.mjs"],

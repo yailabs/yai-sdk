@@ -110,6 +110,15 @@ YAI finite grant and resident exact model evidence remain external prerequisites
 evidence. Network YAI Application transport, additional runtime language clients
 and customer-package legal qualification remain separate, unselected pressures.
 
+The budget-qualification continuation of the same System-1 Task repairs only
+facade validation tooling: explicit Cargo package selectors, independent Studio
+YVEX native/TypeScript pins rather than cross-repository SHA equality, and
+fail-closed schema/disposition comparison. No API or semantic inventory changes.
+[Qualification](qualification.md#finite-compatibility-validation-tooling--2026-10-07)
+separates standalone/synthetic PASS and Core/SDK 115-operation parity from the
+current foreign Studio Host-operation delta and still-unearned real warm
+producer/Fast Search selection. Completed platform Tasks are not reopened.
+
 ## YAI.PRODUCT.BOOTSTRAP.IDENTITY.0
 
 Complete at the owned public projection boundary: project the YAI-owned pre-Case product profile, entitlement observation,

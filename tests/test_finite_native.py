@@ -31,10 +31,10 @@ def main():
             "-c", str(ROOT / "tests/fixtures/finite_client.c"), "-o", str(obj)], check=True)
         subprocess.run(["ar", "rcs", str(prefix / "lib/libyvex.a"), str(obj)], check=True)
         env = dict(os.environ, YVEX_CLIENT_PREFIX=str(prefix), YVEX_CLIENT_LINK_LIBS="")
-        command = ["cargo", "test", "--locked", "-p", "yvex-sdk", "--features", "finite-decision-native"]
+        command = ["cargo", "test", "--locked", "-p", "yvex-sdk@0.1.0", "--features", "finite-decision-native"]
         subprocess.run(command, cwd=ROOT, env=env, check=True)
         executable = ROOT / "target/debug/examples/finite"
-        subprocess.run(["cargo", "build", "--locked", "-p", "yvex-sdk", "--features", "finite-decision-native", "--example", "finite"], cwd=ROOT, env=env, check=True)
+        subprocess.run(["cargo", "build", "--locked", "-p", "yvex-sdk@0.1.0", "--features", "finite-decision-native", "--example", "finite"], cwd=ROOT, env=env, check=True)
         request = {"model_alias": "sdk-conformance-only", "expected_generation": 7, "question": "valid", "context": "SDK fixture, not Case content",
             "candidates": [{"id": "opaque:one", "text": "First"}, {"id": "opaque:two", "text": "Second"}]}
         path = prefix / "request.json"

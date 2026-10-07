@@ -25,7 +25,7 @@ def key_identity(path):
 def main():
     sshd = shutil.which("sshd")
     assert sshd and shutil.which("ssh-keygen"), "Explicit SSH lane requires installed OpenSSH client/server"
-    run(["cargo", "build", "--locked", "-p", "yvex-sdk", "--example", "finite_remote"], cwd=ROOT)
+    run(["cargo", "build", "--locked", "-p", "yvex-sdk@0.1.0", "--example", "finite_remote"], cwd=ROOT)
     target = Path(os.environ.get("CARGO_TARGET_DIR", ROOT / "target"))
     executable = target / "debug/examples/finite_remote"
     with tempfile.TemporaryDirectory(prefix="yvex-sdk-finite-ssh-") as directory:
