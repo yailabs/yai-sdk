@@ -83,6 +83,18 @@ No release qualification is implied. Core semantics and Studio product tasks rem
 
 ## Active downstream product delivery
 
+### Conversation Context Sufficiency consumer
+
+The Core-owned `YAI.CONVERSATION.CONTEXT.SUFFICIENCY.0` adds typed input variants
+and context diagnostics to the existing `conversation.send` / `execution.get`
+operations. The 118-operation catalog and YVEX client domain are unchanged.
+Original `send_text` and `get` inputs remain source/wire-compatible.
+`send_with_search` expresses preference; `get_context` observes exact retained
+lineage, selection, omissions and finite evidence without implementing selection
+or re-dispatch. Standalone contracts are separate from Core's ongoing context
+portfolio and real-model qualification. No completed SDK Task is reopened and
+Studio is not modified by this SDK slice.
+
 ### System-1 conditional consumer closure
 
 The existing `YAI.SYSTEM.ONE.FAST.SEARCH.INTEGRATION.0` now projects three new

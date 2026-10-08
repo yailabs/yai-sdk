@@ -798,6 +798,112 @@ pub struct ConversationObservation {
     pub attempt_outcomes: Vec<AttemptObservation>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub work: Option<CaseWorkObservation>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prepared_context: Option<PreparedContextObservation>,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum MemorySearchMode {
+    #[default]
+    #[serde(rename = "standard")]
+    Standard,
+    #[serde(rename = "fast")]
+    Fast,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ContextSelectionSource {
+    #[default]
+    #[serde(rename = "deterministic")]
+    Deterministic,
+    #[serde(rename = "system_one")]
+    SystemOne,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct TaskConversationInput {
+    pub case_ref: String,
+    pub participant_ref: String,
+    pub thread_ref: String,
+    pub submission_ref: String,
+    pub expected_generation: u64,
+    pub parts: Vec<ConversationTextPart>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub intent: Option<ConversationIntent>,
+    pub memory_search_mode: MemorySearchMode,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ContextContribution {
+    pub family: String,
+    pub entries: usize,
+    pub json_bytes: usize,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ContextPreparationObservation {
+    pub schema: String,
+    pub observation_id: String,
+    pub case_id: String,
+    pub case_generation: u64,
+    pub participant_id: String,
+    pub working_state_id: String,
+    pub source_turn_ref: String,
+    pub source: ContextSelectionSource,
+    pub reason: String,
+    pub candidate_working_state_id: String,
+    pub selected_entry_refs: Vec<String>,
+    pub omitted_items: usize,
+    pub omission_reasons: std::collections::BTreeMap<String, usize>,
+    pub contributions: Vec<ContextContribution>,
+    pub semantic_unit_budget: usize,
+    pub selected_semantic_units: usize,
+    pub context_frame_bytes: usize,
+    pub rendered_content_chars: usize,
+    pub rendered_system_bytes: usize,
+    pub rendered_user_bytes: usize,
+    pub output_contract_bytes: usize,
+    pub instruction_bytes: usize,
+    pub navigation_ref: Option<String>,
+    pub finite_request_ref: Option<String>,
+    pub finite_result_ref: Option<String>,
+    pub finite_dispatch: Option<FiniteDispatchPosture>,
+    pub finite_binding_ref: Option<String>,
+    pub finite_qualification_ref: Option<String>,
+    pub finite_plan_ref: Option<String>,
+    pub finite_ranking: Option<FastSearchRanking>,
+    pub finite_navigation: Option<FastSearchNavigation>,
+    pub finite_distribution: Option<serde_json::Value>,
+    pub finite_producer: Option<FiniteProducerIdentity>,
+    pub finite_engine_generation: Option<u64>,
+    pub finite_score_semantics: Option<String>,
+    pub finite_score_scale: Option<u64>,
+    pub finite_scores: Vec<FastSearchScore>,
+    pub finite_token_count: Option<u64>,
+    pub finite_model_forward_count: Option<u64>,
+    pub finite_compute_nanoseconds: Option<u64>,
+    pub finite_caller_nanoseconds: Option<u64>,
+    pub preparation_nanoseconds: u64,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PreparedInvocationContext {
+    pub invocation_ref: String,
+    pub lineage: serde_json::Value,
+    pub working_state: Option<serde_json::Value>,
+    pub projection: Option<serde_json::Value>,
+    pub frame: Option<serde_json::Value>,
+    pub input_observation: Option<serde_json::Value>,
+    pub unavailable_reason: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub preparation: Option<ContextPreparationObservation>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PreparedContextObservation {
+    pub schema: String,
+    pub observed_generation: u64,
+    pub total_invocations: usize,
+    pub omitted_invocations: usize,
+    pub invocations: Vec<PreparedInvocationContext>,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct TextConversationSubmission {
@@ -820,6 +926,14 @@ pub struct ConversationGetInput {
     pub case_ref: String,
     pub participant_ref: String,
     pub execution: ConversationExecutionReference,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ConversationContextGetInput {
+    pub case_ref: String,
+    pub participant_ref: String,
+    pub execution: ConversationExecutionReference,
+    pub include_context: bool,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct ConversationWorkResumeInput {
@@ -1934,6 +2048,20 @@ impl<T: ClientTransport> Conversation<'_, T> {
 }
 #[derive(Serialize)]
 #[serde(transparent)]
+struct ConversationSendWithSearch<'a>(&'a TaskConversationInput);
+impl Operation for ConversationSendWithSearch<'_> {
+    type Output = TextConversationSubmission;
+    const ID: &'static str = "conversation.send";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.conversation_send_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.conversation_submission_result.v1");
+}
+impl<T: ClientTransport> Conversation<'_, T> {
+    pub fn send_with_search(&self, correlation: &str, input: &TaskConversationInput) -> Result<Response<TextConversationSubmission>, Error> {
+        self.0.execute(correlation, &ConversationSendWithSearch(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
 struct ConversationResumeWork<'a>(&'a ConversationWorkResumeInput);
 impl Operation for ConversationResumeWork<'_> {
     type Output = TextConversationSubmission;
@@ -1958,6 +2086,20 @@ impl Operation for ConversationGet<'_> {
 impl<T: ClientTransport> Conversation<'_, T> {
     pub fn get(&self, correlation: &str, input: &ConversationGetInput) -> Result<Response<ConversationObservation>, Error> {
         self.0.execute(correlation, &ConversationGet(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ConversationGetContext<'a>(&'a ConversationContextGetInput);
+impl Operation for ConversationGetContext<'_> {
+    type Output = ConversationObservation;
+    const ID: &'static str = "execution.get";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.execution_get_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.execution_observation.v1");
+}
+impl<T: ClientTransport> Conversation<'_, T> {
+    pub fn get_context(&self, correlation: &str, input: &ConversationContextGetInput) -> Result<Response<ConversationObservation>, Error> {
+        self.0.execute(correlation, &ConversationGetContext(input))
     }
 }
 pub struct Memory<'a, T>(pub(crate) &'a Client<T>);

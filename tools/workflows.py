@@ -99,6 +99,14 @@ def render(contract):
         if pair in methods:
             raise ValueError('duplicate workflow method')
         methods.add(pair)
+        for variant in op.get('input_variants', []):
+            if set(variant) != {'method', 'input'} or not re.fullmatch('[a-z][a-z0-9_]*', variant['method']):
+                raise ValueError('invalid workflow input variant')
+            pair = (op['family'], variant['method'])
+            if pair in methods:
+                raise ValueError('duplicate workflow method')
+            methods.add(pair)
+            ty(variant['input'], 'rust')
         for key in ('input', 'output'):
             ty(op[key], 'rust')
         families.setdefault(op['family'], []).append(op)
@@ -108,7 +116,9 @@ def render(contract):
         rust.extend([f'pub struct {name}<\'a, T>(pub(crate) &\'a Client<T>);',
                      f'impl<T: ClientTransport> Client<T> {{',
                      f'    pub fn {family}(&self) -> {name}<\'_, T> {{ {name}(self) }}', '}'])
-        for op in operations:
+        variants = [op for base in operations for op in
+                    [base, *({**base, **variant} for variant in base.get('input_variants', []))]]
+        for op in variants:
             opname = name + ''.join(part.title() for part in op['method'].split('_'))
             if opname in types:
                 raise ValueError(f'operation wrapper collides with public type: {opname}')

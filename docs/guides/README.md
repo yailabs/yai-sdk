@@ -82,6 +82,30 @@ real-model Fast Search qualification remains external to SDK conformance.
 
 ## Observe and resynchronize (Host)
 
+### Ordinary Conversation context
+
+`client.conversation().send_with_search(correlation, &TaskConversationInput)`
+uses the existing `conversation.send` operation. `memory_search_mode` is
+`standard` or `fast`; Core decides whether a meaningful, admitted finite
+selection exists. This input variant preserves `send_text` and its historical
+input bytes. Clients must not run a separate search and construct their own W.
+
+Use `get_context(correlation, &ConversationContextGetInput { include_context:
+true, ... })` to observe the exact submitted identity through `execution.get`.
+This is a current-disclosure forensic read, not refresh, redispatch or admission.
+`prepared_context.invocations` retains exact lineage and optional
+`ContextPreparationObservation`: selected/omitted evidence identities and
+reasons, family byte contributions, semantic bounds, deterministic/System-1
+selection, raw-score ranking and bounded computational evidence. Full W/frame
+and provider-input facts remain separately represented; actual producer token
+counts must not be confused with conservative semantic-unit estimates.
+
+An older compatible Core can omit `preparation`. `unavailable_reason` means
+derived backing could not be observed; it is not zero input, success or a retry
+grant. `finite_dispatch = outcome_unavailable` requires retaining the exact
+attempt identity, never an automatic resend. SDK contracts establish no context
+sufficiency, authority, calibrated confidence or model-quality claim.
+
 For a configured provider, [models](../../examples/models.rs) uses only the
 YAI registered-target operation:
 

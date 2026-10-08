@@ -447,7 +447,41 @@
       "invocation_refs": "array:string",
       "primary_result": "optional:ConversationPrimaryResult",
       "attempt_outcomes": "array:AttemptObservation",
-      "work": "optional:CaseWorkObservation"
+      "work": "optional:CaseWorkObservation",
+      "prepared_context": "optional:PreparedContextObservation"
+    },
+    "MemorySearchMode": {"$enum":["standard","fast"]},
+    "ContextSelectionSource": {"$enum":["deterministic","system_one"]},
+    "TaskConversationInput": {
+      "case_ref":"string","participant_ref":"string","thread_ref":"string","submission_ref":"string",
+      "expected_generation":"u64","parts":"array:ConversationTextPart","intent":"optional:ConversationIntent",
+      "memory_search_mode":"MemorySearchMode"
+    },
+    "ContextContribution": {"family":"string","entries":"usize","json_bytes":"usize"},
+    "ContextPreparationObservation": {
+      "schema":"string","observation_id":"string","case_id":"string","case_generation":"u64",
+      "participant_id":"string","working_state_id":"string","source_turn_ref":"string","source":"ContextSelectionSource","reason":"string",
+      "candidate_working_state_id":"string","selected_entry_refs":"array:string","omitted_items":"usize",
+      "omission_reasons":"map:usize","contributions":"array:ContextContribution",
+      "semantic_unit_budget":"usize","selected_semantic_units":"usize","context_frame_bytes":"usize","rendered_content_chars":"usize",
+      "rendered_system_bytes":"usize","rendered_user_bytes":"usize","output_contract_bytes":"usize","instruction_bytes":"usize",
+      "navigation_ref":"nullable:string","finite_request_ref":"nullable:string","finite_result_ref":"nullable:string",
+      "finite_dispatch":"nullable:FiniteDispatchPosture","finite_binding_ref":"nullable:string",
+      "finite_qualification_ref":"nullable:string","finite_plan_ref":"nullable:string","finite_ranking":"nullable:FastSearchRanking",
+      "finite_navigation":"nullable:FastSearchNavigation","finite_distribution":"nullable:json",
+      "finite_producer":"nullable:FiniteProducerIdentity","finite_engine_generation":"nullable:u64","finite_score_semantics":"nullable:string",
+      "finite_score_scale":"nullable:u64","finite_scores":"array:FastSearchScore","finite_token_count":"nullable:u64",
+      "finite_model_forward_count":"nullable:u64","finite_compute_nanoseconds":"nullable:u64","finite_caller_nanoseconds":"nullable:u64",
+      "preparation_nanoseconds":"u64"
+    },
+    "PreparedInvocationContext": {
+      "invocation_ref":"string","lineage":"json","working_state":"nullable:json","projection":"nullable:json",
+      "frame":"nullable:json","input_observation":"nullable:json","unavailable_reason":"nullable:string",
+      "preparation":"optional:ContextPreparationObservation"
+    },
+    "PreparedContextObservation": {
+      "schema":"string","observed_generation":"u64","total_invocations":"usize","omitted_invocations":"usize",
+      "invocations":"array:PreparedInvocationContext"
     },
     "TextConversationSubmission": {
       "created": "bool",
@@ -466,6 +500,9 @@
       "case_ref": "string",
       "participant_ref": "string",
       "execution": "ConversationExecutionReference"
+    },
+    "ConversationContextGetInput": {
+      "case_ref":"string","participant_ref":"string","execution":"ConversationExecutionReference","include_context":"bool"
     },
     "ConversationWorkResumeInput": {
       "case_ref": "string",
@@ -765,6 +802,7 @@
     "FastSearchInput", "FiniteProviderTransport", "FiniteProviderRegisterInput", "FiniteProviderTarget",
     "FiniteQualifyInput", "FiniteQualifyResult", "FiniteComputationObservation", "FastSearchResult",
     "FastSearchRanking", "FastSearchRoute", "FiniteProducerIdentity",
+    "TaskConversationInput", "ConversationContextGetInput", "ContextContribution", "ContextPreparationObservation", "PreparedContextObservation", "PreparedInvocationContext",
     "ProductDevelopmentAccessInput", "ProductAccessSourceObservation", "ProductAccountProfileObservation",
     "CaseVersionProjection",
     "WorkCommit",
@@ -940,6 +978,7 @@
     {
       "family": "conversation",
       "method": "send_text",
+      "input_variants": [{"method":"send_with_search","input":"TaskConversationInput"}],
       "id": "conversation.send",
       "input": "TextConversationInput",
       "output": "TextConversationSubmission",
@@ -959,6 +998,7 @@
       "family": "conversation",
       "method": "get",
       "id": "execution.get",
+      "input_variants": [{"method":"get_context","input":"ConversationContextGetInput"}],
       "input": "ConversationGetInput",
       "output": "ConversationObservation",
       "input_contract": "yai.execution_get_input.v1",

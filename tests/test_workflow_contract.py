@@ -48,6 +48,23 @@ class ContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'duplicate operation'):
             generator.render(self.contract)
 
+    def test_input_variants_preserve_old_methods_and_exact_operation(self):
+        rust, _ = generator.render(self.contract)
+        self.assertIn('pub fn send_text(', rust)
+        self.assertIn('pub fn send_with_search(', rust)
+        self.assertIn('pub fn get_context(', rust)
+        self.assertEqual(rust.count('const ID: &\'static str = "conversation.send"'), 2)
+
+    def test_input_variant_collision_and_unknown_type_refuse(self):
+        op = next(op for op in self.contract['operations'] if op['id'] == 'conversation.send')
+        op['input_variants'][0]['method'] = 'send_text'
+        with self.assertRaisesRegex(ValueError, 'duplicate workflow method'):
+            generator.render(self.contract)
+        op['input_variants'][0]['method'] = 'send_with_search'
+        op['input_variants'][0]['input'] = 'Missing'
+        with self.assertRaisesRegex(ValueError, 'unknown public type'):
+            generator.render(self.contract)
+
     def test_generated_privacy_types_remain_closed(self):
         rust, _ = generator.render(self.contract)
         self.assertIn('#[serde(deny_unknown_fields)]\npub struct WorkCommit', rust)

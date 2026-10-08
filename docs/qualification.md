@@ -16,6 +16,16 @@ The v0.1.0 SDK is a supported client contract, not an implementation of Core
 semantics. This record qualifies Linux same-user local IPC and bounded macOS
 peer-credential queries; full native Host integration remains Linux-only.
 
+## Ordinary Conversation context projection — 2026-10-08
+
+The subsequent Core Context Sufficiency slice introduces additive workflow input
+variants for ordinary Conversation and exact context observation. Three Rust
+controls and two generator controls qualify preserved old input bytes, exact
+operation IDs, search preference, context-only read, typed unknown/refusal/loss
+postures and no automatic retry. This is representation evidence only; Core
+context correctness, installed invocation, real YVEX and Studio acceptance
+remain independently qualified boundaries.
+
 ## Finite compatibility validation tooling — 2026-10-07
 
 The Core-owned `YAI.SYSTEM.ONE.FAST.SEARCH.INTEGRATION.0` continuation starts

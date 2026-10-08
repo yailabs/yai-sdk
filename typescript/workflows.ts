@@ -520,6 +520,85 @@ export interface ConversationObservation {
   primary_result?: ConversationPrimaryResult;
   attempt_outcomes: Array<AttemptObservation>;
   work?: CaseWorkObservation;
+  prepared_context?: PreparedContextObservation;
+}
+export type MemorySearchMode = "standard" | "fast";
+export type ContextSelectionSource = "deterministic" | "system_one";
+export interface TaskConversationInput {
+  case_ref: string;
+  participant_ref: string;
+  thread_ref: string;
+  submission_ref: string;
+  expected_generation: number;
+  parts: Array<ConversationTextPart>;
+  intent?: ConversationIntent;
+  memory_search_mode: MemorySearchMode;
+}
+export interface ContextContribution {
+  family: string;
+  entries: number;
+  json_bytes: number;
+}
+export interface ContextPreparationObservation {
+  schema: string;
+  observation_id: string;
+  case_id: string;
+  case_generation: number;
+  participant_id: string;
+  working_state_id: string;
+  source_turn_ref: string;
+  source: ContextSelectionSource;
+  reason: string;
+  candidate_working_state_id: string;
+  selected_entry_refs: Array<string>;
+  omitted_items: number;
+  omission_reasons: Record<string, number>;
+  contributions: Array<ContextContribution>;
+  semantic_unit_budget: number;
+  selected_semantic_units: number;
+  context_frame_bytes: number;
+  rendered_content_chars: number;
+  rendered_system_bytes: number;
+  rendered_user_bytes: number;
+  output_contract_bytes: number;
+  instruction_bytes: number;
+  navigation_ref?: string | null;
+  finite_request_ref?: string | null;
+  finite_result_ref?: string | null;
+  finite_dispatch?: FiniteDispatchPosture | null;
+  finite_binding_ref?: string | null;
+  finite_qualification_ref?: string | null;
+  finite_plan_ref?: string | null;
+  finite_ranking?: FastSearchRanking | null;
+  finite_navigation?: FastSearchNavigation | null;
+  finite_distribution?: unknown | null;
+  finite_producer?: FiniteProducerIdentity | null;
+  finite_engine_generation?: number | null;
+  finite_score_semantics?: string | null;
+  finite_score_scale?: number | null;
+  finite_scores: Array<FastSearchScore>;
+  finite_token_count?: number | null;
+  finite_model_forward_count?: number | null;
+  finite_compute_nanoseconds?: number | null;
+  finite_caller_nanoseconds?: number | null;
+  preparation_nanoseconds: number;
+}
+export interface PreparedInvocationContext {
+  invocation_ref: string;
+  lineage: unknown;
+  working_state?: unknown | null;
+  projection?: unknown | null;
+  frame?: unknown | null;
+  input_observation?: unknown | null;
+  unavailable_reason?: string | null;
+  preparation?: ContextPreparationObservation;
+}
+export interface PreparedContextObservation {
+  schema: string;
+  observed_generation: number;
+  total_invocations: number;
+  omitted_invocations: number;
+  invocations: Array<PreparedInvocationContext>;
 }
 export interface TextConversationSubmission {
   created: boolean;
@@ -534,6 +613,12 @@ export interface ConversationGetInput {
   case_ref: string;
   participant_ref: string;
   execution: ConversationExecutionReference;
+}
+export interface ConversationContextGetInput {
+  case_ref: string;
+  participant_ref: string;
+  execution: ConversationExecutionReference;
+  include_context: boolean;
 }
 export interface ConversationWorkResumeInput {
   case_ref: string;
