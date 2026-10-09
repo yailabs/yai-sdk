@@ -4,6 +4,8 @@ import type {
   ConversationPosture, ConversationSendInput, ConversationSubmission,
   InspectedConversationExecution, ConversationWorkResumeInput,
   ConversationObservation, ConversationProgressObservation,
+  ConversationIdentity, ConversationRequestGetInput, ExecutionDiscoveryInput,
+  MaterialInspectInput, MaterialSourceRelationship,
 } from "../../typescript/projections.js";
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends
@@ -112,3 +114,32 @@ export const escalated: ConversationIntent = {
 };
 // @ts-expect-error model assertions do not create canonical completion.
 export const fabricatedSuccess: ConversationPosture = "model_says_done";
+
+// A new independent observer knows a canonical request, not client A's journal.
+export const byRequest: ConversationRequestGetInput = {
+  case_ref: "case:isolated", participant_ref: "participant:author",
+  execution: { domain: "cognitive_composition", request_ref: "request:exact" },
+  include_context: false,
+};
+export const discovery: ExecutionDiscoveryInput = {
+  case_ref: "case:isolated", participant_ref: "participant:author", limit: 16,
+};
+export const retainedIdentity: ConversationIdentity = {
+  original_submission_ref: "send:work", submission_posture: "retained",
+  author_participant_ref: "participant:author", executor_participant_ref: "participant:model",
+  thread_ref: "thread:isolated",
+};
+export const legacyIdentity: ConversationIdentity = {
+  ...retainedIdentity, original_submission_ref: null, submission_posture: "unavailable",
+};
+export const material: MaterialInspectInput = {
+  case_ref: "case:isolated", participant_ref: "participant:author", operation_ref: "operation:exact",
+  source_ref: "source:independent",
+};
+export const independentSource: MaterialSourceRelationship = {
+  source_ref: "source:independent", revision_ref: null, material_revision_ref: null,
+  source_resource_ref: null, source_configuration_digest: null,
+  posture: "unverified", reason: "same name alone has no identity basis",
+};
+// @ts-expect-error a matching filename cannot attest a Source/Resource relationship.
+export const fakeSourcePosture: MaterialSourceRelationship["posture"] = "same_filename";

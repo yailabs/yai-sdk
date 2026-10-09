@@ -1101,6 +1101,8 @@ pub struct ConversationObservation {
     pub submission_ref: String,
     pub turn_ref: String,
     pub request_ref: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub identity: Option<ConversationIdentity>,
     pub observed_generation: u64,
     pub posture: ConversationPosture,
     pub invocation_refs: Vec<String>,
@@ -1110,6 +1112,98 @@ pub struct ConversationObservation {
     pub work: Option<CaseWorkObservation>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prepared_context: Option<PreparedContextObservation>,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ConversationSubmissionIdentityPosture {
+    #[default]
+    #[serde(rename = "unavailable")]
+    Unavailable,
+    #[serde(rename = "retained")]
+    Retained,
+    #[serde(rename = "caller_verified_legacy")]
+    CallerVerifiedLegacy,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ConversationIdentity {
+    pub original_submission_ref: Option<String>,
+    pub submission_posture: ConversationSubmissionIdentityPosture,
+    pub author_participant_ref: String,
+    pub executor_participant_ref: String,
+    pub thread_ref: String,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ConversationRequestDomain {
+    #[default]
+    #[serde(rename = "cognitive_composition")]
+    CognitiveComposition,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ConversationRequestReference {
+    pub domain: ConversationRequestDomain,
+    pub request_ref: String,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ConversationRequestGetInput {
+    pub case_ref: String,
+    pub participant_ref: String,
+    pub execution: ConversationRequestReference,
+    pub include_context: bool,
+}
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(tag = "domain", deny_unknown_fields)]
+pub enum ExecutionDiscoveryReference {
+    #[serde(rename = "conversation")]
+    Conversation {
+        submission_ref: String,
+    },
+    #[serde(rename = "cognitive_composition")]
+    CognitiveComposition {
+        request_ref: String,
+    },
+    #[serde(rename = "cognitive_realization")]
+    CognitiveRealization {
+        plan_ref: String,
+    },
+    #[serde(rename = "runtime_work")]
+    RuntimeWork {
+        submission_ref: String,
+    },
+    #[serde(rename = "resource_request")]
+    ResourceRequest {
+        submission_ref: String,
+    },
+    #[serde(rename = "controlled_effect")]
+    ControlledEffect {
+        operation_ref: String,
+    },
+    #[serde(rename = "source_acquisition")]
+    SourceAcquisition {
+        source_ref: String,
+        attempt: u64,
+    },
+}
+impl Default for ExecutionDiscoveryReference { fn default() -> Self { Self::Conversation { submission_ref: Default::default() } } }
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ExecutionDiscoveryInput {
+    pub case_ref: String,
+    pub participant_ref: String,
+    pub limit: usize,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ExecutionDiscoveryEntry {
+    pub execution: ExecutionDiscoveryReference,
+    pub recorded_at_unix_ms: u64,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ExecutionDiscovery {
+    pub schema: String,
+    pub case_ref: String,
+    pub participant_ref: String,
+    pub generation: u64,
+    pub entries: Vec<ExecutionDiscoveryEntry>,
+    pub limit: usize,
+    pub scope: String,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -2282,6 +2376,191 @@ pub struct FilesystemWritePayload {
     pub content: String,
     pub content_digest: String,
     pub content_bytes: usize,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub baseline_observation_ref: Option<String>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct MaterialInspectInput {
+    pub case_ref: String,
+    pub participant_ref: String,
+    pub operation_ref: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_ref: Option<String>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct MaterialReadEvidence {
+    pub observation_ref: String,
+    pub operation_ref: String,
+    pub decision_ref: String,
+    pub resource_ref: String,
+    pub configuration_digest: String,
+    pub relative_path: String,
+    pub content_digest: String,
+    pub content_bytes: u64,
+    pub observed_at_unix_ms: u64,
+    pub file_identity: Option<MaterialFileIdentity>,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum MaterialSourcePosture {
+    #[default]
+    #[serde(rename = "unverified")]
+    Unverified,
+    #[serde(rename = "retained_scope_content_match")]
+    RetainedScopeContentMatch,
+    #[serde(rename = "unavailable")]
+    Unavailable,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum MaterialBaselinePosture {
+    #[default]
+    #[serde(rename = "unavailable")]
+    Unavailable,
+    #[serde(rename = "bound_read")]
+    BoundRead,
+    #[serde(rename = "observed_read")]
+    ObservedRead,
+    #[serde(rename = "prepare_only")]
+    PrepareOnly,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum MaterialEffectPosture {
+    #[default]
+    #[serde(rename = "proposed")]
+    Proposed,
+    #[serde(rename = "observed")]
+    Observed,
+    #[serde(rename = "review_pending")]
+    ReviewPending,
+    #[serde(rename = "denied")]
+    Denied,
+    #[serde(rename = "prepared")]
+    Prepared,
+    #[serde(rename = "applied_attested")]
+    AppliedAttested,
+    #[serde(rename = "uncertain")]
+    Uncertain,
+    #[serde(rename = "finalized_not_applied")]
+    FinalizedNotApplied,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct MaterialSourceRelationship {
+    pub source_ref: String,
+    pub revision_ref: Option<String>,
+    pub material_revision_ref: Option<String>,
+    pub source_resource_ref: Option<String>,
+    pub source_configuration_digest: Option<String>,
+    pub posture: MaterialSourcePosture,
+    pub reason: String,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum MaterialFilesystemState {
+    #[default]
+    #[serde(rename = "absent")]
+    Absent,
+    #[serde(rename = "file")]
+    File,
+    #[serde(rename = "directory")]
+    Directory,
+    #[serde(rename = "symlink")]
+    Symlink,
+    #[serde(rename = "other")]
+    Other,
+    #[serde(rename = "unavailable")]
+    Unavailable,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct MaterialFilesystemObservation {
+    pub schema: String,
+    pub observation_id: String,
+    pub resource_attachment_id: String,
+    pub relative_path: String,
+    pub state: MaterialFilesystemState,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub content_digest: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub size_bytes: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    pub observed_at_unix_ms: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub file_identity: Option<MaterialFileIdentity>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct MaterialFileIdentity {
+    pub device: u64,
+    pub inode: u64,
+    pub modified_seconds: i64,
+    pub modified_nanos: i64,
+    pub changed_seconds: i64,
+    pub changed_nanos: i64,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum MaterialReceiptOutcome {
+    #[default]
+    #[serde(rename = "applied")]
+    Applied,
+    #[serde(rename = "already_applied")]
+    AlreadyApplied,
+    #[serde(rename = "no_effect")]
+    NoEffect,
+    #[serde(rename = "failed_no_effect")]
+    FailedNoEffect,
+    #[serde(rename = "conflict")]
+    Conflict,
+    #[serde(rename = "indeterminate")]
+    Indeterminate,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct MaterialEffectReceipt {
+    pub schema: String,
+    pub receipt_id: String,
+    pub effect_id: String,
+    pub operation_id: String,
+    pub decision_id: String,
+    pub grant_id: String,
+    pub resource_attachment_id: String,
+    pub relative_path: String,
+    pub pre_observation_id: String,
+    pub post_observation_id: String,
+    pub outcome: MaterialReceiptOutcome,
+    pub carrier_backend: String,
+    pub carrier_attempted: bool,
+    pub mutation_performed: bool,
+    pub completed_at_unix_ms: u64,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct MaterialProvenanceObservation {
+    pub schema: String,
+    pub case_ref: String,
+    pub participant_ref: String,
+    pub operation_ref: String,
+    pub operation_digest: String,
+    pub observed_generation: u64,
+    pub resource_ref: String,
+    pub configuration_digest: Option<String>,
+    pub resource_control_ref: Option<String>,
+    pub root_identity_digest: Option<String>,
+    pub relative_path: String,
+    pub origin: OperationOrigin,
+    pub proposed_content_digest: Option<String>,
+    pub baseline_posture: MaterialBaselinePosture,
+    pub baseline: Option<MaterialReadEvidence>,
+    pub posture: MaterialEffectPosture,
+    pub decision_refs: Vec<String>,
+    pub review_refs: Vec<String>,
+    pub effect_ref: Option<String>,
+    pub grant_ref: Option<String>,
+    pub pre_observation: Option<MaterialFilesystemObservation>,
+    pub post_observation: Option<MaterialFilesystemObservation>,
+    pub receipt: Option<MaterialEffectReceipt>,
+    pub source: Option<MaterialSourceRelationship>,
+    pub freshness: String,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -2541,6 +2820,52 @@ pub struct ResourceImportInput {
     pub definition: ResourceDefinitionInput,
 }
 use crate::{ClientTransport, client::{Client, Error, Operation, Response}};
+pub struct Resources<'a, T>(pub(crate) &'a Client<T>);
+impl<T: ClientTransport> Client<T> {
+    pub fn resources(&self) -> Resources<'_, T> { Resources(self) }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ResourcesInspectMaterial<'a>(&'a MaterialInspectInput);
+impl Operation for ResourcesInspectMaterial<'_> {
+    type Output = MaterialProvenanceObservation;
+    const ID: &'static str = "resource.material.inspect";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.material_inspect_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.material_provenance.v1");
+}
+impl<T: ClientTransport> Resources<'_, T> {
+    pub fn inspect_material(&self, correlation: &str, input: &MaterialInspectInput) -> Result<Response<MaterialProvenanceObservation>, Error> {
+        self.0.execute(correlation, &ResourcesInspectMaterial(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ResourcesAttachProcess<'a>(&'a ProcessAttachmentInput);
+impl Operation for ResourcesAttachProcess<'_> {
+    type Output = StateMutationReceipt;
+    const ID: &'static str = "resource.attach_process";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.resource_attach_process_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.case_state_mutation_result.v1");
+}
+impl<T: ClientTransport> Resources<'_, T> {
+    pub fn attach_process(&self, correlation: &str, input: &ProcessAttachmentInput) -> Result<Response<StateMutationReceipt>, Error> {
+        self.0.execute(correlation, &ResourcesAttachProcess(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ResourcesImportDefinition<'a>(&'a ResourceImportInput);
+impl Operation for ResourcesImportDefinition<'_> {
+    type Output = StateMutationReceipt;
+    const ID: &'static str = "resource.import";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.resource_import_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.case_state_mutation_result.v1");
+}
+impl<T: ClientTransport> Resources<'_, T> {
+    pub fn import_definition(&self, correlation: &str, input: &ResourceImportInput) -> Result<Response<StateMutationReceipt>, Error> {
+        self.0.execute(correlation, &ResourcesImportDefinition(input))
+    }
+}
 pub struct Skills<'a, T>(pub(crate) &'a Client<T>);
 impl<T: ClientTransport> Client<T> {
     pub fn skills(&self) -> Skills<'_, T> { Skills(self) }
@@ -2785,6 +3110,34 @@ impl Operation for ConversationGetContext<'_> {
 impl<T: ClientTransport> Conversation<'_, T> {
     pub fn get_context(&self, correlation: &str, input: &ConversationContextGetInput) -> Result<Response<ConversationObservation>, Error> {
         self.0.execute(correlation, &ConversationGetContext(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ConversationGetByRequest<'a>(&'a ConversationRequestGetInput);
+impl Operation for ConversationGetByRequest<'_> {
+    type Output = ConversationObservation;
+    const ID: &'static str = "execution.get";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.execution_get_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.execution_observation.v1");
+}
+impl<T: ClientTransport> Conversation<'_, T> {
+    pub fn get_by_request(&self, correlation: &str, input: &ConversationRequestGetInput) -> Result<Response<ConversationObservation>, Error> {
+        self.0.execute(correlation, &ConversationGetByRequest(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ConversationDiscover<'a>(&'a ExecutionDiscoveryInput);
+impl Operation for ConversationDiscover<'_> {
+    type Output = ExecutionDiscovery;
+    const ID: &'static str = "execution.list";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.execution_list_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.execution_list_projection.v1");
+}
+impl<T: ClientTransport> Conversation<'_, T> {
+    pub fn discover(&self, correlation: &str, input: &ExecutionDiscoveryInput) -> Result<Response<ExecutionDiscovery>, Error> {
+        self.0.execute(correlation, &ConversationDiscover(input))
     }
 }
 pub struct Provider<'a, T>(pub(crate) &'a Client<T>);
@@ -3393,37 +3746,5 @@ impl Operation for HandoffReconcile<'_> {
 impl<T: ClientTransport> Handoff<'_, T> {
     pub fn reconcile(&self, correlation: &str, input: &HandoffReconcileInput) -> Result<Response<WorkCommit>, Error> {
         self.0.execute(correlation, &HandoffReconcile(input))
-    }
-}
-pub struct Resources<'a, T>(pub(crate) &'a Client<T>);
-impl<T: ClientTransport> Client<T> {
-    pub fn resources(&self) -> Resources<'_, T> { Resources(self) }
-}
-#[derive(Serialize)]
-#[serde(transparent)]
-struct ResourcesAttachProcess<'a>(&'a ProcessAttachmentInput);
-impl Operation for ResourcesAttachProcess<'_> {
-    type Output = StateMutationReceipt;
-    const ID: &'static str = "resource.attach_process";
-    const INPUT_CONTRACT: Option<&'static str> = Some("yai.resource_attach_process_input.v1");
-    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.case_state_mutation_result.v1");
-}
-impl<T: ClientTransport> Resources<'_, T> {
-    pub fn attach_process(&self, correlation: &str, input: &ProcessAttachmentInput) -> Result<Response<StateMutationReceipt>, Error> {
-        self.0.execute(correlation, &ResourcesAttachProcess(input))
-    }
-}
-#[derive(Serialize)]
-#[serde(transparent)]
-struct ResourcesImportDefinition<'a>(&'a ResourceImportInput);
-impl Operation for ResourcesImportDefinition<'_> {
-    type Output = StateMutationReceipt;
-    const ID: &'static str = "resource.import";
-    const INPUT_CONTRACT: Option<&'static str> = Some("yai.resource_import_input.v1");
-    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.case_state_mutation_result.v1");
-}
-impl<T: ClientTransport> Resources<'_, T> {
-    pub fn import_definition(&self, correlation: &str, input: &ResourceImportInput) -> Result<Response<StateMutationReceipt>, Error> {
-        self.0.execute(correlation, &ResourcesImportDefinition(input))
     }
 }

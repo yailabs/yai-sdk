@@ -837,6 +837,7 @@
       "submission_ref": "string",
       "turn_ref": "string",
       "request_ref": "string",
+      "identity": "optional:ConversationIdentity",
       "observed_generation": "u64",
       "posture": "ConversationPosture",
       "invocation_refs": "array:string",
@@ -845,6 +846,42 @@
       "work": "optional:CaseWorkObservation",
       "prepared_context": "optional:PreparedContextObservation"
     },
+    "ConversationSubmissionIdentityPosture": {
+      "$enum": ["unavailable", "retained", "caller_verified_legacy"]
+    },
+    "ConversationIdentity": {
+      "original_submission_ref": "nullable:string",
+      "submission_posture": "ConversationSubmissionIdentityPosture",
+      "author_participant_ref": "string",
+      "executor_participant_ref": "string",
+      "thread_ref": "string"
+    },
+    "ConversationRequestDomain": { "$enum": ["cognitive_composition"] },
+    "ConversationRequestReference": {
+      "domain": "ConversationRequestDomain",
+      "request_ref": "string"
+    },
+    "ConversationRequestGetInput": {
+      "case_ref": "string",
+      "participant_ref": "string",
+      "execution": "ConversationRequestReference",
+      "include_context": "bool"
+    },
+    "ExecutionDiscoveryReference": {
+      "$tagged_union": {"tag":"domain", "variants": {
+        "conversation": {"submission_ref":"string"},
+        "cognitive_composition": {"request_ref":"string"},
+        "cognitive_realization": {"plan_ref":"string"},
+        "runtime_work": {"submission_ref":"string"},
+        "resource_request": {"submission_ref":"string"},
+        "controlled_effect": {"operation_ref":"string"},
+        "source_acquisition": {"source_ref":"string", "attempt":"u64"}
+      }}
+    },
+    "ExecutionDiscoveryInput": {"case_ref":"string", "participant_ref":"string", "limit":"usize"},
+    "ExecutionDiscoveryEntry": {"execution":"ExecutionDiscoveryReference", "recorded_at_unix_ms":"u64"},
+    "ExecutionDiscovery": {"schema":"string", "case_ref":"string", "participant_ref":"string",
+      "generation":"u64", "entries":"array:ExecutionDiscoveryEntry", "limit":"usize", "scope":"string"},
     "ProgressiveConversationInput": {
       "case_ref": "string",
       "participant_ref": "string",
@@ -1766,7 +1803,43 @@
       "relative_path": "string",
       "content": "string",
       "content_digest": "string",
-      "content_bytes": "usize"
+      "content_bytes": "usize",
+      "baseline_observation_ref": "optional:string"
+    },
+    "MaterialInspectInput": {"case_ref":"string", "participant_ref":"string", "operation_ref":"string", "source_ref":"optional:string"},
+    "MaterialReadEvidence": {
+      "observation_ref":"string", "operation_ref":"string", "decision_ref":"string", "resource_ref":"string",
+      "configuration_digest":"string", "relative_path":"string", "content_digest":"string", "content_bytes":"u64", "observed_at_unix_ms":"u64", "file_identity":"nullable:MaterialFileIdentity"
+    },
+    "MaterialSourcePosture": {"$enum":["unverified", "retained_scope_content_match", "unavailable"]},
+    "MaterialBaselinePosture": {"$enum":["unavailable", "bound_read", "observed_read", "prepare_only"]},
+    "MaterialEffectPosture": {"$enum":["proposed", "observed", "review_pending", "denied", "prepared", "applied_attested", "uncertain", "finalized_not_applied"]},
+    "MaterialSourceRelationship": {
+      "source_ref":"string", "revision_ref":"nullable:string", "material_revision_ref":"nullable:string",
+      "source_resource_ref":"nullable:string", "source_configuration_digest":"nullable:string", "posture":"MaterialSourcePosture", "reason":"string"
+    },
+    "MaterialFilesystemState": {"$enum":["absent", "file", "directory", "symlink", "other", "unavailable"]},
+    "MaterialFilesystemObservation": {
+      "schema":"string", "observation_id":"string", "resource_attachment_id":"string", "relative_path":"string",
+      "state":"MaterialFilesystemState", "content_digest":"optional:string", "size_bytes":"optional:u64",
+      "error":"optional:string", "observed_at_unix_ms":"u64", "file_identity":"optional:MaterialFileIdentity"
+    },
+    "MaterialFileIdentity": {"device":"u64", "inode":"u64", "modified_seconds":"i64", "modified_nanos":"i64", "changed_seconds":"i64", "changed_nanos":"i64"},
+    "MaterialReceiptOutcome": {"$enum":["applied", "already_applied", "no_effect", "failed_no_effect", "conflict", "indeterminate"]},
+    "MaterialEffectReceipt": {
+      "schema":"string", "receipt_id":"string", "effect_id":"string", "operation_id":"string", "decision_id":"string",
+      "grant_id":"string", "resource_attachment_id":"string", "relative_path":"string", "pre_observation_id":"string",
+      "post_observation_id":"string", "outcome":"MaterialReceiptOutcome", "carrier_backend":"string", "carrier_attempted":"bool",
+      "mutation_performed":"bool", "completed_at_unix_ms":"u64"
+    },
+    "MaterialProvenanceObservation": {
+      "schema":"string", "case_ref":"string", "participant_ref":"string", "operation_ref":"string", "operation_digest":"string",
+      "observed_generation":"u64", "resource_ref":"string", "configuration_digest":"nullable:string", "resource_control_ref":"nullable:string",
+      "root_identity_digest":"nullable:string", "relative_path":"string", "origin":"OperationOrigin", "proposed_content_digest":"nullable:string",
+      "baseline_posture":"MaterialBaselinePosture", "baseline":"nullable:MaterialReadEvidence", "posture":"MaterialEffectPosture",
+      "decision_refs":"array:string", "review_refs":"array:string", "effect_ref":"nullable:string", "grant_ref":"nullable:string",
+      "pre_observation":"nullable:MaterialFilesystemObservation", "post_observation":"nullable:MaterialFilesystemObservation",
+      "receipt":"nullable:MaterialEffectReceipt", "source":"nullable:MaterialSourceRelationship", "freshness":"string"
     },
     "ProcessSignalPayload": {
       "action": "ProcessSignalAction",
@@ -1975,6 +2048,8 @@
     }
   },
   "closed_types": [
+    "ConversationIdentity",
+    "MaterialInspectInput", "MaterialReadEvidence", "MaterialSourceRelationship", "MaterialFilesystemObservation", "MaterialEffectReceipt", "MaterialProvenanceObservation",
     "SkillDefinition",
     "SkillDraft",
     "SkillVersion",
@@ -2066,6 +2141,8 @@
     "ResourceImportInput"
   ],
   "operations": [
+    {"family":"resources", "method":"inspect_material", "id":"resource.material.inspect", "input":"MaterialInspectInput",
+      "output":"MaterialProvenanceObservation", "input_contract":"yai.material_inspect_input.v1", "output_contract":"yai.material_provenance.v1"},
     {
       "family": "skills",
       "method": "list",
@@ -2408,12 +2485,21 @@
         {
           "method": "get_context",
           "input": "ConversationContextGetInput"
+        },
+        {
+          "method": "get_by_request",
+          "input": "ConversationRequestGetInput"
         }
       ],
       "input": "ConversationGetInput",
       "output": "ConversationObservation",
       "input_contract": "yai.execution_get_input.v1",
       "output_contract": "yai.execution_observation.v1"
+    },
+    {
+      "family":"conversation", "method":"discover", "id":"execution.list",
+      "input":"ExecutionDiscoveryInput", "output":"ExecutionDiscovery",
+      "input_contract":"yai.execution_list_input.v1", "output_contract":"yai.execution_list_projection.v1"
     },
     {
       "family": "memory",

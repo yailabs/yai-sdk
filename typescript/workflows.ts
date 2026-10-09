@@ -710,6 +710,7 @@ export interface ConversationObservation {
   submission_ref: string;
   turn_ref: string;
   request_ref: string;
+  identity?: ConversationIdentity;
   observed_generation: number;
   posture: ConversationPosture;
   invocation_refs: Array<string>;
@@ -717,6 +718,44 @@ export interface ConversationObservation {
   attempt_outcomes: Array<AttemptObservation>;
   work?: CaseWorkObservation;
   prepared_context?: PreparedContextObservation;
+}
+export type ConversationSubmissionIdentityPosture = "unavailable" | "retained" | "caller_verified_legacy";
+export interface ConversationIdentity {
+  original_submission_ref?: string | null;
+  submission_posture: ConversationSubmissionIdentityPosture;
+  author_participant_ref: string;
+  executor_participant_ref: string;
+  thread_ref: string;
+}
+export type ConversationRequestDomain = "cognitive_composition";
+export interface ConversationRequestReference {
+  domain: ConversationRequestDomain;
+  request_ref: string;
+}
+export interface ConversationRequestGetInput {
+  case_ref: string;
+  participant_ref: string;
+  execution: ConversationRequestReference;
+  include_context: boolean;
+}
+export type ExecutionDiscoveryReference = { domain: "conversation"; submission_ref: string } | { domain: "cognitive_composition"; request_ref: string } | { domain: "cognitive_realization"; plan_ref: string } | { domain: "runtime_work"; submission_ref: string } | { domain: "resource_request"; submission_ref: string } | { domain: "controlled_effect"; operation_ref: string } | { domain: "source_acquisition"; source_ref: string; attempt: number };
+export interface ExecutionDiscoveryInput {
+  case_ref: string;
+  participant_ref: string;
+  limit: number;
+}
+export interface ExecutionDiscoveryEntry {
+  execution: ExecutionDiscoveryReference;
+  recorded_at_unix_ms: number;
+}
+export interface ExecutionDiscovery {
+  schema: string;
+  case_ref: string;
+  participant_ref: string;
+  generation: number;
+  entries: Array<ExecutionDiscoveryEntry>;
+  limit: number;
+  scope: string;
 }
 export interface ProgressiveConversationInput {
   case_ref: string;
@@ -1380,6 +1419,103 @@ export interface FilesystemWritePayload {
   content: string;
   content_digest: string;
   content_bytes: number;
+  baseline_observation_ref?: string;
+}
+export interface MaterialInspectInput {
+  case_ref: string;
+  participant_ref: string;
+  operation_ref: string;
+  source_ref?: string;
+}
+export interface MaterialReadEvidence {
+  observation_ref: string;
+  operation_ref: string;
+  decision_ref: string;
+  resource_ref: string;
+  configuration_digest: string;
+  relative_path: string;
+  content_digest: string;
+  content_bytes: number;
+  observed_at_unix_ms: number;
+  file_identity?: MaterialFileIdentity | null;
+}
+export type MaterialSourcePosture = "unverified" | "retained_scope_content_match" | "unavailable";
+export type MaterialBaselinePosture = "unavailable" | "bound_read" | "observed_read" | "prepare_only";
+export type MaterialEffectPosture = "proposed" | "observed" | "review_pending" | "denied" | "prepared" | "applied_attested" | "uncertain" | "finalized_not_applied";
+export interface MaterialSourceRelationship {
+  source_ref: string;
+  revision_ref?: string | null;
+  material_revision_ref?: string | null;
+  source_resource_ref?: string | null;
+  source_configuration_digest?: string | null;
+  posture: MaterialSourcePosture;
+  reason: string;
+}
+export type MaterialFilesystemState = "absent" | "file" | "directory" | "symlink" | "other" | "unavailable";
+export interface MaterialFilesystemObservation {
+  schema: string;
+  observation_id: string;
+  resource_attachment_id: string;
+  relative_path: string;
+  state: MaterialFilesystemState;
+  content_digest?: string;
+  size_bytes?: number;
+  error?: string;
+  observed_at_unix_ms: number;
+  file_identity?: MaterialFileIdentity;
+}
+export interface MaterialFileIdentity {
+  device: number;
+  inode: number;
+  modified_seconds: number;
+  modified_nanos: number;
+  changed_seconds: number;
+  changed_nanos: number;
+}
+export type MaterialReceiptOutcome = "applied" | "already_applied" | "no_effect" | "failed_no_effect" | "conflict" | "indeterminate";
+export interface MaterialEffectReceipt {
+  schema: string;
+  receipt_id: string;
+  effect_id: string;
+  operation_id: string;
+  decision_id: string;
+  grant_id: string;
+  resource_attachment_id: string;
+  relative_path: string;
+  pre_observation_id: string;
+  post_observation_id: string;
+  outcome: MaterialReceiptOutcome;
+  carrier_backend: string;
+  carrier_attempted: boolean;
+  mutation_performed: boolean;
+  completed_at_unix_ms: number;
+}
+export interface MaterialProvenanceObservation {
+  schema: string;
+  case_ref: string;
+  participant_ref: string;
+  operation_ref: string;
+  operation_digest: string;
+  observed_generation: number;
+  resource_ref: string;
+  configuration_digest?: string | null;
+  resource_control_ref?: string | null;
+  root_identity_digest?: string | null;
+  relative_path: string;
+  origin: OperationOrigin;
+  proposed_content_digest?: string | null;
+  baseline_posture: MaterialBaselinePosture;
+  baseline?: MaterialReadEvidence | null;
+  posture: MaterialEffectPosture;
+  decision_refs: Array<string>;
+  review_refs: Array<string>;
+  effect_ref?: string | null;
+  grant_ref?: string | null;
+  pre_observation?: MaterialFilesystemObservation | null;
+  post_observation?: MaterialFilesystemObservation | null;
+  receipt?: MaterialEffectReceipt | null;
+  source?: MaterialSourceRelationship | null;
+  freshness: string;
 }
 export interface ProcessSignalPayload {
   action: ProcessSignalAction;

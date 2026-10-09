@@ -83,6 +83,16 @@ No release qualification is implied. Core semantics and Studio product tasks rem
 
 ## Active downstream product delivery
 
+### Operational Conversation identity and material continuation
+
+The existing Core-owned progressive-delivery and operational-projection Tasks
+add typed request-based observation/discovery over released execution operations
+and one filesystem provenance read. The inventory is 130; no completed platform,
+Case Work or Skill foundation is reopened. Submission identity is optional for
+older servers and explicit when unavailable. Source/Resource relationship,
+baseline, Review and receipt projection never confer authority. SDK conformance
+is independent of Core's store/effect proof and Studio consumption.
+
 ### Conversation Context Sufficiency consumer
 
 The Core-owned `YAI.CONVERSATION.CONTEXT.SUFFICIENCY.0` adds typed input variants

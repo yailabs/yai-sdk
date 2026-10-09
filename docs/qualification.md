@@ -18,6 +18,23 @@ peer-credential queries; full native Host integration remains Linux-only.
 
 ## Case Work projection reconciliation — 2026-10-09
 
+### Cross-client identity / material extension
+
+The subsequent isolated slice starts from published `8713c440`. It adds optional
+`ConversationIdentity`, typed discovery/request observation over existing
+operations, and `resource.material.inspect` (130 descriptors). Rust/TypeScript
+controls distinguish original Submission from request aliases, explicit legacy
+absence, unverified Source relationship and missing receipts. Privacy negatives
+reject fabricated authority and effect postures. The standalone gate does not
+qualify Core file fences, store migration, real models or Studio UI.
+
+The [captured standalone runs](../tests/qualification/conversation-identity-material/runs/20261009-contract/observations.jsonl)
+retain the first TypeScript fixture failure (missing explicit `include_context`)
+and its repair without weakening the schema. The repaired complete `make check`
+passed in 2.614 seconds with unchanged source, before the final conservative
+default-enum ordering and documentation reconciliation; the final gate is
+separately retained. No provider request or private credential is involved.
+
 This slice starts from published SDK
 `f91a1d16193a059cec71054dc67df97bb36dcdab`, not from the older 118-operation
 delivery branch. It carries forward the independently qualified representation

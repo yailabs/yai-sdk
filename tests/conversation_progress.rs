@@ -39,6 +39,7 @@ fn pending_progress_keeps_explicit_no_result_without_promoting_partial_output() 
         partial_output: Some("provisional".into()),
         availability: ConversationProgressAvailability::Live,
         execution: ConversationObservation {
+            identity: None,
             case_ref: "case:exact".into(), request_ref: "request:exact".into(),
             ..Default::default()
         },

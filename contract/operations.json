@@ -2,6 +2,7 @@
   "schema": "yai.application_capability_catalog.v1",
   "application_protocol": "yai.studio.application.v1",
   "operations": [
+    {"operation_id":"resource.material.inspect","input_contract":"yai.material_inspect_input.v1","output_contract":"yai.material_provenance.v1","meaning":"Inspect exact retained file baseline, Source relationship, authority and Receipt without live file access or dispatch","impact":"read","authority":"current_case_authority"},
     {"operation_id":"skill.list","input_contract":"yai.skill_list_input.v1","output_contract":"yai.skill_catalog.v1","meaning":"Observe exact governed Skill lifecycle and immutable assignments; assignment grants no authority","impact":"read","authority":"local_authenticated"},
     {"operation_id":"skill.get","input_contract":"yai.skill_get_input.v1","output_contract":"yai.skill_library_entry.v1","meaning":"Observe exact governed Skill lifecycle and immutable assignments; assignment grants no authority","impact":"read","authority":"local_authenticated"},
     {"operation_id":"skill.draft.save","input_contract":"yai.skill_draft_save_input.v1","output_contract":"yai.skill_draft.v1","meaning":"Observe exact governed Skill lifecycle and immutable assignments; assignment grants no authority","impact":"canonical_mutation","authority":"tenant_owner"},

@@ -77,6 +77,40 @@ the published execution operations; a new correlation does not authorize replay.
 
 ## Public projections and privacy
 
+### Cross-client execution identity and material provenance
+
+`conversation().discover` projects the existing bounded `execution.list`.
+`conversation().get_by_request` projects `execution.get` with a
+`cognitive_composition` request reference. No private client journal or new SEND
+is needed. `ConversationObservation.identity` is additive and optional for older
+servers. Its original Submission, author, executor and Thread are distinct from
+the canonical Turn/request. `retained` means Core retained the original token;
+`caller_verified_legacy` means an exact caller-supplied token matched the old
+canonical admission; `unavailable` has a null original token. For request-only
+legacy observations the old `submission_ref` string is empty, never a request
+alias. Do not resume an unavailable identity or automatically redispatch.
+After recovery, `resume_work` still uses the original token, author and current
+observed generation; Core owns eligibility, immutable budgets and authority.
+
+`resources().inspect_material` adds `resource.material.inspect` (130 released
+descriptors), with `yai.material_inspect_input.v1` / `yai.material_provenance.v1`.
+It observes an exact governed filesystem Operation, not an arbitrary path. The
+typed result separates the read baseline, proposed digest, Decisions/Reviews,
+PREPARE, receipt and post-observation. `prepared` is not proof of dispatch;
+`applied_attested` requires a canonical applied receipt. `uncertain` never means
+success. All snapshots are retained observations, not live file-state claims.
+
+An optional Source is independently disclosure-qualified. `unverified` and
+`unavailable` have no equivalence claim. `retained_scope_content_match` records
+independently bound root scope and exact retained content, not the identity of a
+physical file object or write permission. `bound_read` additionally identifies a
+canonical read baseline used by Core's versioned write proposal/Operation. Older
+unbound proposals retain `prepare_only`/`unavailable`, not a fabricated read.
+Filesystem file identity is descriptor-observed device/inode and modification/
+change times, not a client licence to act. Neither client selects evidence,
+creates receipts nor enforces a write fence. Closed DTOs refuse invented
+postures, authority fields and secrets.
+
 Mutation receipts bind Case identity/generation and bounded Transition identity
 facts. They never export persisted CaseState/Transition layouts. Probe projections
 exclude carrier tokens, private process ownership and storage seals. Their

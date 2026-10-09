@@ -287,7 +287,7 @@ export interface PreparedContext {
 
 export type InspectedConversationExecution = ConversationExecution & { prepared_context?: PreparedContext | null };
 
-export type ExecutionReference = { domain: "runtime_work" | "resource_request"; submission_ref: string }
+export type ExecutionReference = { domain: "conversation" | "runtime_work" | "resource_request"; submission_ref: string }
   | { domain: "controlled_effect"; operation_ref: string }
   | { domain: "cognitive_realization"; plan_ref: string }
   | { domain: "cognitive_composition"; request_ref: string }
