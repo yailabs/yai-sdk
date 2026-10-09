@@ -166,6 +166,16 @@ postures; an indeterminate delivery is never permission to dispatch again.
 These contracts expose YAI meaning and do not grant the executor Participant
 the submitting Principal's authority.
 
+`@yai/sdk/projections` reuses generated `ConversationIntent`,
+`ConversationPosture` and `CaseWorkObservation` instead of narrowing Work to
+ordinary chat. The input retains the independently published
+`progressive_output` opt-in. Work answer, step invocation/result/Operation
+references and Conversation primary result accept explicit `null` as emitted
+by Core, as well as older omitted fields. No answer or result is invented from
+that absence. Optional native-read and Operation payloads keep their existing
+omission contract. This compatible representation correction adds no operation,
+wire-schema identity, execution owner or retry behavior.
+
 Case events carry exact Case, generation, sequence, cursor and affected-view
 facts. They invalidate cached views; they are not replacement canonical state.
 Resynchronize via supported reads after reconnect, missing continuity or Host

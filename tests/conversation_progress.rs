@@ -33,6 +33,27 @@ fn lost_send_is_not_replayed_by_the_public_client() {
     assert_eq!(peer.calls.borrow().iter().filter(|r|r.operation_ref=="conversation.send").count(),1);
 }
 #[test]
+fn pending_progress_keeps_explicit_no_result_without_promoting_partial_output() {
+    let mut observation = serde_json::to_value(ConversationProgressObservation {
+        schema: "yai.conversation_progress.v1".into(),
+        partial_output: Some("provisional".into()),
+        availability: ConversationProgressAvailability::Live,
+        execution: ConversationObservation {
+            case_ref: "case:exact".into(), request_ref: "request:exact".into(),
+            ..Default::default()
+        },
+        ..Default::default()
+    }).unwrap();
+    assert_eq!(observation["execution"]["primary_result"], serde_json::Value::Null);
+    observation["execution"].as_object_mut().unwrap().remove("primary_result");
+    let old: ConversationProgressObservation = serde_json::from_value(observation).unwrap();
+    assert!(old.execution.primary_result.is_none());
+    assert!(old.execution.work.is_none());
+    assert_eq!(old.partial_output.as_deref(), Some("provisional"));
+    assert_eq!(serde_json::to_value(old).unwrap()["execution"]["primary_result"], serde_json::Value::Null);
+}
+
+#[test]
 fn public_progress_refuses_unknown_channels_and_fake_canonical_fields() {
     let mut event=serde_json::to_value(ConversationProgressEvent::default()).unwrap();event["kind"]=serde_json::json!("hidden_reasoning");assert!(serde_json::from_value::<ConversationProgressEvent>(event).is_err());
     let mut value=serde_json::to_value(ConversationProgressObservation::default()).unwrap();value["canonical_partial"]=serde_json::json!(true);assert!(serde_json::from_value::<ConversationProgressObservation>(value).is_err());

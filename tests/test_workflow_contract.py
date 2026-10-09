@@ -52,8 +52,9 @@ class ContractTests(unittest.TestCase):
         rust, _ = generator.render(self.contract)
         self.assertIn('pub fn send_text(', rust)
         self.assertIn('pub fn send_with_search(', rust)
+        self.assertIn('pub fn send_progressive(', rust)
         self.assertIn('pub fn get_context(', rust)
-        self.assertEqual(rust.count('const ID: &\'static str = "conversation.send"'), 2)
+        self.assertEqual(rust.count('const ID: &\'static str = "conversation.send"'), 3)
 
     def test_input_variant_collision_and_unknown_type_refuse(self):
         op = next(op for op in self.contract['operations'] if op['id'] == 'conversation.send')

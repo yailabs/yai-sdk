@@ -173,6 +173,17 @@ receipts, plus SearchAPI Resource imports. There is no SDK semantic owner, secon
 orchestrator or retry policy. Generated workflow exports support independent
 consumers without adopting unpublished thin projection work.
 
+The subsequent independently owned Case Work projection reconciliation starts
+from published SDK `f91a1d16193a059cec71054dc67df97bb36dcdab`, preserving its
+129 descriptors, progress/native-read/Skill contracts and consumer tests.
+The thin TypeScript surface now reuses the generated intent, posture and Work
+types; shared output DTOs preserve Core's explicit nulls and older omissions.
+This closes the representation gap, not unpublished Core streaming, installed
+integration or Studio acceptance. The Core CLI checkpoint and overlapping
+`conversation.rs` / `registry.rs` WIP require hunk-level reconciliation by their
+owner; no shared Core files or operator runtime are changed in this SDK slice.
+See [reconciliation evidence](qualification.md#case-work-projection-reconciliation--2026-10-09).
+
 Full operational Conversation remains IN PROGRESS in its producer/client owners.
 Live-model execution, web credentials, integrated native product and human
 acceptance are not standalone SDK exits. No completed platform Task or successor

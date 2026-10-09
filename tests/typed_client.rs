@@ -213,6 +213,31 @@ fn case_work_contract_retains_bounded_intent_and_exact_observation_lineage() {
 }
 
 #[test]
+fn case_work_absent_and_null_observations_preserve_no_result_without_fabrication() {
+    let omitted = serde_json::json!({"schema":"yai.case_work_execution.v1",
+        "request_ref":"request:pending", "participant_ref":"participant:model",
+        "thread_ref":"thread:pending", "observed_generation":9, "posture":"unresolved",
+        "steps":[{"ordinal":0, "source_ref":"step:pending", "selection_ref":"selection:pending",
+            "target_ref":"target:qualified", "outcome_refs":[]}]});
+    let mut explicit = omitted.clone();
+    explicit["answer"] = serde_json::Value::Null;
+    for field in ["invocation_ref", "provider_result_ref", "operation_ref"] {
+        explicit["steps"][0][field] = serde_json::Value::Null;
+    }
+    let missing: workflows::CaseWorkObservation = serde_json::from_value(omitted).unwrap();
+    let null: workflows::CaseWorkObservation = serde_json::from_value(explicit.clone()).unwrap();
+    assert_eq!(serde_json::to_value(missing).unwrap(), explicit);
+    assert_eq!(serde_json::to_value(null).unwrap(), explicit);
+    assert_eq!(explicit["steps"][0]["outcome_refs"], serde_json::json!([]));
+    let pending = serde_json::json!({"case_ref":"case:pending", "participant_ref":"participant:author",
+        "submission_ref":"send:pending", "turn_ref":"turn:pending", "request_ref":"request:pending",
+        "observed_generation":10, "posture":"admitted", "invocation_refs":[],
+        "primary_result":null, "attempt_outcomes":[]});
+    let parsed: workflows::ConversationObservation = serde_json::from_value(pending.clone()).unwrap();
+    assert_eq!(serde_json::to_value(parsed).unwrap(), pending);
+}
+
+#[test]
 fn partial_and_unavailable_do_not_become_success_or_erase_evidence() {
     for mode in ["partial", "unavailable"] {
         let transport = mock(mode);

@@ -675,9 +675,9 @@ export interface CaseWorkStepObservation {
   source_ref: string;
   selection_ref: string;
   target_ref: string;
-  invocation_ref?: string;
-  provider_result_ref?: string;
-  operation_ref?: string;
+  invocation_ref?: string | null;
+  provider_result_ref?: string | null;
+  operation_ref?: string | null;
   outcome_refs: Array<string>;
   operation?: CaseOperation;
   read_observation?: CaseReadObservation;
@@ -689,7 +689,7 @@ export interface CaseWorkObservation {
   thread_ref: string;
   observed_generation: number;
   posture: CaseWorkPosture;
-  answer?: string;
+  answer?: string | null;
   steps: Array<CaseWorkStepObservation>;
 }
 export interface AttemptObservation {
@@ -713,7 +713,7 @@ export interface ConversationObservation {
   observed_generation: number;
   posture: ConversationPosture;
   invocation_refs: Array<string>;
-  primary_result?: ConversationPrimaryResult;
+  primary_result?: ConversationPrimaryResult | null;
   attempt_outcomes: Array<AttemptObservation>;
   work?: CaseWorkObservation;
   prepared_context?: PreparedContextObservation;

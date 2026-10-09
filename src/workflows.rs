@@ -1051,11 +1051,8 @@ pub struct CaseWorkStepObservation {
     pub source_ref: String,
     pub selection_ref: String,
     pub target_ref: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub invocation_ref: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub provider_result_ref: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub operation_ref: Option<String>,
     pub outcome_refs: Vec<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1071,7 +1068,6 @@ pub struct CaseWorkObservation {
     pub thread_ref: String,
     pub observed_generation: u64,
     pub posture: CaseWorkPosture,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub answer: Option<String>,
     pub steps: Vec<CaseWorkStepObservation>,
 }
@@ -1108,7 +1104,6 @@ pub struct ConversationObservation {
     pub observed_generation: u64,
     pub posture: ConversationPosture,
     pub invocation_refs: Vec<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub primary_result: Option<ConversationPrimaryResult>,
     pub attempt_outcomes: Vec<AttemptObservation>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
