@@ -23,14 +23,17 @@ answer/step references. The shared workflow contract now admits that existing
 owner representation in both languages. A Rust omission/null round-trip control
 and a TypeScript consumer fixture preserve no-value semantics without fabricating
 an Operation, invocation or answer. Full standalone validation is retained as
-observation 5 in the same run; observation 4 preserves the sandbox's denied
-local-socket test attempt, not a passing qualification. This is a representation correction; ordinary
+`case-work-nullable-20261009` observation 2; observation 1 preserves the sandbox's
+denied local-socket test attempt, not a passing qualification. A metadata-only
+correction gives these later records their own run ID/order rather than colliding
+with the earlier parity observation 4; timestamps, commands, source fingerprints,
+exit codes and captured output are unchanged. This is a representation correction; ordinary
 SEND input identity and the 118-operation inventory remain unchanged.
 
 Starting SDK `8ef877e6ed4ea288627ed25179e881e6e648d4f5`, against published
 Core `3802e96edb3a477b4f49c0b34df4f6c684824232`, this slice aligns
-`@yai/sdk/projections` with the existing generated Case Work contract. It
-does not change Rust workflows, operation IDs, wire schemas, provider transport
+`@yai/sdk/projections` with the existing generated Case Work contract. The original
+TypeScript alignment does not change Rust workflows, operation IDs, wire schemas, provider transport
 or the 118-operation inventory. Explicit intent retains executor/author
 separation and finite limits. Observation retains Work steps, Review suspension,
 budget exhaustion and indeterminate delivery without a fabricated success.
