@@ -20,7 +20,7 @@
     "PROVENANCE.md"
   ],
   "scripts": {
-    "check": "tsc --noEmit --strict --noUnusedLocals --noUnusedParameters --target ES2022 --module ESNext --moduleResolution Bundler typescript/projections.ts typescript/yvex.ts"
+    "check": "tsc --noEmit --strict --noUnusedLocals --noUnusedParameters --target ES2022 --module ESNext --moduleResolution Bundler typescript/projections.ts typescript/yvex.ts tests/typescript/conversation-work.ts"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

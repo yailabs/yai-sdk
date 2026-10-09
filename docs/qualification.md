@@ -16,6 +16,48 @@ The v0.1.0 SDK is a supported client contract, not an implementation of Core
 semantics. This record qualifies Linux same-user local IPC and bounded macOS
 peer-credential queries; full native Host integration remains Linux-only.
 
+## Case Work TypeScript projection — 2026-10-09
+
+Starting SDK `8ef877e6ed4ea288627ed25179e881e6e648d4f5`, against published
+Core `3802e96edb3a477b4f49c0b34df4f6c684824232`, this slice aligns
+`@yai/sdk/projections` with the existing generated Case Work contract. It
+does not change Rust workflows, operation IDs, wire schemas, provider transport
+or the 118-operation inventory. Explicit intent retains executor/author
+separation and finite limits. Observation retains Work steps, Review suspension,
+budget exhaustion and indeterminate delivery without a fabricated success.
+
+The [TypeScript consumer controls](../tests/typescript/conversation-work.ts)
+check exact generated-type reuse, preserved ordinary SEND, explicit bounded
+Work, Workflow binding, ordered lineage, nullable/nonterminal results and exact
+generation-fenced continuation. Negative compiler controls reject incomplete
+limits, client-owned permission overrides and model-invented completion posture.
+These controls are representation proof, not live Core authority or provider
+execution evidence. Core streaming and Skill lifecycle WIP are not adopted.
+
+The [retained observations](../tests/qualification/case-work-projection/runs/20261009/observations.jsonl)
+separate the isolated standalone gate (1: PASS, 12.80 seconds) from the deliberate
+old-projection regression (2: expected TypeScript refusal). The finalized gate
+passes again (3: 3.81 seconds); the installed Core/SDK catalog comparison passes
+all 118 operations and rejects an intentional output-contract drift (4).
+This is not four-repository or native Execution qualification. The old projection
+cannot express the executor, Work observation, Review or budget-exhausted state;
+the new consumer controls detect each omission. Evidence from the shared
+checkout is not used to qualify this slice because a concurrent owner added
+unpublished streaming contracts during that work. No model was invoked and no
+installed Host, operator Case, ProductProfile or credentials were changed.
+Golden-local and real Core/Studio interaction are not newly qualified by this
+representation-only repair. No semantic Decision is introduced.
+
+The public operations remain `conversation.send`, `execution.get` and
+`conversation.work.resume`. Streaming events are not published by this slice.
+The existing installed official CLI can inspect an already committed submission
+with `yai case conversation observe <case> --participant <author> --submission
+<exact-submission>` and `--json`; adding `--context` requests the separately
+qualified context projection. This SDK-only change does not add CLI Work flags.
+The current CLI cannot author the complete bounded Work intent through that
+command yet; Core owns closing that product-surface gap. Never substitute a new
+SEND for observation or explicit resumability, and never replay uncertain Work.
+
 ## Ordinary Conversation context projection — 2026-10-08
 
 The subsequent Core Context Sufficiency slice introduces additive workflow input

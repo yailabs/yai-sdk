@@ -1,4 +1,4 @@
-import type { RecallBounds, HandoffAcceptInput } from "./workflows.js";
+import type { RecallBounds, HandoffAcceptInput, ConversationIntent, ConversationPosture, CaseWorkObservation } from "./workflows.js";
 export * from "./workflows.js";
 export type { CaseSummary as LiveCaseRow } from "./workflows.js";
 /** Supported public Application projections. No semantic implementation.
@@ -227,16 +227,18 @@ export interface ConversationSendInput {
   submission_ref: string; expected_generation: number;
   parts: Array<{ modality: "text"; media_type: "text/plain"; bytes: number[] }>;
   memory_search_mode?: "standard" | "fast";
-  intent?: { context_depth: "focused" };
+  // Core 3802e96: ordinary SEND and bounded Case Work share one immutable intent.
+  intent?: ConversationIntent;
 }
 
 export interface ConversationExecution {
   case_ref: string; participant_ref: string; submission_ref: string;
   turn_ref: string; request_ref: string; observed_generation: number;
-  posture: "admitted" | "running" | "completed" | "provider_result_recorded" | "refused" | "failed" | "cancelled" | "delivery_indeterminate" | "unresolved";
+  posture: ConversationPosture;
   invocation_refs: string[];
   primary_result?: { result_id: string; invocation_id: string; output: string; selection: { selected_target_id: string } } | null;
   attempt_outcomes: ProviderAttemptObservation[];
+  work?: CaseWorkObservation | null;
 }
 
 export interface ProviderAttemptObservation {

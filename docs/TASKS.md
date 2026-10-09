@@ -83,6 +83,19 @@ No release qualification is implied. Core semantics and Studio product tasks rem
 
 ## Active downstream product delivery
 
+### Operational Conversation — Case Work projection
+
+The Core-coordinated `YAI.CASE.CONVERSATION.OPERATIONAL.EXPERIENCE.0` milestone
+includes an independently deliverable alignment of the existing Case Work
+contract. The TypeScript consumer projection now reuses the generated intent,
+posture and Work observation types already exposed by Rust. This fixes the
+client gap without adding operations, a scheduler or an authority owner.
+Streaming and progressive execution remain separate, unpublished Core work;
+this projection does not claim those boundaries or Studio qualification.
+Concurrent Core streaming and untracked Skill lifecycle work are preserved and
+excluded from this SDK slice. Context Sufficiency remains IN PROGRESS in Core.
+See [bounded projection qualification](qualification.md#case-work-typescript-projection--2026-10-09).
+
 ### Conversation Context Sufficiency consumer
 
 The Core-owned `YAI.CONVERSATION.CONTEXT.SUFFICIENCY.0` adds typed input variants
