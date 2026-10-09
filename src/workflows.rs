@@ -2387,6 +2387,8 @@ pub struct MaterialInspectInput {
     pub operation_ref: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source_ref: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub include_baseline_content: Option<bool>,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -2401,7 +2403,22 @@ pub struct MaterialReadEvidence {
     pub content_bytes: u64,
     pub observed_at_unix_ms: u64,
     pub file_identity: Option<MaterialFileIdentity>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub content: Option<MaterialReadContent>,
 }
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(tag = "posture", deny_unknown_fields)]
+pub enum MaterialReadContent {
+    #[serde(rename = "unavailable")]
+    Unavailable {
+        reason: String,
+    },
+    #[serde(rename = "retained")]
+    Retained {
+        text: String,
+    },
+}
+impl Default for MaterialReadContent { fn default() -> Self { Self::Unavailable { reason: Default::default() } } }
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum MaterialSourcePosture {
     #[default]

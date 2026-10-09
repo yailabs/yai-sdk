@@ -111,6 +111,16 @@ change times, not a client licence to act. Neither client selects evidence,
 creates receipts nor enforces a write fence. Closed DTOs refuse invented
 postures, authority fields and secrets.
 
+`include_baseline_content: true` explicitly requests the retained UTF-8 baseline
+through the same material inspection. The optional `baseline.content` is a typed
+`retained { text }` or `unavailable { reason }`, never a live filesystem read or
+reconstruction from a Source. Core limits this projection to 65,536 bytes and
+requalifies the original read disclosure; compare the text's UTF-8 length and
+SHA-256 against the adjacent baseline fields. By default the field is omitted,
+preserving the closed response shape of `d749a24` clients. Absence on an older
+producer is unavailable content, not an empty file. The operation inventory
+remains 130; consumer/native and producer evidence remain separate.
+
 Mutation receipts bind Case identity/generation and bounded Transition identity
 facts. They never export persisted CaseState/Transition layouts. Probe projections
 exclude carrier tokens, private process ownership and storage seals. Their

@@ -93,6 +93,12 @@ older servers and explicit when unavailable. Source/Resource relationship,
 baseline, Review and receipt projection never confer authority. SDK conformance
 is independent of Core's store/effect proof and Studio consumption.
 
+The same contract closure adds opt-in, bounded retained baseline text to material
+inspection. Default requests preserve the `d749a24` closed response shape; no new
+operation or authority is introduced. Rust/TypeScript representation and negative
+controls qualify the projection only; Core installation and native Studio remain
+independent gates.
+
 ### Conversation Context Sufficiency consumer
 
 The Core-owned `YAI.CONVERSATION.CONTEXT.SUFFICIENCY.0` adds typed input variants

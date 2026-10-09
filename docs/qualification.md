@@ -28,6 +28,12 @@ absence, unverified Source relationship and missing receipts. Privacy negatives
 reject fabricated authority and effect postures. The standalone gate does not
 qualify Core file fences, store migration, real models or Studio UI.
 
+The 2026-10-10 continuation qualifies opt-in `MaterialReadContent` against legacy
+omission, exact Unicode text, unavailable posture and closed-field negatives.
+`cargo test --locked`, TypeScript check, workflow generation and package boundary
+checks pass. These are representation claims; actual read disclosure, integrity,
+the 65,536-byte producer bound and no live reread belong to Core qualification.
+
 The [captured standalone runs](../tests/qualification/conversation-identity-material/runs/20261009-contract/observations.jsonl)
 retain the first TypeScript fixture failure (missing explicit `include_context`)
 and its repair without weakening the schema. The repaired complete `make check`

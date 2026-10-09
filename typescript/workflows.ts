@@ -1426,6 +1426,7 @@ export interface MaterialInspectInput {
   participant_ref: string;
   operation_ref: string;
   source_ref?: string;
+  include_baseline_content?: boolean;
 }
 export interface MaterialReadEvidence {
   observation_ref: string;
@@ -1438,7 +1439,9 @@ export interface MaterialReadEvidence {
   content_bytes: number;
   observed_at_unix_ms: number;
   file_identity?: MaterialFileIdentity | null;
+  content?: MaterialReadContent;
 }
+export type MaterialReadContent = { posture: "unavailable"; reason: string } | { posture: "retained"; text: string };
 export type MaterialSourcePosture = "unverified" | "retained_scope_content_match" | "unavailable";
 export type MaterialBaselinePosture = "unavailable" | "bound_read" | "observed_read" | "prepare_only";
 export type MaterialEffectPosture = "proposed" | "observed" | "review_pending" | "denied" | "prepared" | "applied_attested" | "uncertain" | "finalized_not_applied";

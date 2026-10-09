@@ -1806,11 +1806,12 @@
       "content_bytes": "usize",
       "baseline_observation_ref": "optional:string"
     },
-    "MaterialInspectInput": {"case_ref":"string", "participant_ref":"string", "operation_ref":"string", "source_ref":"optional:string"},
+    "MaterialInspectInput": {"case_ref":"string", "participant_ref":"string", "operation_ref":"string", "source_ref":"optional:string", "include_baseline_content":"optional:bool"},
     "MaterialReadEvidence": {
       "observation_ref":"string", "operation_ref":"string", "decision_ref":"string", "resource_ref":"string",
-      "configuration_digest":"string", "relative_path":"string", "content_digest":"string", "content_bytes":"u64", "observed_at_unix_ms":"u64", "file_identity":"nullable:MaterialFileIdentity"
+      "configuration_digest":"string", "relative_path":"string", "content_digest":"string", "content_bytes":"u64", "observed_at_unix_ms":"u64", "file_identity":"nullable:MaterialFileIdentity", "content":"optional:MaterialReadContent"
     },
+    "MaterialReadContent": {"$tagged_union":{"tag":"posture", "variants":{"unavailable":{"reason":"string"}, "retained":{"text":"string"}}}},
     "MaterialSourcePosture": {"$enum":["unverified", "retained_scope_content_match", "unavailable"]},
     "MaterialBaselinePosture": {"$enum":["unavailable", "bound_read", "observed_read", "prepare_only"]},
     "MaterialEffectPosture": {"$enum":["proposed", "observed", "review_pending", "denied", "prepared", "applied_attested", "uncertain", "finalized_not_applied"]},
