@@ -517,7 +517,7 @@ export interface ConversationObservation {
   observed_generation: number;
   posture: ConversationPosture;
   invocation_refs: Array<string>;
-  primary_result?: ConversationPrimaryResult;
+  primary_result?: ConversationPrimaryResult | null;
   attempt_outcomes: Array<AttemptObservation>;
   work?: CaseWorkObservation;
   prepared_context?: PreparedContextObservation;

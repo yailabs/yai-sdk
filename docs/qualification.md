@@ -29,6 +29,9 @@ correction gives these later records their own run ID/order rather than collidin
 with the earlier parity observation 4; timestamps, commands, source fingerprints,
 exit codes and captured output are unchanged. This is a representation correction; ordinary
 SEND input identity and the 118-operation inventory remain unchanged.
+The same owner emits explicit null for an admitted Conversation's absent primary
+result; observation 3 additionally qualifies that pending/nonterminal envelope
+through generated Rust and TypeScript, with no fabricated completion.
 
 Starting SDK `8ef877e6ed4ea288627ed25179e881e6e648d4f5`, against published
 Core `3802e96edb3a477b4f49c0b34df4f6c684824232`, this slice aligns

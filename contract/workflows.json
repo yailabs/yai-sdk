@@ -445,7 +445,7 @@
       "observed_generation": "u64",
       "posture": "ConversationPosture",
       "invocation_refs": "array:string",
-      "primary_result": "optional:ConversationPrimaryResult",
+      "primary_result": "nullable:ConversationPrimaryResult",
       "attempt_outcomes": "array:AttemptObservation",
       "work": "optional:CaseWorkObservation",
       "prepared_context": "optional:PreparedContextObservation"

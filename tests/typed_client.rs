@@ -229,6 +229,12 @@ fn case_work_absent_and_null_observations_preserve_no_result_without_fabrication
     assert_eq!(serde_json::to_value(missing).unwrap(), explicit);
     assert_eq!(serde_json::to_value(null).unwrap(), explicit);
     assert_eq!(explicit["steps"][0]["outcome_refs"], serde_json::json!([]));
+    let pending = serde_json::json!({"case_ref":"case:pending", "participant_ref":"participant:author",
+        "submission_ref":"send:pending", "turn_ref":"turn:pending", "request_ref":"request:pending",
+        "observed_generation":10, "posture":"admitted", "invocation_refs":[],
+        "primary_result":null, "attempt_outcomes":[]});
+    let parsed: workflows::ConversationObservation = serde_json::from_value(pending.clone()).unwrap();
+    assert_eq!(serde_json::to_value(parsed).unwrap(), pending);
 }
 
 #[test]

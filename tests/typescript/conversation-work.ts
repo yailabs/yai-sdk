@@ -3,6 +3,7 @@ import type {
   CaseWorkLimits, CaseWorkObservation, ConversationExecution, ConversationIntent,
   ConversationPosture, ConversationSendInput, ConversationSubmission,
   InspectedConversationExecution, ConversationWorkResumeInput,
+  ConversationObservation,
 } from "../../typescript/projections.js";
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends
@@ -67,6 +68,13 @@ export const noAnswer: CaseWorkObservation = {
   steps: [{ ordinal: 1, source_ref: "step:pending", selection_ref: "selection:pending",
     target_ref: "target:exact", invocation_ref: null, provider_result_ref: null,
     operation_ref: null, outcome_refs: [] }],
+};
+
+export const admittedWithoutResult: ConversationObservation = {
+  case_ref: "case:isolated", participant_ref: "participant:author",
+  submission_ref: "send:pending", turn_ref: "turn:pending", request_ref: "request:pending",
+  observed_generation: 10, posture: "admitted", invocation_refs: [],
+  primary_result: null, attempt_outcomes: [],
 };
 
 export const uncertain: InspectedConversationExecution = {
