@@ -409,9 +409,9 @@
       "source_ref": "string",
       "selection_ref": "string",
       "target_ref": "string",
-      "invocation_ref": "optional:string",
-      "provider_result_ref": "optional:string",
-      "operation_ref": "optional:string",
+      "invocation_ref": "nullable:string",
+      "provider_result_ref": "nullable:string",
+      "operation_ref": "nullable:string",
       "outcome_refs": "array:string"
     },
     "CaseWorkObservation": {
@@ -421,7 +421,7 @@
       "thread_ref": "string",
       "observed_generation": "u64",
       "posture": "CaseWorkPosture",
-      "answer": "optional:string",
+      "answer": "nullable:string",
       "steps": "array:CaseWorkStepObservation"
     },
     "AttemptObservation": {

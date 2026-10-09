@@ -60,6 +60,15 @@ export const exhausted: ConversationExecution = {
   work: { ...review.execution.work!, posture: "budget_exhausted" },
 };
 
+// Core observations may explicitly report no answer/operation. Omitted fields
+// from older clients remain compatible; neither form fabricates a result.
+export const noAnswer: CaseWorkObservation = {
+  ...review.execution.work!, answer: null,
+  steps: [{ ordinal: 1, source_ref: "step:pending", selection_ref: "selection:pending",
+    target_ref: "target:exact", invocation_ref: null, provider_result_ref: null,
+    operation_ref: null, outcome_refs: [] }],
+};
+
 export const uncertain: InspectedConversationExecution = {
   ...review.execution, posture: "delivery_indeterminate", primary_result: null,
   work: { ...review.execution.work!, posture: "delivery_indeterminate" },

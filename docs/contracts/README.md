@@ -177,6 +177,13 @@ These are compatible projections of the existing operations, not streaming or
 new client-side execution semantics. A primary provider result, a Work answer
 and completion of an authorized effect must not be conflated.
 
+`CaseWorkObservation.answer` and the step's invocation/result/Operation
+references admit both an omitted field and explicit `null`, as the Application
+owner actually emits. Both mean no recorded value, never a synthetic answer or
+receipt. The generated Rust projection retains `Option<String>`; TypeScript
+retains `string | null | undefined`. This output representation correction does
+not change historical SEND intent bytes or introduce a new operation/schema.
+
 Case events carry exact Case, generation, sequence, cursor and affected-view
 facts. They invalidate cached views; they are not replacement canonical state.
 Resynchronize via supported reads after reconnect, missing continuity or Host

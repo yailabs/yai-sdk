@@ -481,9 +481,9 @@ export interface CaseWorkStepObservation {
   source_ref: string;
   selection_ref: string;
   target_ref: string;
-  invocation_ref?: string;
-  provider_result_ref?: string;
-  operation_ref?: string;
+  invocation_ref?: string | null;
+  provider_result_ref?: string | null;
+  operation_ref?: string | null;
   outcome_refs: Array<string>;
 }
 export interface CaseWorkObservation {
@@ -493,7 +493,7 @@ export interface CaseWorkObservation {
   thread_ref: string;
   observed_generation: number;
   posture: CaseWorkPosture;
-  answer?: string;
+  answer?: string | null;
   steps: Array<CaseWorkStepObservation>;
 }
 export interface AttemptObservation {
