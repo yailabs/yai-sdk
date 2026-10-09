@@ -426,3 +426,31 @@ budgets, post-result fences and navigation meaning. A completed computation can
 remain `deterministic_fallback`; `outcome_unavailable` never authorizes retry.
 The observed real DGX Laya realization is still incompatible with Fast Search v1's
 5000 ms bound. Studio adoption and a compatible real producer are separate exits.
+
+## Operational Conversation public contracts — 2026-10-09
+
+Starting SDK `8ef877e6ed4ea288627ed25179e881e6e648d4f5`, the independent
+client slice qualifies 129 operation descriptors and 237 generated types across
+56 typed workflows. `cargo test --locked`: 53 tests pass; generation consistency,
+`npm run check` and `python3 tools/check.py` pass. New controlled fixtures cover
+progress opt-in and historical inputs, exact cursor/request recovery, lost SEND
+without redispatch, unknown-channel refusal, closed CaseRead/Operation variants,
+Skill receipt recovery without a second mutation, caller-Principal spoof refusal,
+and observed-empty versus unavailable Library. TypeScript checks include
+CaseRead/Operation and SearchAPI inputs/results.
+
+These are SDK contract and local socket fixtures. They do not qualify a live
+model, Core policy enforcement, Tavily credentials, Studio native rendering,
+operator acceptance or interactive inference throughput. Core/Studio own their
+separate integration evidence. The unrelated concurrent thin Case Work projection
+and its tests/docs are preserved outside this commit.
+
+Operator read checks use the official Core CLI after its compatible checkpoint:
+`yai case conversation observe CASE --participant AUTHOR --submission EXACT_ID
+--progress --json`, or `--context --json` for grounded context; and
+`yai skill list --tenant TENANT --json`, `yai skill assigned CASE --participant
+PARTICIPANT --json`, `yai skill mutation EXACT_REQUEST --tenant TENANT --json`.
+Compare canonical IDs, posture, generation, stream sequence and version/digest
+with Studio. Missing stream/receipt is observation uncertainty, never permission
+to resend. Core owns publication and spelling verification of these new CLI
+flags; the SDK provides no executable CLI of its own.

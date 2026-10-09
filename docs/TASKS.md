@@ -160,3 +160,21 @@ separate. Standalone TLS controls, real producer HTTPS/UDS plus native-vault
 cross-process restoration, and real tiny compiled CPU lifecycle passed. Native
 Studio integration, operator LAN/Spark deployment and human product acceptance
 remain their owners' evidence; publication does not imply those exits.
+
+### Operational Conversation — public client boundary
+
+Within the operator-selected Real Case Task Pack, the SDK projects
+`YAI.CONVERSATION.PROGRESSIVE.DELIVERY.0`,
+`YAI.CASE.CAPABILITY.OPERATIONAL.PROJECTION.0` and
+`YAI.SKILL.LIFECYCLE.FOUNDATION.0`. The bounded standalone client contract slice
+is qualified: actual provisional observations, exact canonical recovery, typed
+native read/Operation evidence, versioned Skill lifecycle and exact mutation
+receipts, plus SearchAPI Resource imports. There is no SDK semantic owner, second
+orchestrator or retry policy. Generated workflow exports support independent
+consumers without adopting unpublished thin projection work.
+
+Full operational Conversation remains IN PROGRESS in its producer/client owners.
+Live-model execution, web credentials, integrated native product and human
+acceptance are not standalone SDK exits. No completed platform Task or successor
+roadmap is selected. [Qualification](qualification.md#operational-conversation-public-contracts--2026-10-09)
+records the 53-test contract scope and exact limitations.

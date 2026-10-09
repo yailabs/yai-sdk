@@ -29,7 +29,7 @@ def render(contract):
             raise ValueError(f'unknown type constructor: {kind}')
         primitives = {'string': ('String', 'string'), 'u8': ('u8', 'number'), 'u64': ('u64', 'number'),
                       'usize': ('usize', 'number'), 'u16': ('u16', 'number'), 'u32': ('u32', 'number'), 'i64': ('i64', 'number'), 'bool': ('bool', 'boolean'),
-                      'json': ('serde_json::Value', 'unknown'), 'T': ('serde_json::Value', 'T')}
+                      'f64': ('f64', 'number'), 'json': ('serde_json::Value', 'unknown'), 'T': ('serde_json::Value', 'T')}
         if value in primitives:
             return primitives[value][language == 'typescript']
         if value not in types:
@@ -42,6 +42,61 @@ def render(contract):
     for name, fields in types.items():
         if not re.fullmatch('[A-Z][A-Za-z0-9]*', name):
             raise ValueError('invalid public type name')
+        if '$array' in fields:
+            inner = fields['$array']
+            rust.append(f'pub type {name} = Vec<{ty(inner, "rust")}>;')
+            ts.append(f'export type {name} = Array<{ty(inner, "typescript")}>;')
+            continue
+        if '$external_union' in fields:
+            variants = fields['$external_union']['variants']
+            if not variants:
+                raise ValueError('empty external union')
+            rust.extend(['#[derive(Clone, Debug, Serialize, Deserialize)]', f'pub enum {name} {{'])
+            projected = []
+            for value, payload in variants.items():
+                if not re.fullmatch('[a-z][a-z0-9_]*', value):
+                    raise ValueError('invalid external union variant')
+                variant = ''.join(part.title() for part in value.split('_'))
+                rust.append(f'    #[serde(rename = "{value}")]')
+                rust.append('    ' + variant + (f'({ty(payload, "rust")})' if payload else '') + ',')
+                projected.append('{ ' + value + ': ' + ty(payload, 'typescript') + ' }' if payload else json.dumps(value))
+            rust.append('}')
+            first, payload = next(iter(variants.items()))
+            variant = ''.join(part.title() for part in first.split('_'))
+            value = f'{variant}(Default::default())' if payload else variant
+            rust.append(f'impl Default for {name} {{ fn default() -> Self {{ Self::{value} }} }}')
+            ts.append(f'export type {name} = ' + ' | '.join(projected) + ';')
+            continue
+        if '$tagged_union' in fields:
+            union = fields['$tagged_union']
+            tag, variants = union['tag'], union['variants']
+            if not re.fullmatch('[a-z][a-z0-9_]*', tag) or not variants:
+                raise ValueError('invalid tagged union')
+            rust.extend(['#[derive(Clone, Debug, Serialize, Deserialize)]',
+                         f'#[serde(tag = "{tag}", deny_unknown_fields)]', f'pub enum {name} {{'])
+            projected = []
+            for value, body in variants.items():
+                if not re.fullmatch('[a-z][a-z0-9_]*', value):
+                    raise ValueError('invalid union variant')
+                variant = ''.join(part.title() for part in value.split('_'))
+                rust.extend([f'    #[serde(rename = "{value}")]', f'    {variant} {{'])
+                ts_fields = [f'{tag}: {json.dumps(value)}']
+                for field, kind in body.items():
+                    if not re.fullmatch('[a-z][a-z0-9_]*', field) or field == tag:
+                        raise ValueError('invalid union field')
+                    if kind.startswith('optional:'):
+                        rust.append('        #[serde(default, skip_serializing_if = "Option::is_none")]')
+                    rust.append(f'        {field}: {ty(kind, "rust")},')
+                    ts_fields.append(f'{field}{"?" if kind.startswith(("optional:", "nullable:")) else ""}: {ty(kind, "typescript")}')
+                rust.append('    },')
+                projected.append('{ ' + '; '.join(ts_fields) + ' }')
+            rust.append('}')
+            first, fields = next(iter(variants.items()))
+            variant = ''.join(part.title() for part in first.split('_'))
+            defaults = ', '.join(f'{field}: Default::default()' for field in fields)
+            rust.append(f'impl Default for {name} {{ fn default() -> Self {{ Self::{variant} {{ {defaults} }} }} }}')
+            ts.append(f'export type {name} = ' + ' | '.join(projected) + ';')
+            continue
         if '$enum' in fields:
             values = fields['$enum']
             if not values or len(set(values)) != len(values):

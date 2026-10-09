@@ -2,88 +2,449 @@
   "format": "yai.sdk.workflow-contract.v1",
   "application_protocol": "yai.studio.application.v1",
   "types": {
+    "SkillScope": {
+      "$enum": [
+        "case_work"
+      ]
+    },
+    "SkillAvailability": {
+      "$enum": [
+        "usable",
+        "dependencies_unavailable",
+        "retired"
+      ]
+    },
+    "SkillMutationPosture": {
+      "$enum": [
+        "recorded",
+        "not_recorded"
+      ]
+    },
+    "SkillDefinition": {
+      "name": "string",
+      "description": "string",
+      "instructions": "string",
+      "required_capabilities": "array:string",
+      "required_resources": "array:string",
+      "prerequisites": "array:string",
+      "scope": "SkillScope",
+      "provenance_refs": "array:string"
+    },
+    "SkillDraft": {
+      "schema": "string",
+      "tenant_ref": "string",
+      "skill_ref": "string",
+      "revision": "u64",
+      "definition": "SkillDefinition",
+      "created_by_principal_ref": "string",
+      "created_at_unix_ms": "u64",
+      "content_digest": "string"
+    },
+    "SkillVersion": {
+      "schema": "string",
+      "tenant_ref": "string",
+      "skill_ref": "string",
+      "version": "u64",
+      "version_ref": "string",
+      "draft_revision": "u64",
+      "definition": "SkillDefinition",
+      "published_by_principal_ref": "string",
+      "published_at_unix_ms": "u64",
+      "content_digest": "string"
+    },
+    "SkillRetirement": {
+      "version_ref": "string",
+      "retired_by_principal_ref": "string",
+      "retired_at_unix_ms": "u64",
+      "reason": "string"
+    },
+    "SkillAssignment": {
+      "schema": "string",
+      "assignment_ref": "string",
+      "tenant_ref": "string",
+      "case_ref": "string",
+      "participant_ref": "nullable:string",
+      "skill_ref": "string",
+      "version": "u64",
+      "version_ref": "string",
+      "version_digest": "string",
+      "assigned_by_principal_ref": "string",
+      "assigned_at_generation": "u64",
+      "assigned_at_unix_ms": "u64",
+      "integrity_digest": "string"
+    },
+    "SkillAssignmentDisabled": {
+      "assignment_ref": "string",
+      "disabled_by_principal_ref": "string",
+      "disabled_at_generation": "u64",
+      "reason": "string"
+    },
+    "SkillLibraryEntry": {
+      "tenant_ref": "string",
+      "skill_ref": "string",
+      "draft": "nullable:SkillDraft",
+      "versions": "array:SkillVersion",
+      "retirements": "array:SkillRetirement"
+    },
+    "SkillLibrary": {
+      "$array": "SkillLibraryEntry"
+    },
+    "CaseSkillEntry": {
+      "assignment": "SkillAssignment",
+      "version": "SkillVersion",
+      "availability": "SkillAvailability",
+      "reasons": "array:string"
+    },
+    "CaseSkillView": {
+      "schema": "string",
+      "case_ref": "string",
+      "participant_ref": "string",
+      "case_generation": "u64",
+      "capability_view_ref": "string",
+      "effective_policy_ref": "string",
+      "entries": "array:CaseSkillEntry"
+    },
+    "SkillValidation": {
+      "schema": "string",
+      "skill_ref": "string",
+      "draft_revision": "u64",
+      "content_digest": "string",
+      "valid": "bool",
+      "reasons": "array:string"
+    },
+    "SkillMutationResult": {
+      "$tagged_union": {
+        "tag": "kind",
+        "variants": {
+          "draft_saved": {
+            "value": "SkillDraft"
+          },
+          "version_published": {
+            "value": "SkillVersion"
+          },
+          "version_retired": {
+            "value": "SkillRetirement"
+          },
+          "case_assigned": {
+            "value": "SkillAssignment"
+          },
+          "case_disabled": {
+            "value": "SkillAssignmentDisabled"
+          }
+        }
+      }
+    },
+    "SkillMutationReceipt": {
+      "schema": "string",
+      "tenant_ref": "string",
+      "request_ref": "string",
+      "principal_ref": "string",
+      "operation_ref": "string",
+      "result": "SkillMutationResult"
+    },
+    "SkillMutationObservation": {
+      "schema": "string",
+      "tenant_ref": "string",
+      "request_ref": "string",
+      "posture": "SkillMutationPosture",
+      "receipt": "nullable:SkillMutationReceipt"
+    },
+    "SkillListInput": {
+      "tenant_ref": "string"
+    },
+    "SkillGetInput": {
+      "tenant_ref": "string",
+      "skill_ref": "string"
+    },
+    "SkillDraftSaveInput": {
+      "tenant_ref": "string",
+      "skill_ref": "string",
+      "definition": "SkillDefinition",
+      "expected_revision": "u64"
+    },
+    "SkillValidateInput": {
+      "tenant_ref": "string",
+      "skill_ref": "string",
+      "expected_revision": "u64"
+    },
+    "SkillPublishInput": {
+      "tenant_ref": "string",
+      "skill_ref": "string",
+      "expected_revision": "u64",
+      "expected_latest_version": "u64"
+    },
+    "SkillRetireInput": {
+      "tenant_ref": "string",
+      "skill_ref": "string",
+      "version": "u64",
+      "expected_digest": "string",
+      "reason": "string"
+    },
+    "CaseSkillAssignInput": {
+      "case_ref": "string",
+      "participant_ref": "nullable:string",
+      "skill_ref": "string",
+      "version": "u64",
+      "expected_digest": "string",
+      "expected_generation": "u64"
+    },
+    "CaseSkillDisableInput": {
+      "case_ref": "string",
+      "assignment_ref": "string",
+      "expected_generation": "u64",
+      "reason": "string"
+    },
+    "CaseSkillListInput": {
+      "case_ref": "string",
+      "participant_ref": "string"
+    },
+    "SkillMutationGetInput": {
+      "tenant_ref": "string",
+      "mutation_request_ref": "string"
+    },
     "EmptyInput": {},
-    "FastSearchInput": {"working_state":"json","max_candidates":"usize"},
-    "FastSearchCandidate": {"candidate_id":"string","candidate_kind":"string","description":"string","semantic_refs":"array:string"},
-    "FastSearchDecisionBudget": {"max_candidates":"usize","max_result_bytes":"usize","max_compute_millis":"u64"},
+    "FastSearchInput": {
+      "working_state": "json",
+      "max_candidates": "usize"
+    },
+    "FastSearchCandidate": {
+      "candidate_id": "string",
+      "candidate_kind": "string",
+      "description": "string",
+      "semantic_refs": "array:string"
+    },
+    "FastSearchDecisionBudget": {
+      "max_candidates": "usize",
+      "max_result_bytes": "usize",
+      "max_compute_millis": "u64"
+    },
     "FastSearchDecisionRequest": {
-      "schema":"string","request_id":"string","case_id":"string","case_generation":"u64","participant_id":"string",
-      "task_id":"string","working_state_id":"string","decision_kind":"string","candidates":"array:FastSearchCandidate","budget":"FastSearchDecisionBudget"
+      "schema": "string",
+      "request_id": "string",
+      "case_id": "string",
+      "case_generation": "u64",
+      "participant_id": "string",
+      "task_id": "string",
+      "working_state_id": "string",
+      "decision_kind": "string",
+      "candidates": "array:FastSearchCandidate",
+      "budget": "FastSearchDecisionBudget"
     },
-    "FastSearchChoice": {"candidate":"FastSearchCandidate","origin":"json"},
-    "FastSearchPreparationPosture": {"$enum":["ready_for_optional_producer","deterministic_fallback_no_choice"]},
+    "FastSearchChoice": {
+      "candidate": "FastSearchCandidate",
+      "origin": "json"
+    },
+    "FastSearchPreparationPosture": {
+      "$enum": [
+        "ready_for_optional_producer",
+        "deterministic_fallback_no_choice"
+      ]
+    },
     "FastSearchNavigation": {
-      "schema":"string","navigation_id":"string","working_state_id":"string","posture":"FastSearchPreparationPosture",
-      "choices":"array:FastSearchChoice","omitted_optional_choices":"usize","decision_request":"nullable:FastSearchDecisionRequest"
+      "schema": "string",
+      "navigation_id": "string",
+      "working_state_id": "string",
+      "posture": "FastSearchPreparationPosture",
+      "choices": "array:FastSearchChoice",
+      "omitted_optional_choices": "usize",
+      "decision_request": "nullable:FastSearchDecisionRequest"
     },
-    "FastSearchScore": {"candidate_id":"string","value":"i64"},
-    "FastSearchPosture": {"$enum":["scored","deterministic_fallback"]},
-    "FiniteDispatchPosture": {"$enum":["not_attempted","not_dispatched","completed","outcome_unavailable"]},
+    "FastSearchScore": {
+      "candidate_id": "string",
+      "value": "i64"
+    },
+    "FastSearchPosture": {
+      "$enum": [
+        "scored",
+        "deterministic_fallback"
+      ]
+    },
+    "FiniteDispatchPosture": {
+      "$enum": [
+        "not_attempted",
+        "not_dispatched",
+        "completed",
+        "outcome_unavailable"
+      ]
+    },
     "FiniteComputationObservation": {
-      "dispatch":"FiniteDispatchPosture","request_ref":"nullable:string","result_ref":"nullable:string",
-      "engine_generation":"nullable:u64","producer_compute_nanoseconds":"nullable:u64",
-      "caller_nanoseconds":"nullable:u64","token_count":"nullable:u64","model_forward_count":"nullable:u64"
+      "dispatch": "FiniteDispatchPosture",
+      "request_ref": "nullable:string",
+      "result_ref": "nullable:string",
+      "engine_generation": "nullable:u64",
+      "producer_compute_nanoseconds": "nullable:u64",
+      "caller_nanoseconds": "nullable:u64",
+      "token_count": "nullable:u64",
+      "model_forward_count": "nullable:u64"
     },
     "FiniteProviderTransport": {
-      "user":"string","pinned_known_hosts":"string","enrolled_client_key":"string",
-      "device_identity":"string","authenticated_peer":"string","source_identity":"string",
-      "logical_model_identity":"string","binding_identity":"string","tokenizer_identity":"string",
-      "physical_program_identity":"string","input_policy_identity":"string"
+      "user": "string",
+      "pinned_known_hosts": "string",
+      "enrolled_client_key": "string",
+      "device_identity": "string",
+      "authenticated_peer": "string",
+      "source_identity": "string",
+      "logical_model_identity": "string",
+      "binding_identity": "string",
+      "tokenizer_identity": "string",
+      "physical_program_identity": "string",
+      "input_policy_identity": "string"
     },
     "FiniteProviderRegisterInput": {
-      "tenant_id":"string","provider_key":"string","adapter":"string","endpoint":"string",
-      "model_id":"string","credential_ref":"string","locality":"string","finite_transport":"FiniteProviderTransport"
+      "tenant_id": "string",
+      "provider_key": "string",
+      "adapter": "string",
+      "endpoint": "string",
+      "model_id": "string",
+      "credential_ref": "string",
+      "locality": "string",
+      "finite_transport": "FiniteProviderTransport"
     },
     "FiniteProviderTarget": {
-      "schema":"string","target_id":"string","integrity_digest":"string","tenant_id":"string",
-      "provider_key":"string","adapter":"string","endpoint":"string","model_id":"string",
-      "credential_ref":"string","locality":"string","extension_adapter_id":"nullable:string",
-      "finite_transport":"FiniteProviderTransport","created_by_principal_id":"string","created_at_unix_ms":"u64"
+      "schema": "string",
+      "target_id": "string",
+      "integrity_digest": "string",
+      "tenant_id": "string",
+      "provider_key": "string",
+      "adapter": "string",
+      "endpoint": "string",
+      "model_id": "string",
+      "credential_ref": "string",
+      "locality": "string",
+      "extension_adapter_id": "nullable:string",
+      "finite_transport": "FiniteProviderTransport",
+      "created_by_principal_id": "string",
+      "created_at_unix_ms": "u64"
     },
     "FiniteQualifyInput": {
-      "target_ref":"string","working_state":"json","max_candidates":"usize","expected_generation":"u64","valid_for_ms":"u64"
+      "target_ref": "string",
+      "working_state": "json",
+      "max_candidates": "usize",
+      "expected_generation": "u64",
+      "valid_for_ms": "u64"
     },
     "FiniteQualifyResult": {
-      "schema":"string","compatible":"bool","qualification_ref":"nullable:string","navigation_ref":"string",
-      "decision_request_ref":"string","computations":"array:FiniteComputationObservation","reason":"string"
+      "schema": "string",
+      "compatible": "bool",
+      "qualification_ref": "nullable:string",
+      "navigation_ref": "string",
+      "decision_request_ref": "string",
+      "computations": "array:FiniteComputationObservation",
+      "reason": "string"
     },
     "FastSearchRanking": {
-      "schema":"string","ranking_id":"string","navigation_id":"string","distribution_id":"string",
-      "ordered_candidate_ids":"array:string","preferred_candidate_id":"nullable:string"
+      "schema": "string",
+      "ranking_id": "string",
+      "navigation_id": "string",
+      "distribution_id": "string",
+      "ordered_candidate_ids": "array:string",
+      "preferred_candidate_id": "nullable:string"
     },
     "FiniteProducerIdentity": {
-      "capability_id":"string","producer_id":"string","producer_version":"string","model_id":"nullable:string",
-      "composition_id":"nullable:string","profile_id":"nullable:string","state_generation":"nullable:string","evidence_refs":"array:string"
+      "capability_id": "string",
+      "producer_id": "string",
+      "producer_version": "string",
+      "model_id": "nullable:string",
+      "composition_id": "nullable:string",
+      "profile_id": "nullable:string",
+      "state_generation": "nullable:string",
+      "evidence_refs": "array:string"
     },
-    "CognitiveStepTier": {"$enum":["deterministic","system_one","general_llm","unavailable"]},
-    "FiniteProducerPosture": {"$enum":["no_public_qualified_producer","qualified"]},
+    "CognitiveStepTier": {
+      "$enum": [
+        "deterministic",
+        "system_one",
+        "general_llm",
+        "unavailable"
+      ]
+    },
+    "FiniteProducerPosture": {
+      "$enum": [
+        "no_public_qualified_producer",
+        "qualified"
+      ]
+    },
     "FastSearchRoute": {
-      "schema":"string","request_ref":"nullable:string","participant_ref":"string","selected_tier":"CognitiveStepTier",
-      "producer_posture":"FiniteProducerPosture","reason":"string","general_llm_equivalent_qualified":"bool"
+      "schema": "string",
+      "request_ref": "nullable:string",
+      "participant_ref": "string",
+      "selected_tier": "CognitiveStepTier",
+      "producer_posture": "FiniteProducerPosture",
+      "reason": "string",
+      "general_llm_equivalent_qualified": "bool"
     },
     "FastSearchResult": {
-      "schema":"string","posture":"FastSearchPosture","navigation":"FastSearchNavigation","route":"FastSearchRoute",
-      "binding_ref":"nullable:string","qualification_ref":"nullable:string","target_ref":"nullable:string",
-      "ranking":"nullable:FastSearchRanking","producer":"nullable:FiniteProducerIdentity","score_semantics":"nullable:string",
-      "score_scale":"nullable:u64","scores":"array:FastSearchScore",
-      "computation":"FiniteComputationObservation","reason":"string"
+      "schema": "string",
+      "posture": "FastSearchPosture",
+      "navigation": "FastSearchNavigation",
+      "route": "FastSearchRoute",
+      "binding_ref": "nullable:string",
+      "qualification_ref": "nullable:string",
+      "target_ref": "nullable:string",
+      "ranking": "nullable:FastSearchRanking",
+      "producer": "nullable:FiniteProducerIdentity",
+      "score_semantics": "nullable:string",
+      "score_scale": "nullable:u64",
+      "scores": "array:FastSearchScore",
+      "computation": "FiniteComputationObservation",
+      "reason": "string"
     },
-    "ProductAccessSource": {"$enum":["commercial","local_development","unconfigured_pre_release"]},
-    "ProductAccessSourcePosture": {"$enum":["allowed","refused","not_enforced"]},
-    "AccountProfilePosture": {"$enum":["not_applicable","authentication_required","unavailable","current","stale","unsupported_contract"]},
-    "EmailVerificationPosture": {"$enum":["not_reported","verified","unverified"]},
-    "ProductDevelopmentAccessInput": {"expected_revision":"u64"},
+    "ProductAccessSource": {
+      "$enum": [
+        "commercial",
+        "local_development",
+        "unconfigured_pre_release"
+      ]
+    },
+    "ProductAccessSourcePosture": {
+      "$enum": [
+        "allowed",
+        "refused",
+        "not_enforced"
+      ]
+    },
+    "AccountProfilePosture": {
+      "$enum": [
+        "not_applicable",
+        "authentication_required",
+        "unavailable",
+        "current",
+        "stale",
+        "unsupported_contract"
+      ]
+    },
+    "EmailVerificationPosture": {
+      "$enum": [
+        "not_reported",
+        "verified",
+        "unverified"
+      ]
+    },
+    "ProductDevelopmentAccessInput": {
+      "expected_revision": "u64"
+    },
     "ProductAccountProfileObservation": {
-      "schema":"string","posture":"AccountProfilePosture","account_ref":"nullable:string",
-      "display_name":"nullable:string","email":"nullable:string","email_verification":"EmailVerificationPosture",
-      "observed_at_unix_ms":"nullable:u64","reason":"nullable:string"
+      "schema": "string",
+      "posture": "AccountProfilePosture",
+      "account_ref": "nullable:string",
+      "display_name": "nullable:string",
+      "email": "nullable:string",
+      "email_verification": "EmailVerificationPosture",
+      "observed_at_unix_ms": "nullable:u64",
+      "reason": "nullable:string"
     },
     "ProductAccessSourceObservation": {
-      "schema":"string","source":"ProductAccessSource","posture":"ProductAccessSourcePosture",
-      "operation_allowed":"bool","development_capable":"bool","development_enabled":"bool",
-      "profile_revision":"nullable:u64","commercial_limits_applied":"bool",
-      "commercial_auth":"nullable:ProductAuthObservation","account_profile":"ProductAccountProfileObservation",
-      "refusal":"nullable:string"
+      "schema": "string",
+      "source": "ProductAccessSource",
+      "posture": "ProductAccessSourcePosture",
+      "operation_allowed": "bool",
+      "development_capable": "bool",
+      "development_enabled": "bool",
+      "profile_revision": "nullable:u64",
+      "commercial_limits_applied": "bool",
+      "commercial_auth": "nullable:ProductAuthObservation",
+      "account_profile": "ProductAccountProfileObservation",
+      "refusal": "nullable:string"
     },
     "CaseRefInput": {
       "case_ref": "string"
@@ -194,24 +555,56 @@
       "source": "string",
       "text": "string",
       "kind": "string",
-      "posture": "string"
+      "posture": "string",
+      "parent": "nullable:string",
+      "location": "optional:json",
+      "entity": "nullable:string",
+      "predicate": "nullable:string",
+      "value": "nullable:json",
+      "references": "optional:array:string",
+      "topics": "optional:array:string"
     },
     "KnowledgeSource": {
       "id": "string",
-      "path": "string"
+      "path": "string",
+      "source_id": "optional:string",
+      "logical_name": "optional:string",
+      "revision_id": "optional:string",
+      "current_revision": "optional:bool",
+      "digest": "optional:string",
+      "bytes": "optional:u64",
+      "backing": "optional:KnowledgeSourceBacking",
+      "roles": "optional:array:KnowledgeSourceRole",
+      "resource_id": "optional:string",
+      "media_type": "optional:string",
+      "source_kind": "optional:string",
+      "extractor": "optional:string",
+      "extraction_id": "optional:string",
+      "status": "optional:string",
+      "detail": "optional:string"
     },
     "KnowledgeRelation": {
       "id": "string",
       "from": "string",
       "to": "string",
-      "kind": "string"
+      "kind": "string",
+      "posture": "optional:string",
+      "backing_units": "optional:array:string"
     },
     "KnowledgeView": {
       "id": "string",
       "case_id": "string",
       "units": "array:KnowledgeUnit",
       "sources": "array:KnowledgeSource",
-      "relations": "array:KnowledgeRelation"
+      "relations": "array:KnowledgeRelation",
+      "schema": "optional:string",
+      "requesting_principal": "optional:string",
+      "profile": "optional:string",
+      "entities": "optional:array:KnowledgeEntity",
+      "topics": "optional:array:KnowledgeTopic",
+      "contradictions": "optional:array:RecallKnowledgeConflict",
+      "source_closure": "optional:string",
+      "max_units": "optional:usize"
     },
     "KnowledgeHit": {
       "document_id": "string",
@@ -412,7 +805,9 @@
       "invocation_ref": "optional:string",
       "provider_result_ref": "optional:string",
       "operation_ref": "optional:string",
-      "outcome_refs": "array:string"
+      "outcome_refs": "array:string",
+      "operation": "optional:CaseOperation",
+      "read_observation": "optional:CaseReadObservation"
     },
     "CaseWorkObservation": {
       "schema": "string",
@@ -450,38 +845,159 @@
       "work": "optional:CaseWorkObservation",
       "prepared_context": "optional:PreparedContextObservation"
     },
-    "MemorySearchMode": {"$enum":["standard","fast"]},
-    "ContextSelectionSource": {"$enum":["deterministic","system_one"]},
-    "TaskConversationInput": {
-      "case_ref":"string","participant_ref":"string","thread_ref":"string","submission_ref":"string",
-      "expected_generation":"u64","parts":"array:ConversationTextPart","intent":"optional:ConversationIntent",
-      "memory_search_mode":"MemorySearchMode"
+    "ProgressiveConversationInput": {
+      "case_ref": "string",
+      "participant_ref": "string",
+      "thread_ref": "string",
+      "submission_ref": "string",
+      "expected_generation": "u64",
+      "parts": "array:ConversationTextPart",
+      "intent": "optional:ConversationIntent",
+      "memory_search_mode": "MemorySearchMode",
+      "progressive_output": "bool"
     },
-    "ContextContribution": {"family":"string","entries":"usize","json_bytes":"usize"},
+    "ConversationProgressInput": {
+      "case_ref": "string",
+      "participant_ref": "string",
+      "request_ref": "string",
+      "after_sequence": "u64",
+      "stream_ref": "optional:string"
+    },
+    "ConversationProgressAvailability": {
+      "$enum": [
+        "live",
+        "ended",
+        "unavailable"
+      ]
+    },
+    "ConversationProgressKind": {
+      "$enum": [
+        "accepted",
+        "preparing_context",
+        "provider_admitted",
+        "provider_dispatched",
+        "model_fragment",
+        "provider_completed",
+        "result_recorded",
+        "execution_ended",
+        "interrupted"
+      ]
+    },
+    "ConversationProgressEvent": {
+      "sequence": "u64",
+      "kind": "ConversationProgressKind",
+      "observed_at_unix_ms": "u64",
+      "invocation_ref": "nullable:string",
+      "target_ref": "nullable:string",
+      "fragment": "nullable:string"
+    },
+    "ConversationProgressObservation": {
+      "schema": "string",
+      "case_ref": "string",
+      "participant_ref": "string",
+      "executor_participant_ref": "string",
+      "thread_ref": "string",
+      "turn_ref": "string",
+      "request_ref": "string",
+      "stream_ref": "nullable:string",
+      "availability": "ConversationProgressAvailability",
+      "oldest_sequence": "u64",
+      "last_sequence": "u64",
+      "history_gap": "bool",
+      "events": "array:ConversationProgressEvent",
+      "partial_output": "nullable:string",
+      "partial_output_limited": "bool",
+      "execution": "ConversationObservation",
+      "current_invocation_ref": "nullable:string",
+      "current_target_ref": "nullable:string"
+    },
+    "MemorySearchMode": {
+      "$enum": [
+        "standard",
+        "fast"
+      ]
+    },
+    "ContextSelectionSource": {
+      "$enum": [
+        "deterministic",
+        "system_one"
+      ]
+    },
+    "TaskConversationInput": {
+      "case_ref": "string",
+      "participant_ref": "string",
+      "thread_ref": "string",
+      "submission_ref": "string",
+      "expected_generation": "u64",
+      "parts": "array:ConversationTextPart",
+      "intent": "optional:ConversationIntent",
+      "memory_search_mode": "MemorySearchMode"
+    },
+    "ContextContribution": {
+      "family": "string",
+      "entries": "usize",
+      "json_bytes": "usize"
+    },
     "ContextPreparationObservation": {
-      "schema":"string","observation_id":"string","case_id":"string","case_generation":"u64",
-      "participant_id":"string","working_state_id":"string","source_turn_ref":"string","source":"ContextSelectionSource","reason":"string",
-      "candidate_working_state_id":"string","selected_entry_refs":"array:string","omitted_items":"usize",
-      "omission_reasons":"map:usize","contributions":"array:ContextContribution",
-      "semantic_unit_budget":"usize","selected_semantic_units":"usize","context_frame_bytes":"usize","rendered_content_chars":"usize",
-      "rendered_system_bytes":"usize","rendered_user_bytes":"usize","output_contract_bytes":"usize","instruction_bytes":"usize",
-      "navigation_ref":"nullable:string","finite_request_ref":"nullable:string","finite_result_ref":"nullable:string",
-      "finite_dispatch":"nullable:FiniteDispatchPosture","finite_binding_ref":"nullable:string",
-      "finite_qualification_ref":"nullable:string","finite_plan_ref":"nullable:string","finite_ranking":"nullable:FastSearchRanking",
-      "finite_navigation":"nullable:FastSearchNavigation","finite_distribution":"nullable:json",
-      "finite_producer":"nullable:FiniteProducerIdentity","finite_engine_generation":"nullable:u64","finite_score_semantics":"nullable:string",
-      "finite_score_scale":"nullable:u64","finite_scores":"array:FastSearchScore","finite_token_count":"nullable:u64",
-      "finite_model_forward_count":"nullable:u64","finite_compute_nanoseconds":"nullable:u64","finite_caller_nanoseconds":"nullable:u64",
-      "preparation_nanoseconds":"u64"
+      "schema": "string",
+      "observation_id": "string",
+      "case_id": "string",
+      "case_generation": "u64",
+      "participant_id": "string",
+      "working_state_id": "string",
+      "source_turn_ref": "string",
+      "source": "ContextSelectionSource",
+      "reason": "string",
+      "candidate_working_state_id": "string",
+      "selected_entry_refs": "array:string",
+      "omitted_items": "usize",
+      "omission_reasons": "map:usize",
+      "contributions": "array:ContextContribution",
+      "semantic_unit_budget": "usize",
+      "selected_semantic_units": "usize",
+      "context_frame_bytes": "usize",
+      "rendered_content_chars": "usize",
+      "rendered_system_bytes": "usize",
+      "rendered_user_bytes": "usize",
+      "output_contract_bytes": "usize",
+      "instruction_bytes": "usize",
+      "navigation_ref": "nullable:string",
+      "finite_request_ref": "nullable:string",
+      "finite_result_ref": "nullable:string",
+      "finite_dispatch": "nullable:FiniteDispatchPosture",
+      "finite_binding_ref": "nullable:string",
+      "finite_qualification_ref": "nullable:string",
+      "finite_plan_ref": "nullable:string",
+      "finite_ranking": "nullable:FastSearchRanking",
+      "finite_navigation": "nullable:FastSearchNavigation",
+      "finite_distribution": "nullable:json",
+      "finite_producer": "nullable:FiniteProducerIdentity",
+      "finite_engine_generation": "nullable:u64",
+      "finite_score_semantics": "nullable:string",
+      "finite_score_scale": "nullable:u64",
+      "finite_scores": "array:FastSearchScore",
+      "finite_token_count": "nullable:u64",
+      "finite_model_forward_count": "nullable:u64",
+      "finite_compute_nanoseconds": "nullable:u64",
+      "finite_caller_nanoseconds": "nullable:u64",
+      "preparation_nanoseconds": "u64"
     },
     "PreparedInvocationContext": {
-      "invocation_ref":"string","lineage":"json","working_state":"nullable:json","projection":"nullable:json",
-      "frame":"nullable:json","input_observation":"nullable:json","unavailable_reason":"nullable:string",
-      "preparation":"optional:ContextPreparationObservation"
+      "invocation_ref": "string",
+      "lineage": "json",
+      "working_state": "nullable:json",
+      "projection": "nullable:json",
+      "frame": "nullable:json",
+      "input_observation": "nullable:json",
+      "unavailable_reason": "nullable:string",
+      "preparation": "optional:ContextPreparationObservation"
     },
     "PreparedContextObservation": {
-      "schema":"string","observed_generation":"u64","total_invocations":"usize","omitted_invocations":"usize",
-      "invocations":"array:PreparedInvocationContext"
+      "schema": "string",
+      "observed_generation": "u64",
+      "total_invocations": "usize",
+      "omitted_invocations": "usize",
+      "invocations": "array:PreparedInvocationContext"
     },
     "TextConversationSubmission": {
       "created": "bool",
@@ -502,13 +1018,17 @@
       "execution": "ConversationExecutionReference"
     },
     "ConversationContextGetInput": {
-      "case_ref":"string","participant_ref":"string","execution":"ConversationExecutionReference","include_context":"bool"
+      "case_ref": "string",
+      "participant_ref": "string",
+      "execution": "ConversationExecutionReference",
+      "include_context": "bool"
     },
     "ConversationWorkResumeInput": {
       "case_ref": "string",
       "participant_ref": "string",
       "submission_ref": "string",
-      "observed_generation": "u64"
+      "observed_generation": "u64",
+      "progressive_output": "optional:bool"
     },
     "ResultState": {
       "$enum": [
@@ -733,47 +1253,177 @@
       "claim": "nullable:EntitlementClaim",
       "expected_revision": "u64"
     },
-    "ProductActivationStartInput": { "name": "string" },
-    "ProductActivationPollInput": { "activation_ref": "string" },
-    "ProductLoginClient": { "$enum": ["cli", "studio"] },
-    "ProductLoginStartInput": { "client": "ProductLoginClient", "name": "string" },
-    "ProductLoginCancelInput": { "login_ref": "string" },
-    "ProductLoginPosture": { "$enum": ["idle", "awaiting_browser", "exchanging", "authenticated", "cancelled", "expired", "unavailable", "refused", "interrupted", "indeterminate"] },
-    "ProductLoginFailure": { "$enum": ["service_unavailable", "unsupported_contract", "authorization_refused", "entitlement_required", "token_refused", "entitlement_verification_refused", "delivery_indeterminate", "listener_interrupted", "request_expired"] },
-    "ProductLoginObservation": {
-      "schema": "string", "login_ref": "nullable:string", "posture": "ProductLoginPosture",
-      "authorization_url": "nullable:string", "expires_at_unix_ms": "nullable:u64",
-      "callback_received": "bool", "failure": "nullable:ProductLoginFailure", "auth": "ProductAuthObservation"
+    "ProductActivationStartInput": {
+      "name": "string"
     },
-    "CommercialSessionPosture": { "$enum": ["signed_out", "activation_pending", "authenticated", "credential_unavailable"] },
-    "ActivationPosture": { "$enum": ["pending", "slow_down", "activated", "expired", "denied", "indeterminate"] },
-    "CommercialServicePosture": { "$enum": ["not_observed", "reachable", "unavailable", "credential_rejected", "entitlement_refused", "unsupported_contract"] },
-    "ProductAccessPosture": { "$enum": ["trial_active", "paid_active", "not_yet_valid", "expired", "revoked", "clock_rollback"] },
-    "AcquiredAccessKind": { "$enum": ["trial", "subscription", "team"] },
-    "EntitlementVerificationRefusal": { "$enum": ["malformed", "unsupported_contract", "unsupported_issuer", "unsupported_key", "invalid_signature", "invalid_installation_binding", "invalid_claims", "unsupported_policy"] },
-    "ProductPolicyScope": { "$enum": ["installation", "member", "organization_pool"] },
+    "ProductActivationPollInput": {
+      "activation_ref": "string"
+    },
+    "ProductLoginClient": {
+      "$enum": [
+        "cli",
+        "studio"
+      ]
+    },
+    "ProductLoginStartInput": {
+      "client": "ProductLoginClient",
+      "name": "string"
+    },
+    "ProductLoginCancelInput": {
+      "login_ref": "string"
+    },
+    "ProductLoginPosture": {
+      "$enum": [
+        "idle",
+        "awaiting_browser",
+        "exchanging",
+        "authenticated",
+        "cancelled",
+        "expired",
+        "unavailable",
+        "refused",
+        "interrupted",
+        "indeterminate"
+      ]
+    },
+    "ProductLoginFailure": {
+      "$enum": [
+        "service_unavailable",
+        "unsupported_contract",
+        "authorization_refused",
+        "entitlement_required",
+        "token_refused",
+        "entitlement_verification_refused",
+        "delivery_indeterminate",
+        "listener_interrupted",
+        "request_expired"
+      ]
+    },
+    "ProductLoginObservation": {
+      "schema": "string",
+      "login_ref": "nullable:string",
+      "posture": "ProductLoginPosture",
+      "authorization_url": "nullable:string",
+      "expires_at_unix_ms": "nullable:u64",
+      "callback_received": "bool",
+      "failure": "nullable:ProductLoginFailure",
+      "auth": "ProductAuthObservation"
+    },
+    "CommercialSessionPosture": {
+      "$enum": [
+        "signed_out",
+        "activation_pending",
+        "authenticated",
+        "credential_unavailable"
+      ]
+    },
+    "ActivationPosture": {
+      "$enum": [
+        "pending",
+        "slow_down",
+        "activated",
+        "expired",
+        "denied",
+        "indeterminate"
+      ]
+    },
+    "CommercialServicePosture": {
+      "$enum": [
+        "not_observed",
+        "reachable",
+        "unavailable",
+        "credential_rejected",
+        "entitlement_refused",
+        "unsupported_contract"
+      ]
+    },
+    "ProductAccessPosture": {
+      "$enum": [
+        "trial_active",
+        "paid_active",
+        "not_yet_valid",
+        "expired",
+        "revoked",
+        "clock_rollback"
+      ]
+    },
+    "AcquiredAccessKind": {
+      "$enum": [
+        "trial",
+        "subscription",
+        "team"
+      ]
+    },
+    "EntitlementVerificationRefusal": {
+      "$enum": [
+        "malformed",
+        "unsupported_contract",
+        "unsupported_issuer",
+        "unsupported_key",
+        "invalid_signature",
+        "invalid_installation_binding",
+        "invalid_claims",
+        "unsupported_policy"
+      ]
+    },
+    "ProductPolicyScope": {
+      "$enum": [
+        "installation",
+        "member",
+        "organization_pool"
+      ]
+    },
     "ProductAccessPolicy": {
-      "schema": "string", "policy_id": "string", "revision": "string", "scope": "ProductPolicyScope",
-      "owner_id": "string", "assignment_ref": "nullable:string", "capabilities": "array:string", "limits": "map:nullable:u64"
+      "schema": "string",
+      "policy_id": "string",
+      "revision": "string",
+      "scope": "ProductPolicyScope",
+      "owner_id": "string",
+      "assignment_ref": "nullable:string",
+      "capabilities": "array:string",
+      "limits": "map:nullable:u64"
     },
     "ProductActivationObservation": {
-      "activation_ref": "string", "posture": "ActivationPosture", "user_code": "string",
-      "verification_uri": "string", "verification_uri_complete": "string",
-      "expires_at_unix_ms": "u64", "poll_interval_ms": "u64", "next_poll_at_unix_ms": "u64"
+      "activation_ref": "string",
+      "posture": "ActivationPosture",
+      "user_code": "string",
+      "verification_uri": "string",
+      "verification_uri_complete": "string",
+      "expires_at_unix_ms": "u64",
+      "poll_interval_ms": "u64",
+      "next_poll_at_unix_ms": "u64"
     },
     "VerifiedProductAccessObservation": {
-      "schema": "string", "posture": "ProductAccessPosture", "licensed_operation_allowed": "bool",
-      "account_ref": "string", "commercial_installation_ref": "string", "grant_ref": "string",
-      "attestation_ref": "string", "attestation_digest": "string", "issuer_ref": "string", "key_ref": "string",
-      "kind": "AcquiredAccessKind", "issued_at_unix_ms": "u64", "not_before_unix_ms": "u64",
-      "valid_until_unix_ms": "u64", "offline_until_unix_ms": "u64", "observed_at_unix_ms": "u64",
-      "plan_ref": "optional:string", "policy": "optional:ProductAccessPolicy"
+      "schema": "string",
+      "posture": "ProductAccessPosture",
+      "licensed_operation_allowed": "bool",
+      "account_ref": "string",
+      "commercial_installation_ref": "string",
+      "grant_ref": "string",
+      "attestation_ref": "string",
+      "attestation_digest": "string",
+      "issuer_ref": "string",
+      "key_ref": "string",
+      "kind": "AcquiredAccessKind",
+      "issued_at_unix_ms": "u64",
+      "not_before_unix_ms": "u64",
+      "valid_until_unix_ms": "u64",
+      "offline_until_unix_ms": "u64",
+      "observed_at_unix_ms": "u64",
+      "plan_ref": "optional:string",
+      "policy": "optional:ProductAccessPolicy"
     },
     "ProductAuthObservation": {
-      "schema": "string", "session": "CommercialSessionPosture", "service": "CommercialServicePosture",
-      "account_ref": "nullable:string", "commercial_installation_ref": "nullable:string",
-      "activation": "nullable:ProductActivationObservation", "access": "nullable:VerifiedProductAccessObservation",
-      "verification_refusal": "nullable:EntitlementVerificationRefusal", "online_access_refused": "bool", "licensed_progress_allowed": "bool",
+      "schema": "string",
+      "session": "CommercialSessionPosture",
+      "service": "CommercialServicePosture",
+      "account_ref": "nullable:string",
+      "commercial_installation_ref": "nullable:string",
+      "activation": "nullable:ProductActivationObservation",
+      "access": "nullable:VerifiedProductAccessObservation",
+      "verification_refusal": "nullable:EntitlementVerificationRefusal",
+      "online_access_refused": "bool",
+      "licensed_progress_allowed": "bool",
       "credential_storage": "string"
     },
     "ProductBootstrapProjection": {
@@ -795,15 +1445,589 @@
     },
     "CaseListInput": {
       "tenant_id": "optional:string"
+    },
+    "CaseReadKind": {
+      "$enum": [
+        "knowledge_search",
+        "recall",
+        "workflow_inspect"
+      ]
+    },
+    "CaseReadRequest": {
+      "$tagged_union": {
+        "tag": "read",
+        "variants": {
+          "knowledge_search": {
+            "query": "string",
+            "limit": "usize"
+          },
+          "recall": {
+            "query": "string",
+            "limit": "usize"
+          },
+          "workflow_inspect": {}
+        }
+      }
+    },
+    "CaseReadResult": {
+      "$tagged_union": {
+        "tag": "kind",
+        "variants": {
+          "knowledge": {
+            "view": "KnowledgeView",
+            "hits": "array:KnowledgeHit"
+          },
+          "recall": {
+            "trace": "CanonicalRecallTrace"
+          },
+          "workflow": {
+            "definition": "CaseWorkflowDefinition",
+            "resolution": "CaseWorkflowResolution"
+          }
+        }
+      }
+    },
+    "CaseReadObservation": {
+      "schema": "string",
+      "observation_id": "string",
+      "case_id": "string",
+      "participant_id": "string",
+      "request_id": "string",
+      "thread_id": "string",
+      "turn_id": "string",
+      "provider_result_id": "string",
+      "provider_invocation_id": "string",
+      "provider_call_id": "string",
+      "provider_function_name": "string",
+      "observed_generation": "u64",
+      "request": "CaseReadRequest",
+      "result": "CaseReadResult"
+    },
+    "CanonicalRecallTrace": {
+      "schema": "string",
+      "trace_id": "string",
+      "request_id": "string",
+      "request": "RecallQuery",
+      "generation": "u64",
+      "disclosure_digest": "string",
+      "qualified_source_digest": "string",
+      "events": "array:CanonicalRecallEvent",
+      "relations": "array:CanonicalExperienceRelation",
+      "segments": "array:CanonicalRecallSegment",
+      "assertions": "array:CanonicalRecallAssertion",
+      "contradictions": "array:CanonicalContradiction",
+      "candidates": "array:RecallCandidate",
+      "vector_evidence_digest": "nullable:string",
+      "source_closure": "array:CanonicalSourceClosure",
+      "closure_complete": "bool",
+      "omitted_candidates": "usize",
+      "expansion_stopped_at_depth": "bool",
+      "limitations": "array:string",
+      "documentary": "optional:CanonicalDocumentaryTrace"
+    },
+    "RecallSelectionReason": {
+      "$enum": [
+        "exact_required_ref",
+        "current_state_anchor",
+        "lexical_candidate",
+        "vector_candidate",
+        "qualified_relation_expansion",
+        "source_closure",
+        "supersession_chain",
+        "contradiction_context"
+      ]
+    },
+    "CanonicalRecallEvent": {
+      "event": "CanonicalExperienceEvent",
+      "label": "string",
+      "validity_at_cut": "string",
+      "reasons": "array:RecallSelectionReason",
+      "content_reference": "optional:RecallContentReference",
+      "resource_reference": "optional:string"
+    },
+    "CanonicalExperienceEvent": {
+      "transition_id": "string",
+      "kind": "string",
+      "object_refs": "array:string",
+      "posture": "string",
+      "recorded_generation": "u64",
+      "recorded_at_unix_ms": "nullable:u64",
+      "observed_at_unix_ms": "nullable:u64",
+      "occurred_at_unix_ms": "nullable:u64",
+      "source_closed": "bool"
+    },
+    "RecallContentReference": {
+      "admission_id": "string",
+      "object_id": "string",
+      "source_resource_id": "string",
+      "source_path": "string"
+    },
+    "CanonicalExperienceRelation": {
+      "relation_id": "string",
+      "from_event": "string",
+      "to_event": "string",
+      "kind": "string",
+      "posture": "string",
+      "known_at_generation": "u64",
+      "sources": "array:CanonicalRelationSource"
+    },
+    "CanonicalRelationSource": {
+      "transition_id": "string",
+      "field": "string"
+    },
+    "CanonicalRecallSegment": {
+      "segment_id": "string",
+      "events": "array:string",
+      "grouping": "string"
+    },
+    "CanonicalRecallAssertion": {
+      "assertion": "CanonicalMemoryAssertion",
+      "source_events": "array:string",
+      "reasons": "array:RecallSelectionReason"
+    },
+    "CanonicalMemoryAssertion": {
+      "schema": "string",
+      "assertion_id": "string",
+      "case_id": "string",
+      "semantic_schema_version": "string",
+      "subject": "json",
+      "predicate": "string",
+      "value": "json",
+      "epistemic_class": "string",
+      "support_refs": "array:json",
+      "source_generation_start": "u64",
+      "source_generation_end": "u64",
+      "origin": "string",
+      "lifecycle": "string",
+      "contradiction_set_ref": "nullable:string",
+      "supersession_refs": "array:string",
+      "participant_refs": "array:string",
+      "assertion_digest": "string"
+    },
+    "CanonicalContradiction": {
+      "schema": "string",
+      "contradiction_id": "string",
+      "case_id": "string",
+      "subject": "json",
+      "predicate": "string",
+      "competing_assertion_ids": "array:string",
+      "contradiction_kind": "string",
+      "resolution_posture": "string",
+      "mechanical_basis": "string",
+      "derivation_version": "string"
+    },
+    "CanonicalSourceClosure": {
+      "source_ref": "string",
+      "posture": "string"
+    },
+    "CanonicalDocumentaryTrace": {
+      "sources": "array:RecalledDocumentSource",
+      "units": "array:RecalledDocumentUnit",
+      "relations": "array:KnowledgeRelation",
+      "cross_references": "array:RecallDocumentCrossReference",
+      "contradictions": "array:RecallKnowledgeConflict",
+      "segments": "array:RecallDocumentSegment"
+    },
+    "RecalledDocumentSource": {
+      "source": "KnowledgeSource",
+      "admitted_at_generation": "u64",
+      "admission_transition": "string",
+      "applicable_at_cut": "bool",
+      "reasons": "array:RecallSelectionReason"
+    },
+    "RecalledDocumentUnit": {
+      "unit": "KnowledgeUnit",
+      "reasons": "array:RecallSelectionReason"
+    },
+    "RecallDocumentCrossReference": {
+      "unit": "string",
+      "exact_reference": "string",
+      "event": "string",
+      "posture": "string"
+    },
+    "RecallKnowledgeConflict": {
+      "id": "string",
+      "entity": "string",
+      "predicate": "string",
+      "members": "array:string",
+      "posture": "string"
+    },
+    "RecallDocumentSegment": {
+      "source": "string",
+      "units": "array:string",
+      "grouping": "string"
+    },
+    "CaseWorkflowDefinition": {
+      "schema": "string",
+      "workflow_definition_id": "string",
+      "content_digest": "string",
+      "integrity_digest": "string",
+      "tenant_id": "string",
+      "workflow_key": "string",
+      "declared_version": "string",
+      "name": "string",
+      "description": "string",
+      "nodes": "array:json",
+      "edges": "array:json",
+      "created_by_principal_id": "string",
+      "created_at_unix_ms": "u64"
+    },
+    "CaseWorkflowResolution": {
+      "schema": "string",
+      "tenant_id": "string",
+      "case_id": "string",
+      "case_generation": "u64",
+      "workflow_definition_id": "string",
+      "workflow_binding_id": "string",
+      "effective_nodes": "array:json",
+      "effective_edges": "array:json",
+      "effective_revision": "u32",
+      "effective_topology_digest": "string",
+      "amendment_ids": "array:string",
+      "referenced_definition_ids": "array:string",
+      "nodes": "array:CaseWorkflowNodeResolution",
+      "ready_work": "array:CaseWorkflowReadyWork",
+      "satisfied_count": "usize",
+      "skipped_count": "usize",
+      "active_count": "usize",
+      "waiting_count": "usize",
+      "completed": "bool"
+    },
+    "CaseWorkflowNodeResolution": {
+      "node_id": "string",
+      "node_kind": "string",
+      "posture": "string",
+      "reason": "string",
+      "execution_id": "nullable:string",
+      "evidence_refs": "array:string"
+    },
+    "CaseWorkflowReadyWork": {
+      "node_id": "string",
+      "node_kind": "string",
+      "topological_rank": "usize"
+    },
+    "OperationScope": {
+      "case_id": "string",
+      "participant_refs": "array:string",
+      "resource_refs": "array:string",
+      "policy_refs": "array:string"
+    },
+    "ResourceAccessKind": {
+      "$enum": [
+        "filesystem_read",
+        "filesystem_search",
+        "discover",
+        "admit_content",
+        "content_read",
+        "process_run",
+        "database_query",
+        "database_mutation",
+        "http_fetch",
+        "mcp_catalog",
+        "mcp_resource_read",
+        "mcp_tool_call",
+        "web_search"
+      ]
+    },
+    "OperationKind": {
+      "$external_union": {
+        "variants": {
+          "filesystem_write": null,
+          "process_signal": null,
+          "resource_access": "ResourceAccessKind"
+        }
+      }
+    },
+    "OperationOrigin": {
+      "$tagged_union": {
+        "tag": "kind",
+        "variants": {
+          "participant_request": {
+            "request_id": "string",
+            "principal_id": "string",
+            "participant_link_id": "string"
+          },
+          "provider_result": {
+            "provider_result_id": "string",
+            "provider_invocation_id": "string"
+          },
+          "compatibility_review": {
+            "review_id": "string",
+            "attempt_id": "string"
+          },
+          "workflow_deterministic_proposal": {
+            "proposal_id": "string",
+            "workflow_execution_id": "string"
+          }
+        }
+      }
+    },
+    "FilesystemWritePayload": {
+      "relative_path": "string",
+      "content": "string",
+      "content_digest": "string",
+      "content_bytes": "usize"
+    },
+    "ProcessSignalPayload": {
+      "action": "ProcessSignalAction",
+      "target_identity_digest": "string"
+    },
+    "ProcessSignalAction": {
+      "$enum": [
+        "terminate",
+        "suspend",
+        "resume"
+      ]
+    },
+    "ResourceAction": {
+      "$tagged_union": {
+        "tag": "action",
+        "variants": {
+          "filesystem_read": {
+            "path": "string"
+          },
+          "filesystem_search": {
+            "path": "string",
+            "needle": "string"
+          },
+          "discover": {
+            "path": "string"
+          },
+          "admit_content": {
+            "path": "string",
+            "candidate_digest": "string"
+          },
+          "content_read": {
+            "admission_id": "string"
+          },
+          "process_run": {
+            "name": "string"
+          },
+          "database_query": {
+            "name": "string"
+          },
+          "database_mutation": {
+            "name": "string"
+          },
+          "http_fetch": {
+            "name": "string"
+          },
+          "mcp_catalog": {},
+          "mcp_resource_read": {
+            "uri": "string",
+            "catalog_digest": "string"
+          },
+          "mcp_tool_call": {
+            "name": "string",
+            "catalog_digest": "string",
+            "arguments": "json"
+          },
+          "web_search": {
+            "query": "string",
+            "limit": "usize"
+          }
+        }
+      }
+    },
+    "ResourceRequest": {
+      "schema": "string",
+      "configuration_digest": "string",
+      "action": "ResourceAction"
+    },
+    "CaseOperation": {
+      "schema": "string",
+      "operation_id": "string",
+      "operation_digest": "string",
+      "case_id": "string",
+      "participant_id": "string",
+      "scope": "OperationScope",
+      "kind": "OperationKind",
+      "resource_attachment_id": "string",
+      "filesystem_write": "FilesystemWritePayload",
+      "process_signal": "optional:ProcessSignalPayload",
+      "resource_request": "optional:ResourceRequest",
+      "origin": "OperationOrigin",
+      "expected_case_generation": "u64"
+    },
+    "KnowledgeSourceBacking": {
+      "$tagged_union": {
+        "tag": "kind",
+        "variants": {
+          "policy": {
+            "source_id": "string",
+            "artifact_id": "string"
+          },
+          "content": {
+            "admission_id": "string"
+          },
+          "observation": {
+            "observation_id": "string"
+          }
+        }
+      }
+    },
+    "KnowledgeSourceRole": {
+      "$enum": [
+        "policy",
+        "knowledge",
+        "operational"
+      ]
+    },
+    "KnowledgeEntity": {
+      "id": "string",
+      "definitions": "array:string"
+    },
+    "KnowledgeTopic": {
+      "name": "string",
+      "units": "array:string"
+    },
+    "WebSearchProvider": {
+      "$enum": [
+        "tavily"
+      ]
+    },
+    "WebSearchHit": {
+      "title": "string",
+      "url": "string",
+      "snippet": "string",
+      "relevance_score": "nullable:f64"
+    },
+    "WebSearchResult": {
+      "schema": "string",
+      "provider": "WebSearchProvider",
+      "query": "string",
+      "provider_request_id": "nullable:string",
+      "response_body_digest": "string",
+      "provider_response_seconds": "nullable:f64",
+      "hits": "array:WebSearchHit",
+      "posture": "string"
+    },
+    "ResourceReviewRequirement": {
+      "$enum": [
+        "automatic",
+        "require_review"
+      ]
+    },
+    "NetworkResourceInput": {
+      "endpoint": "string",
+      "allowed_ip_addresses": "array:string",
+      "credential_ref": "nullable:string"
+    },
+    "ResourceProcessRunnerInput": {
+      "executable": "string",
+      "executable_digest": "string",
+      "argv": "array:string",
+      "working_directory": "string",
+      "environment": "map:string",
+      "timeout_ms": "u64"
+    },
+    "ResourceAddressInput": {
+      "$tagged_union": {
+        "tag": "kind",
+        "variants": {
+          "filesystem": {
+            "root": "string"
+          },
+          "discovery": {
+            "root": "string"
+          },
+          "process_runner": {
+            "root": "string",
+            "runners": "map:ResourceProcessRunnerInput"
+          },
+          "sqlite": {
+            "root": "string",
+            "path": "string",
+            "queries": "map:string"
+          },
+          "http_service": {
+            "endpoint": "NetworkResourceInput",
+            "paths": "map:string"
+          },
+          "search_api": {
+            "provider": "WebSearchProvider",
+            "endpoint": "NetworkResourceInput"
+          },
+          "mcp": {
+            "endpoint": "NetworkResourceInput"
+          }
+        }
+      }
+    },
+    "ResourceDefinitionInput": {
+      "schema": "string",
+      "attachment_id": "string",
+      "policy_owner": "string",
+      "participant_ids": "array:string",
+      "operations": "array:ResourceAccessKind",
+      "read_prefixes": "array:string",
+      "names": "array:string",
+      "max_output_bytes": "usize",
+      "max_items": "usize",
+      "address": "ResourceAddressInput",
+      "write_prefix": "optional:string",
+      "max_write_bytes": "optional:usize",
+      "review_requirement": "optional:ResourceReviewRequirement"
+    },
+    "ResourceImportInput": {
+      "case_ref": "string",
+      "definition": "ResourceDefinitionInput"
     }
   },
   "closed_types": [
-    "FastSearchCandidate", "FastSearchDecisionBudget", "FastSearchDecisionRequest", "FastSearchChoice", "FastSearchNavigation", "FastSearchScore",
-    "FastSearchInput", "FiniteProviderTransport", "FiniteProviderRegisterInput", "FiniteProviderTarget",
-    "FiniteQualifyInput", "FiniteQualifyResult", "FiniteComputationObservation", "FastSearchResult",
-    "FastSearchRanking", "FastSearchRoute", "FiniteProducerIdentity",
-    "TaskConversationInput", "ConversationContextGetInput", "ContextContribution", "ContextPreparationObservation", "PreparedContextObservation", "PreparedInvocationContext",
-    "ProductDevelopmentAccessInput", "ProductAccessSourceObservation", "ProductAccountProfileObservation",
+    "SkillDefinition",
+    "SkillDraft",
+    "SkillVersion",
+    "SkillRetirement",
+    "SkillAssignment",
+    "SkillAssignmentDisabled",
+    "SkillLibraryEntry",
+    "CaseSkillEntry",
+    "CaseSkillView",
+    "SkillValidation",
+    "SkillMutationResult",
+    "SkillMutationReceipt",
+    "SkillMutationObservation",
+    "SkillListInput",
+    "SkillGetInput",
+    "SkillDraftSaveInput",
+    "SkillValidateInput",
+    "SkillPublishInput",
+    "SkillRetireInput",
+    "CaseSkillAssignInput",
+    "CaseSkillDisableInput",
+    "CaseSkillListInput",
+    "SkillMutationGetInput",
+    "ProgressiveConversationInput",
+    "ConversationProgressInput",
+    "ConversationProgressEvent",
+    "ConversationProgressObservation",
+    "FastSearchCandidate",
+    "FastSearchDecisionBudget",
+    "FastSearchDecisionRequest",
+    "FastSearchChoice",
+    "FastSearchNavigation",
+    "FastSearchScore",
+    "FastSearchInput",
+    "FiniteProviderTransport",
+    "FiniteProviderRegisterInput",
+    "FiniteProviderTarget",
+    "FiniteQualifyInput",
+    "FiniteQualifyResult",
+    "FiniteComputationObservation",
+    "FastSearchResult",
+    "FastSearchRanking",
+    "FastSearchRoute",
+    "FiniteProducerIdentity",
+    "TaskConversationInput",
+    "ConversationContextGetInput",
+    "ContextContribution",
+    "ContextPreparationObservation",
+    "PreparedContextObservation",
+    "PreparedInvocationContext",
+    "ProductDevelopmentAccessInput",
+    "ProductAccessSourceObservation",
+    "ProductAccountProfileObservation",
     "CaseVersionProjection",
     "WorkCommit",
     "TransitionReceipt",
@@ -819,18 +2043,191 @@
     "ProductWorkspaceSelectInput",
     "ProductEntitlementRecordInput",
     "CaseListInput",
-    "ProductActivationStartInput", "ProductActivationPollInput", "ProductActivationObservation",
-    "ProductAccessPolicy", "VerifiedProductAccessObservation", "ProductAuthObservation",
-    "ProductLoginStartInput", "ProductLoginCancelInput", "ProductLoginObservation"
+    "ProductActivationStartInput",
+    "ProductActivationPollInput",
+    "ProductActivationObservation",
+    "ProductAccessPolicy",
+    "VerifiedProductAccessObservation",
+    "ProductAuthObservation",
+    "ProductLoginStartInput",
+    "ProductLoginCancelInput",
+    "ProductLoginObservation",
+    "CaseReadObservation",
+    "CaseOperation",
+    "ResourceRequest",
+    "FilesystemWritePayload",
+    "ProcessSignalPayload",
+    "OperationScope",
+    "WebSearchHit",
+    "WebSearchResult",
+    "NetworkResourceInput",
+    "ResourceProcessRunnerInput",
+    "ResourceDefinitionInput",
+    "ResourceImportInput"
   ],
   "operations": [
-    {"id":"provider.finite.register","family":"provider","method":"register_finite","input":"FiniteProviderRegisterInput","output":"FiniteProviderTarget","input_contract":"yai.finite_provider_register_input.v1","output_contract":"yai.provider_target.v2"},
-    {"id":"provider.finite.qualify","family":"provider","method":"qualify_finite","input":"FiniteQualifyInput","output":"FiniteQualifyResult","input_contract":"yai.finite_qualify_input.v1","output_contract":"yai.finite_qualify_result.v1"},
-    {"id":"semantic.fast_search.execute","family":"cognitive","method":"fast_search","input":"FastSearchInput","output":"FastSearchResult","input_contract":"yai.fast_search_prepare_input.v1","output_contract":"yai.fast_search_result.v1"},
-    {"family":"product","method":"access_status","id":"product.access.get","input":"EmptyInput","output":"ProductAccessSourceObservation","input_contract":"yai.product_access_source_get_input.v1","output_contract":"yai.product_access_source.v1"},
-    {"family":"product","method":"enable_development","id":"product.access.development.enable","input":"ProductDevelopmentAccessInput","output":"ProductAccessSourceObservation","input_contract":"yai.product_development_access_input.v1","output_contract":"yai.product_access_source.v1"},
-    {"family":"product","method":"disable_development","id":"product.access.development.disable","input":"ProductDevelopmentAccessInput","output":"ProductAccessSourceObservation","input_contract":"yai.product_development_access_input.v1","output_contract":"yai.product_access_source.v1"},
-    {"family":"product","method":"account_profile","id":"product.account.profile.get","input":"EmptyInput","output":"ProductAccountProfileObservation","input_contract":"yai.product_account_profile_get_input.v1","output_contract":"yai.product_account_profile.v1"},
+    {
+      "family": "skills",
+      "method": "list",
+      "id": "skill.list",
+      "input": "SkillListInput",
+      "output": "SkillLibrary",
+      "input_contract": "yai.skill_list_input.v1",
+      "output_contract": "yai.skill_catalog.v1"
+    },
+    {
+      "family": "skills",
+      "method": "get",
+      "id": "skill.get",
+      "input": "SkillGetInput",
+      "output": "SkillLibraryEntry",
+      "input_contract": "yai.skill_get_input.v1",
+      "output_contract": "yai.skill_library_entry.v1"
+    },
+    {
+      "family": "skills",
+      "method": "save_draft",
+      "id": "skill.draft.save",
+      "input": "SkillDraftSaveInput",
+      "output": "SkillDraft",
+      "input_contract": "yai.skill_draft_save_input.v1",
+      "output_contract": "yai.skill_draft.v1"
+    },
+    {
+      "family": "skills",
+      "method": "validate",
+      "id": "skill.validate",
+      "input": "SkillValidateInput",
+      "output": "SkillValidation",
+      "input_contract": "yai.skill_validate_input.v1",
+      "output_contract": "yai.skill_validation.v1"
+    },
+    {
+      "family": "skills",
+      "method": "publish",
+      "id": "skill.publish",
+      "input": "SkillPublishInput",
+      "output": "SkillVersion",
+      "input_contract": "yai.skill_publish_input.v1",
+      "output_contract": "yai.skill_version.v1"
+    },
+    {
+      "family": "skills",
+      "method": "retire",
+      "id": "skill.retire",
+      "input": "SkillRetireInput",
+      "output": "SkillRetirement",
+      "input_contract": "yai.skill_retire_input.v1",
+      "output_contract": "yai.skill_retirement.v1"
+    },
+    {
+      "family": "skills",
+      "method": "assign",
+      "id": "skill.case.assign",
+      "input": "CaseSkillAssignInput",
+      "output": "SkillAssignment",
+      "input_contract": "yai.case_skill_assign_input.v1",
+      "output_contract": "yai.skill_assignment.v1"
+    },
+    {
+      "family": "skills",
+      "method": "disable",
+      "id": "skill.case.disable",
+      "input": "CaseSkillDisableInput",
+      "output": "SkillAssignmentDisabled",
+      "input_contract": "yai.case_skill_disable_input.v1",
+      "output_contract": "yai.skill_assignment_disabled.v1"
+    },
+    {
+      "family": "skills",
+      "method": "for_case",
+      "id": "skill.case.list",
+      "input": "CaseSkillListInput",
+      "output": "CaseSkillView",
+      "input_contract": "yai.case_skill_list_input.v1",
+      "output_contract": "yai.case_skill_view.v1"
+    },
+    {
+      "family": "skills",
+      "method": "mutation",
+      "id": "skill.mutation.get",
+      "input": "SkillMutationGetInput",
+      "output": "SkillMutationObservation",
+      "input_contract": "yai.skill_mutation_get_input.v1",
+      "output_contract": "yai.skill_mutation_observation.v1"
+    },
+    {
+      "family": "conversation",
+      "method": "progress",
+      "id": "conversation.progress.get",
+      "input": "ConversationProgressInput",
+      "output": "ConversationProgressObservation",
+      "input_contract": "yai.conversation_progress_input.v1",
+      "output_contract": "yai.conversation_progress.v1"
+    },
+    {
+      "id": "provider.finite.register",
+      "family": "provider",
+      "method": "register_finite",
+      "input": "FiniteProviderRegisterInput",
+      "output": "FiniteProviderTarget",
+      "input_contract": "yai.finite_provider_register_input.v1",
+      "output_contract": "yai.provider_target.v2"
+    },
+    {
+      "id": "provider.finite.qualify",
+      "family": "provider",
+      "method": "qualify_finite",
+      "input": "FiniteQualifyInput",
+      "output": "FiniteQualifyResult",
+      "input_contract": "yai.finite_qualify_input.v1",
+      "output_contract": "yai.finite_qualify_result.v1"
+    },
+    {
+      "id": "semantic.fast_search.execute",
+      "family": "cognitive",
+      "method": "fast_search",
+      "input": "FastSearchInput",
+      "output": "FastSearchResult",
+      "input_contract": "yai.fast_search_prepare_input.v1",
+      "output_contract": "yai.fast_search_result.v1"
+    },
+    {
+      "family": "product",
+      "method": "access_status",
+      "id": "product.access.get",
+      "input": "EmptyInput",
+      "output": "ProductAccessSourceObservation",
+      "input_contract": "yai.product_access_source_get_input.v1",
+      "output_contract": "yai.product_access_source.v1"
+    },
+    {
+      "family": "product",
+      "method": "enable_development",
+      "id": "product.access.development.enable",
+      "input": "ProductDevelopmentAccessInput",
+      "output": "ProductAccessSourceObservation",
+      "input_contract": "yai.product_development_access_input.v1",
+      "output_contract": "yai.product_access_source.v1"
+    },
+    {
+      "family": "product",
+      "method": "disable_development",
+      "id": "product.access.development.disable",
+      "input": "ProductDevelopmentAccessInput",
+      "output": "ProductAccessSourceObservation",
+      "input_contract": "yai.product_development_access_input.v1",
+      "output_contract": "yai.product_access_source.v1"
+    },
+    {
+      "family": "product",
+      "method": "account_profile",
+      "id": "product.account.profile.get",
+      "input": "EmptyInput",
+      "output": "ProductAccountProfileObservation",
+      "input_contract": "yai.product_account_profile_get_input.v1",
+      "output_contract": "yai.product_account_profile.v1"
+    },
     {
       "family": "identity",
       "method": "current",
@@ -978,7 +2375,16 @@
     {
       "family": "conversation",
       "method": "send_text",
-      "input_variants": [{"method":"send_with_search","input":"TaskConversationInput"}],
+      "input_variants": [
+        {
+          "method": "send_with_search",
+          "input": "TaskConversationInput"
+        },
+        {
+          "method": "send_progressive",
+          "input": "ProgressiveConversationInput"
+        }
+      ],
       "id": "conversation.send",
       "input": "TextConversationInput",
       "output": "TextConversationSubmission",
@@ -998,7 +2404,12 @@
       "family": "conversation",
       "method": "get",
       "id": "execution.get",
-      "input_variants": [{"method":"get_context","input":"ConversationContextGetInput"}],
+      "input_variants": [
+        {
+          "method": "get_context",
+          "input": "ConversationContextGetInput"
+        }
+      ],
       "input": "ConversationGetInput",
       "output": "ConversationObservation",
       "input_contract": "yai.execution_get_input.v1",
@@ -1059,44 +2470,76 @@
       "output_contract": "yai.case_state_mutation_result.v1"
     },
     {
-      "family": "product", "method": "login_start", "id": "product.login.start",
-      "input": "ProductLoginStartInput", "output": "ProductLoginObservation",
-      "input_contract": "yai.product_login_start_input.v1", "output_contract": "yai.product_login.v1"
+      "family": "product",
+      "method": "login_start",
+      "id": "product.login.start",
+      "input": "ProductLoginStartInput",
+      "output": "ProductLoginObservation",
+      "input_contract": "yai.product_login_start_input.v1",
+      "output_contract": "yai.product_login.v1"
     },
     {
-      "family": "product", "method": "login", "id": "product.login.get",
-      "input": "EmptyInput", "output": "ProductLoginObservation",
-      "input_contract": "yai.product_login_get_input.v1", "output_contract": "yai.product_login.v1"
+      "family": "product",
+      "method": "login",
+      "id": "product.login.get",
+      "input": "EmptyInput",
+      "output": "ProductLoginObservation",
+      "input_contract": "yai.product_login_get_input.v1",
+      "output_contract": "yai.product_login.v1"
     },
     {
-      "family": "product", "method": "cancel_login", "id": "product.login.cancel",
-      "input": "ProductLoginCancelInput", "output": "ProductLoginObservation",
-      "input_contract": "yai.product_login_cancel_input.v1", "output_contract": "yai.product_login.v1"
+      "family": "product",
+      "method": "cancel_login",
+      "id": "product.login.cancel",
+      "input": "ProductLoginCancelInput",
+      "output": "ProductLoginObservation",
+      "input_contract": "yai.product_login_cancel_input.v1",
+      "output_contract": "yai.product_login.v1"
     },
     {
-      "family": "product", "method": "activation_start", "id": "product.activation.start",
-      "input": "ProductActivationStartInput", "output": "ProductAuthObservation",
-      "input_contract": "yai.product_activation_start_input.v1", "output_contract": "yai.product_auth.v1"
+      "family": "product",
+      "method": "activation_start",
+      "id": "product.activation.start",
+      "input": "ProductActivationStartInput",
+      "output": "ProductAuthObservation",
+      "input_contract": "yai.product_activation_start_input.v1",
+      "output_contract": "yai.product_auth.v1"
     },
     {
-      "family": "product", "method": "activation_poll", "id": "product.activation.poll",
-      "input": "ProductActivationPollInput", "output": "ProductAuthObservation",
-      "input_contract": "yai.product_activation_poll_input.v1", "output_contract": "yai.product_auth.v1"
+      "family": "product",
+      "method": "activation_poll",
+      "id": "product.activation.poll",
+      "input": "ProductActivationPollInput",
+      "output": "ProductAuthObservation",
+      "input_contract": "yai.product_activation_poll_input.v1",
+      "output_contract": "yai.product_auth.v1"
     },
     {
-      "family": "product", "method": "auth", "id": "product.auth.get",
-      "input": "EmptyInput", "output": "ProductAuthObservation",
-      "input_contract": "yai.product_auth_get_input.v1", "output_contract": "yai.product_auth.v1"
+      "family": "product",
+      "method": "auth",
+      "id": "product.auth.get",
+      "input": "EmptyInput",
+      "output": "ProductAuthObservation",
+      "input_contract": "yai.product_auth_get_input.v1",
+      "output_contract": "yai.product_auth.v1"
     },
     {
-      "family": "product", "method": "refresh_auth", "id": "product.auth.refresh",
-      "input": "EmptyInput", "output": "ProductAuthObservation",
-      "input_contract": "yai.product_auth_refresh_input.v1", "output_contract": "yai.product_auth.v1"
+      "family": "product",
+      "method": "refresh_auth",
+      "id": "product.auth.refresh",
+      "input": "EmptyInput",
+      "output": "ProductAuthObservation",
+      "input_contract": "yai.product_auth_refresh_input.v1",
+      "output_contract": "yai.product_auth.v1"
     },
     {
-      "family": "product", "method": "sign_out", "id": "product.auth.sign_out",
-      "input": "EmptyInput", "output": "ProductAuthObservation",
-      "input_contract": "yai.product_auth_sign_out_input.v1", "output_contract": "yai.product_auth.v1"
+      "family": "product",
+      "method": "sign_out",
+      "id": "product.auth.sign_out",
+      "input": "EmptyInput",
+      "output": "ProductAuthObservation",
+      "input_contract": "yai.product_auth_sign_out_input.v1",
+      "output_contract": "yai.product_auth.v1"
     },
     {
       "family": "product",
@@ -1133,6 +2576,15 @@
       "output": "ProductBootstrapProjection",
       "input_contract": "yai.product_entitlement_record_input.v1",
       "output_contract": "yai.product_bootstrap.v1"
+    },
+    {
+      "family": "resources",
+      "method": "import_definition",
+      "id": "resource.import",
+      "input": "ResourceImportInput",
+      "output": "StateMutationReceipt",
+      "input_contract": "yai.resource_import_input.v1",
+      "output_contract": "yai.case_state_mutation_result.v1"
     }
   ],
   "generics": {
@@ -1154,6 +2606,11 @@
         "ready",
         "deferred",
         "not_applicable"
+      ]
+    },
+    "ResourceDefinitionInput": {
+      "schema": [
+        "yai.resource_definition.v1"
       ]
     }
   }

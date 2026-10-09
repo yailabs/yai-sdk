@@ -177,3 +177,29 @@ Attachment and subscription do not own Core's lifetime or cancel admitted work.
 Installed-process launch is optional client lifecycle support, not an embedded
 server. Stopping Core is an explicit supported operation, never a side effect of
 closing a Studio window.
+
+## Operational Conversation, native reads and versioned Skills
+
+The additive public contract exports generated workflows through Rust and
+`@yai/sdk/workflows`. The operation catalog has 129 descriptors.
+`send_progressive` opts into actual producer fragments; `conversation.progress.get`
+returns the versioned exact Case/author/executor/Thread/Turn/request/Invocation/target
+envelope, bounded sequence/cursor and provisional snapshot. Canonical execution
+observation remains authoritative after stream loss or Host replacement. The SDK
+does not retry SEND, continuation, capability execution or a Skill mutation.
+
+Case Work intent and typed steps retain the producer's immutable budgets, native
+read observations and actual Operation proposals. Knowledge, Recall and Workflow
+results preserve their variant-specific evidence and provenance; an Operation is
+not an applied effect. Closed tagged unions exclude client-owned permission fields.
+
+Ten Skill operations project a Tenant-owned library, draft CAS, validation,
+immutable publication, retirement, exact Case/Participant assignment and disable.
+`skill.mutation.get` recovers the exact producer receipt; `not_recorded` does not
+prove that no request is in flight. Assignment usability grants no capability.
+
+`Resources.import_definition` projects every current public Resource address,
+including `search_api` with a fixed supported provider and native credential
+reference. Typed WebSearch results are producer-owned URL/title/snippet/provenance
+records, not acquired Case Sources. The SDK stores no token and implements no
+search, policy, compiler, tool orchestration or Skills semantic owner.

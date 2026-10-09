@@ -1,4 +1,4 @@
-import type { RecallBounds, HandoffAcceptInput } from "./workflows.js";
+import type { RecallBounds, HandoffAcceptInput, ResourceAction } from "./workflows.js";
 export * from "./workflows.js";
 export type { CaseSummary as LiveCaseRow } from "./workflows.js";
 /** Supported public Application projections. No semantic implementation.
@@ -227,6 +227,8 @@ export interface ConversationSendInput {
   submission_ref: string; expected_generation: number;
   parts: Array<{ modality: "text"; media_type: "text/plain"; bytes: number[] }>;
   memory_search_mode?: "standard" | "fast";
+  /** Opt-in provisional delivery; canonical completion remains separate. */
+  progressive_output?: boolean;
   intent?: { context_depth: "focused" };
 }
 
@@ -244,7 +246,6 @@ export interface ProviderAttemptObservation {
   delivery?: string; stage?: string; request_bytes_written?: number;
   response_status?: number | null; no_execution_proven?: boolean;
   failure_class?: string | null; recorded_at_unix_ms?: number;
-  [key: string]: unknown;
 }
 
 export interface ConversationSubmission {
@@ -345,11 +346,6 @@ export interface CaseRunInput { case_ref: string; participant_ref: string; resou
 
 export interface CaseStopInput { case_ref: string; participant_ref: string; submission_ref: string; run_ref: string }
 
-export type ResourceAction = { action: "filesystem_read" | "discover"; path: string }
-  | { action: "filesystem_search"; path: string; needle: string }
-  | { action: "process_run" | "database_query" | "database_mutation" | "http_fetch"; name: string }
-  | { action: "mcp_catalog" };
-
 export interface ResourceRequestInput { case_ref: string; participant_ref: string; resource_ref: string; submission_ref: string; expected_generation: number; request: { schema: "yai.resource_request.v1"; configuration_digest: string; action: ResourceAction } }
 
 export interface CaseResumeInput { case_ref: string; participant_ref: string; previous_submission_ref: string; submission_ref: string; run_ref: string; checkpoint_digest: string; budgets: RuntimeBudgets }
@@ -434,22 +430,6 @@ export interface SourceDeclarationInput {
   action: { action: "discover"; path: string } | { action: "database_query" | "http_fetch"; name: string };
   bootstrap_policy: boolean; media_type: string;
 }
-
-export interface ResourceImportInput {
-  case_ref: string;
-  definition: {
-    schema: "yai.resource_definition.v1"; attachment_id: string; policy_owner: string;
-    participant_ids: string[]; operations: string[]; read_prefixes: string[]; names: string[];
-    max_output_bytes: number; max_items: number; review_requirement: "require_review";
-    address: { kind: "filesystem" | "discovery"; root: string }
-      | { kind: "process_runner"; root: string; runners: Record<string, { executable: string; executable_digest: string; argv: string[]; working_directory: string; environment: Record<string, string>; timeout_ms: number }> }
-      | { kind: "sqlite"; root: string; path: string; queries: Record<string, string> }
-      | { kind: "http_service"; endpoint: NetworkResourceInput; paths: Record<string, string> }
-      | { kind: "mcp"; endpoint: NetworkResourceInput };
-  };
-}
-
-export interface NetworkResourceInput { endpoint: string; allowed_ip_addresses: string[]; credential_ref: string | null }
 
 export interface CasePolicyBindingInput { case_ref: string; artifact_ref: string; expected_generation: number; reason: string }
 
