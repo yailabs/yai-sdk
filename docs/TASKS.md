@@ -205,3 +205,11 @@ Live-model execution, web credentials, integrated native product and human
 acceptance are not standalone SDK exits. No completed platform Task or successor
 roadmap is selected. [Qualification](qualification.md#operational-conversation-public-contracts--2026-10-09)
 records the 53-test contract scope and exact limitations.
+
+## Product experience handoff adoption
+
+Substantial consumer-facing contract changes follow the
+[contract handoff](contracts/README.md#studio-consumer-handoff), discoverable from
+AGENTS. This docs-only outcome changes no operation inventory, package/schema
+version, selected Task state or consumer pin. Core semantics and Studio native/human
+acceptance require their independent evidence; current qualifications are unchanged.

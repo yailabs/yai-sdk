@@ -257,3 +257,29 @@ including `search_api` with a fixed supported provider and native credential
 reference. Typed WebSearch results are producer-owned URL/title/snippet/provenance
 records, not acquired Case Sources. The SDK stores no token and implements no
 search, policy, compiler, tool orchestration or Skills semantic owner.
+
+## Studio consumer handoff
+
+The handoff is resource- and service-general: document discovery, connection and
+identity separately from documentary Source intake. An attached service or advertised
+operation is not an Authority grant. Cover manual operations and supported
+model-requested operations, their governance, observations, exact-object navigation,
+recovery and contextual presentation. Conversation remains a first-class interaction
+and continuity surface; it does not become a second execution owner. Future database,
+Redis, container, endpoint, process, remote-system or MCP integrations require their
+own public contracts and evidence; this protocol asserts no new family support.
+
+For substantial product-facing changes, include the following in the existing Task
+or release handoff, without a new registry or reporting hierarchy:
+
+- User intent/domain, public operations/types and exact compatible producer/SDK revisions; absent capability and version compatibility behavior.
+- Canonical identities, disclosure/freshness/finality and available actions; admission remains with the semantic owner, never SDK or frontend.
+- Recovery observations and explicit continuation eligibility; lost acknowledgement never authorizes automatic redispatch.
+- Reproducible public reads and controlled positive/negative evidence, with exact objects and unearned real-provider gates.
+- Affected existing Studio journey and missing projection, if any; the Studio Task owner determines presentation reuse, exact navigation, Context and native qualification under its [experience contract](https://github.com/yailabs/studio/blob/main/docs/interaction-contracts.md#product-experience-integration).
+
+SDK projects supported contracts and transport; it does not infer admission, fill missing identities or own UI orchestration. Independently versioned consumer pins must be qualified against the connected producer.
+
+This obligation does not block independent releases on Studio acceptance or duplicate
+Studio documentation. Independent open-source consumers need only the public contracts and local handoff facts; the Studio link is integration guidance, not a private semantic dependency.
+No new feature, runtime qualification or acceptance claim follows from this method.
