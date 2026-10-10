@@ -1,0 +1,231 @@
+{
+  "basis_refs": [],
+  "decided_at_case_generation": 36,
+  "decision_basis": {
+    "authority": [
+      {
+        "contributing_rules": [
+          {
+            "artifact_id": "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82",
+            "binding_id": "case-policy-binding:eb9d8872a351a65ce7c9cc3d28ce65a8",
+            "fact_refs": [
+              "policy-fact:10be19663df43669f898ef76ce70ca11810e00a6fbc456355892fdd939bb4df6"
+            ],
+            "policy_ir_rule_id": "filesystem-proposer",
+            "source_id": "policy-source:871dfe3f883e407b0d8f196b7f333b8b77a8aabef4691f3a9967403efdf2b6bf",
+            "source_locations": [
+              "$.rules[1]"
+            ]
+          }
+        ],
+        "eligible_participant_ids": [],
+        "observed_roles": [
+          "operation-proposer"
+        ],
+        "participant_id": "participant:model",
+        "required_roles": [
+          "operation-proposer"
+        ],
+        "satisfied": true,
+        "subject": "proposer"
+      },
+      {
+        "contributing_rules": [
+          {
+            "artifact_id": "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82",
+            "binding_id": "case-policy-binding:eb9d8872a351a65ce7c9cc3d28ce65a8",
+            "fact_refs": [
+              "policy-fact:0c3163136fafaca6f1c28bf9c1cd2178b08d69273ef6d527bb04607a64baeb53"
+            ],
+            "policy_ir_rule_id": "reviewer",
+            "source_id": "policy-source:871dfe3f883e407b0d8f196b7f333b8b77a8aabef4691f3a9967403efdf2b6bf",
+            "source_locations": [
+              "$.rules[9]"
+            ]
+          }
+        ],
+        "eligible_participant_ids": [
+          "participant:human"
+        ],
+        "observed_roles": [],
+        "participant_id": null,
+        "required_roles": [
+          "policy-reviewer"
+        ],
+        "satisfied": true,
+        "subject": "reviewer"
+      }
+    ],
+    "authority_evaluated_at_unix_ms": 1791672808000,
+    "basis_id": "decision-basis:091e622b5d39798ec18a1c5624f3f4ec",
+    "case_id": "case:material-qualification",
+    "contributing_provenance": [
+      {
+        "artifact_id": "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82",
+        "binding_id": "case-policy-binding:eb9d8872a351a65ce7c9cc3d28ce65a8",
+        "fact_refs": [
+          "policy-fact:8a4c1a4d6365eddf74bffb282c277875e117d524ae1eaacac65353455eb48272"
+        ],
+        "policy_ir_rule_id": "filesystem-post",
+        "source_id": "policy-source:871dfe3f883e407b0d8f196b7f333b8b77a8aabef4691f3a9967403efdf2b6bf",
+        "source_locations": [
+          "$.rules[3]"
+        ]
+      },
+      {
+        "artifact_id": "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82",
+        "binding_id": "case-policy-binding:eb9d8872a351a65ce7c9cc3d28ce65a8",
+        "fact_refs": [
+          "policy-fact:f2b500dbe2e180db8f8ce818acaf7cd445b683afe99e3260724180f79b995bb0"
+        ],
+        "policy_ir_rule_id": "filesystem-posture",
+        "source_id": "policy-source:871dfe3f883e407b0d8f196b7f333b8b77a8aabef4691f3a9967403efdf2b6bf",
+        "source_locations": [
+          "$.rules[0]"
+        ]
+      },
+      {
+        "artifact_id": "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82",
+        "binding_id": "case-policy-binding:eb9d8872a351a65ce7c9cc3d28ce65a8",
+        "fact_refs": [
+          "policy-fact:10be19663df43669f898ef76ce70ca11810e00a6fbc456355892fdd939bb4df6"
+        ],
+        "policy_ir_rule_id": "filesystem-proposer",
+        "source_id": "policy-source:871dfe3f883e407b0d8f196b7f333b8b77a8aabef4691f3a9967403efdf2b6bf",
+        "source_locations": [
+          "$.rules[1]"
+        ]
+      },
+      {
+        "artifact_id": "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82",
+        "binding_id": "case-policy-binding:eb9d8872a351a65ce7c9cc3d28ce65a8",
+        "fact_refs": [
+          "policy-fact:c4a8abc2b9063f27a3927ed722429471673ee1b06b9db01c378b2d64fcc22918"
+        ],
+        "policy_ir_rule_id": "filesystem-source",
+        "source_id": "policy-source:871dfe3f883e407b0d8f196b7f333b8b77a8aabef4691f3a9967403efdf2b6bf",
+        "source_locations": [
+          "$.rules[2]"
+        ]
+      },
+      {
+        "artifact_id": "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82",
+        "binding_id": "case-policy-binding:eb9d8872a351a65ce7c9cc3d28ce65a8",
+        "fact_refs": [
+          "policy-fact:9c3cdb6fc8d87e60adc5150ae1a034bb7a07b6d6e121df6ea5e614bfebd8ed08"
+        ],
+        "policy_ir_rule_id": "review",
+        "source_id": "policy-source:871dfe3f883e407b0d8f196b7f333b8b77a8aabef4691f3a9967403efdf2b6bf",
+        "source_locations": [
+          "$.rules[8]"
+        ]
+      },
+      {
+        "artifact_id": "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82",
+        "binding_id": "case-policy-binding:eb9d8872a351a65ce7c9cc3d28ce65a8",
+        "fact_refs": [
+          "policy-fact:0c3163136fafaca6f1c28bf9c1cd2178b08d69273ef6d527bb04607a64baeb53"
+        ],
+        "policy_ir_rule_id": "reviewer",
+        "source_id": "policy-source:871dfe3f883e407b0d8f196b7f333b8b77a8aabef4691f3a9967403efdf2b6bf",
+        "source_locations": [
+          "$.rules[9]"
+        ]
+      }
+    ],
+    "effective_policy_digest": "sha256:8bb8230e2318ea8cbaa749edc79c469a487bc60bd4e9cb891720d82df78574d3",
+    "effective_policy_id": "effective-policy:8bb8230e2318ea8cbaa749edc79c469a",
+    "evaluated_case_generation": 36,
+    "final_posture": "require_review",
+    "final_reason": "policy_requires_human_review",
+    "integrity_digest": "sha256:091e622b5d39798ec18a1c5624f3f4ecfe651fa7cbe7fd404ca17879e8fd17bd",
+    "matched_rule_refs": [
+      "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82#filesystem-post",
+      "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82#filesystem-posture",
+      "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82#filesystem-proposer",
+      "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82#filesystem-source",
+      "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82#review",
+      "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82#reviewer"
+    ],
+    "materializer_version": "yai.policy_materializer.v3",
+    "mechanical_posture": "satisfied",
+    "obligations": [
+      {
+        "contributing_rules": [
+          {
+            "artifact_id": "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82",
+            "binding_id": "case-policy-binding:eb9d8872a351a65ce7c9cc3d28ce65a8",
+            "fact_refs": [
+              "policy-fact:8a4c1a4d6365eddf74bffb282c277875e117d524ae1eaacac65353455eb48272"
+            ],
+            "policy_ir_rule_id": "filesystem-post",
+            "source_id": "policy-source:871dfe3f883e407b0d8f196b7f333b8b77a8aabef4691f3a9967403efdf2b6bf",
+            "source_locations": [
+              "$.rules[3]"
+            ]
+          }
+        ],
+        "evidence_refs": [],
+        "obligation": "post_observation",
+        "status": "required_at_execution"
+      },
+      {
+        "contributing_rules": [
+          {
+            "artifact_id": "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82",
+            "binding_id": "case-policy-binding:eb9d8872a351a65ce7c9cc3d28ce65a8",
+            "fact_refs": [
+              "policy-fact:c4a8abc2b9063f27a3927ed722429471673ee1b06b9db01c378b2d64fcc22918"
+            ],
+            "policy_ir_rule_id": "filesystem-source",
+            "source_id": "policy-source:871dfe3f883e407b0d8f196b7f333b8b77a8aabef4691f3a9967403efdf2b6bf",
+            "source_locations": [
+              "$.rules[2]"
+            ]
+          }
+        ],
+        "evidence_refs": [
+          "provider-result:cognitive:b9cf61735dfe740a",
+          "invocation:cognitive:b9cf61735dfe740a"
+        ],
+        "obligation": "source_provenance",
+        "status": "satisfied"
+      }
+    ],
+    "operation_digest": "sha256:75b3f3f65ca8d5bc7e8b66568fe71690cc431e686cf5a1b99d56d89a718ddbff",
+    "operation_id": "operation:75b3f3f65ca8d5bc7e8b66568fe71690",
+    "operation_kind": "filesystem.write",
+    "operation_restriction": "explicit_allow",
+    "policy_artifact_refs": [
+      "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82"
+    ],
+    "policy_binding_refs": [
+      "case-policy-binding:eb9d8872a351a65ce7c9cc3d28ce65a8"
+    ],
+    "policy_validity": [
+      {
+        "artifact_id": "policy-artifact:cb7807b604f087d3ecd4f2cb430a34ee2d58fb5223f9cd395ecabe59e51cee82",
+        "binding_id": "case-policy-binding:eb9d8872a351a65ce7c9cc3d28ce65a8",
+        "contract": {
+          "mode": "unbounded"
+        },
+        "lineage_id": "policy-lineage:729cffc8e0bee32f7cacd94fbc6e070a6c1ea4ab62c21b0fb283ddb6f8febb62",
+        "posture": "valid",
+        "reason": "unbounded"
+      }
+    ],
+    "proposer_participant_id": "participant:model",
+    "resource_attachment_id": "workspace",
+    "resource_kind": "filesystem",
+    "review_required": true,
+    "schema": "yai.decision_basis.v3",
+    "tenant_id": "tenant:material-qualification"
+  },
+  "decision_digest": "sha256:73ae08275340992a7212e0185ca637784043097ffdad855b443df7fe33c414e2",
+  "decision_id": "decision:73ae08275340992a7212e0185ca63778",
+  "operation_digest": "sha256:75b3f3f65ca8d5bc7e8b66568fe71690cc431e686cf5a1b99d56d89a718ddbff",
+  "operation_id": "operation:75b3f3f65ca8d5bc7e8b66568fe71690",
+  "outcome": "require_review",
+  "reason": "policy_requires_human_review",
+  "schema": "yai.decision.v3"
+}

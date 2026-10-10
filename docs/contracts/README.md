@@ -77,6 +77,39 @@ the published execution operations; a new correlation does not authorize replay.
 
 ## Public projections and privacy
 
+### Delegated Decision explanation
+
+The existing `decision.trajectory.inspect` / `yai.decision_trajectory_inspect_input.v1`
+accepts optional `operation_ref` as an exact association fence. Older omitted
+or null fields remain compatible; no new operation is added (130 descriptors).
+`DecisionTrajectory.decision` now projects `DecisionProjection` and optional
+`DecisionBasis` v1/v2/v3 in Rust and TypeScript. It retains evaluated generation,
+Operation digest/proposer/Resource, effective-policy digest, binding/artifact refs,
+rule contributions, source/fact/location refs, authority/obligation evaluations,
+validity-at-evaluation and optional review-action reference. These are historical
+facts, not today's policy, a Grant, or proof of an applied effect. Legacy absent
+or null basis remains unavailable; `basis_refs: []` alone means neither no policy
+nor ALLOW.
+
+Core permits an author's delegated Work inspection only after exact committed
+Turn/request/selection/invocation/result/Operation lineage and current identity
+and Resource disclosure qualify. SDK performs no authority calculation. Observer
+Participant, original author and Operation proposer/executor remain distinct.
+`unauthorized / decision_not_visible` withholds the read without confirming the
+existence or outcome of a hidden Decision. A disclosed mismatched Operation gives
+`error / decision_operation_mismatch`, with no trajectory data. Lost reads may be
+reobserved; neither refusal nor reconnection permits SEND, Review continuation or
+effect replay. Rust `DecisionInspectInput` can use the existing typed
+`client::Operation` surface; TypeScript remains types-only.
+
+Studio must use exact Case/observer/Decision/Operation identity, render retained
+outcomes `allow`, `deny`, `require_review`, and separately show withheld or absent
+basis. Policy source locations refer to recorded source artifacts, not live paths.
+No private persistence, model-text parsing or executor impersonation is needed.
+Required consumer checks: disclosed delegation, hidden/unrelated observer,
+mismatched association, replaced historical policy and unavailable legacy basis.
+This delivery does not qualify Studio native rendering or generic regeneration.
+
 ### Cross-client execution identity and material provenance
 
 `conversation().discover` projects the existing bounded `execution.list`.

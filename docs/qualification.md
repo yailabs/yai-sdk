@@ -18,6 +18,24 @@ peer-credential queries; full native Host integration remains Linux-only.
 
 ## Case Work projection reconciliation — 2026-10-09
 
+### Delegated Decision policy projection — 2026-10-11
+
+Base `6da0b353a368653fcb2ffcf09f9aa05de4add876`; public inventory stays 130.
+Four independent Rust controls decode an actual controlled public Core v3 Decision
+(`tests/fixtures/delegated-decision-v3.json`), retain exact rule/source references,
+distinguish observer from proposer, reject incomplete typed provenance, and
+preserve legacy omitted/null basis and old/fenced input. TypeScript checks
+additive input and nullable basis; client code does not derive Authority.
+Core separately qualifies delegated disclosure and current-resource negatives.
+This contract proof is not a real model, Studio native or human acceptance result.
+The default sandbox prohibits UDS creation; standalone socket conformance needs
+the ordinary permitted local IPC environment, not a change to SDK semantics.
+
+The [consumer contract](contracts/README.md#delegated-decision-explanation) names
+the exact fields, withheld/mismatch behavior and Studio reproduction requirements.
+No generic regeneration, new transport, operation, credential or authority store
+is introduced.
+
 ### Agentic-loop projection — 2026-10-10
 
 Starting from `34cc6586`, the generated Rust/TypeScript contract adds opt-in

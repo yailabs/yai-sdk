@@ -12,6 +12,14 @@ publication: {html: true, pdf: false, index: true}
 
 [Documentation](README.md)
 
+**Operational Conversation continuation (2026-10-11):** the existing Core
+`YAI.CASE.CAPABILITY.OPERATIONAL.PROJECTION.0` consumes the additive
+[delegated Decision projection](contracts/README.md#delegated-decision-explanation).
+SDK qualification covers typed historical basis, exact optional Operation fence,
+legacy/null compatibility and unchanged 130 descriptors. Core owns observer
+disclosure; Studio native and human acceptance remain separate. No completed
+SDK foundation is reopened and no successor Task is selected.
+
 | Task | State | Exit |
 | --- | --- | --- |
 | PRODUCT.REPOSITORY.BOUNDARY.0 | COMPLETE | Independent MIT client/projection owner; canonical Core mutation/probe projections exclude private persisted state; standalone conformance and final real Core/Studio integration qualified at the bounded Linux local scope. |

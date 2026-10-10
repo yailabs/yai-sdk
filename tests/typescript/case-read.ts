@@ -1,5 +1,18 @@
 // Typed contract scope only: real provider behavior is qualified by YAI.
 import type { CaseReadRequest, CaseReadResult, CaseOperation, CaseWorkStepObservation } from "../../typescript/workflows.js";
+import type { DecisionInspectInput, DecisionTrajectory, DecisionProjection } from "../../typescript/projections.js";
+
+export const legacyDecision: DecisionProjection = { decision_id: "decision:legacy", operation_id: "operation:legacy",
+  outcome: "deny", reason: "legacy basis unavailable", basis_refs: [], decision_basis: null };
+export const fencedDecision: DecisionInspectInput = { case_ref: "case:exact", participant_ref: "participant:author",
+  decision_ref: "decision:exact", operation_ref: "operation:exact" };
+export function historicalRuleSources(trajectory: DecisionTrajectory): string[] | undefined {
+  const basis = trajectory.decision.decision_basis;
+  // Absence is unavailable, not a current policy substituted by the client.
+  return basis?.contributing_provenance.flatMap(rule => [rule.source_id, ...rule.fact_refs, ...rule.source_locations]);
+}
+// @ts-expect-error A withheld Decision is not an ALLOW or a invented outcome value.
+export const inventedDecision: DecisionProjection = { ...legacyDecision, outcome: "withheld_allow" };
 
 export const query: CaseReadRequest = { read: "knowledge_search", query: "checkpoint", limit: 4 };
 export const recall: CaseReadRequest = { read: "recall", query: "previous decision", limit: 4 };
