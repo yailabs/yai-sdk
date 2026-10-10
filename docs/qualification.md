@@ -18,6 +18,24 @@ peer-credential queries; full native Host integration remains Linux-only.
 
 ## Case Work projection reconciliation — 2026-10-09
 
+### Agentic-loop projection — 2026-10-10
+
+Starting from `34cc6586`, the generated Rust/TypeScript contract adds opt-in
+filesystem readback verification, derived Work progress, exact required Recall
+anchors and typed budget insufficiency. `make check` passes with local TCP/UDS
+conformance, exhaustive TypeScript consumers and omitted-field roundtrips.
+The initial sandbox run could not bind local peers; it is not qualifying
+evidence. The subsequent unrestricted local-fixture gate passes independently.
+Inventory remains 130; generated workflows contain 261 types / 58 operations.
+
+These are representation/compatibility tests, not Core postcondition enforcement,
+real-model tool choice, operator acceptance or Studio integration. New opt-in
+v9 Work/v2 reads require the compatible client; old unanchored reads and omitted
+Work fields preserve their encoding. Core separately qualifies controller and
+installed product behavior. The SDK has no CLI: the Core owner supplies official
+`yai case conversation send ... --work --verify-effects` and observation checks
+after its corresponding publication and supported installation.
+
 ### Cross-client identity / material extension
 
 The subsequent isolated slice starts from published `8713c440`. It adds optional

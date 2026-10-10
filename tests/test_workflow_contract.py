@@ -21,6 +21,15 @@ class ContractTests(unittest.TestCase):
         for path, result in zip(('src/workflows.rs', 'typescript/workflows.ts'), outputs):
             self.assertEqual((ROOT / path).read_text(), result)
 
+    def test_case_work_verification_and_required_recall_are_owned_facts(self):
+        rust, ts = generator.render(self.contract)
+        self.assertIn('pub verification: Option<CaseWorkVerification>', rust)
+        self.assertIn('pub progress: Option<CaseWorkProgress>', rust)
+        self.assertIn('required_refs?: Array<string>', ts)
+        self.assertIn('"recall_insufficient"', ts)
+        self.assertIn('pending_effect_refs: Array<string>', ts)
+        self.assertIn('goal_satisfaction: string', ts)
+
     def test_unknown_type_refuses(self):
         self.contract['types']['CaseRefInput']['case_ref'] = 'UnknownPrivateState'
         with self.assertRaisesRegex(ValueError, 'unknown public type'):

@@ -649,6 +649,16 @@ export interface CaseWorkLimits {
   effects: number;
   max_input_units: number;
   max_output_tokens?: number;
+  verification?: CaseWorkVerification;
+}
+export type CaseWorkVerification = "filesystem_readback";
+export interface CaseWorkProgress {
+  goal_turn_ref: string;
+  verification?: CaseWorkVerification;
+  pending_effect_refs: Array<string>;
+  verified_effect_refs: Array<string>;
+  insufficient_evidence_refs: Array<string>;
+  goal_satisfaction: string;
 }
 export interface TextConversationInput {
   case_ref: string;
@@ -691,6 +701,7 @@ export interface CaseWorkObservation {
   posture: CaseWorkPosture;
   answer?: string | null;
   steps: Array<CaseWorkStepObservation>;
+  progress?: CaseWorkProgress;
 }
 export interface AttemptObservation {
   outcome_id?: string;
@@ -1195,8 +1206,8 @@ export interface CaseListInput {
   tenant_id?: string;
 }
 export type CaseReadKind = "knowledge_search" | "recall" | "workflow_inspect";
-export type CaseReadRequest = { read: "knowledge_search"; query: string; limit: number } | { read: "recall"; query: string; limit: number } | { read: "workflow_inspect" };
-export type CaseReadResult = { kind: "knowledge"; view: KnowledgeView; hits: Array<KnowledgeHit> } | { kind: "recall"; trace: CanonicalRecallTrace } | { kind: "workflow"; definition: CaseWorkflowDefinition; resolution: CaseWorkflowResolution };
+export type CaseReadRequest = { read: "knowledge_search"; query: string; limit: number } | { read: "recall"; query: string; limit: number; required_refs?: Array<string> } | { read: "workflow_inspect" };
+export type CaseReadResult = { kind: "knowledge"; view: KnowledgeView; hits: Array<KnowledgeHit> } | { kind: "recall"; trace: CanonicalRecallTrace } | { kind: "recall_insufficient"; request: RecallQuery; reason: string } | { kind: "workflow"; definition: CaseWorkflowDefinition; resolution: CaseWorkflowResolution };
 export interface CaseReadObservation {
   schema: string;
   observation_id: string;

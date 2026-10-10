@@ -752,7 +752,19 @@
       "operations": "u16",
       "effects": "u16",
       "max_input_units": "usize",
-      "max_output_tokens": "optional:u32"
+      "max_output_tokens": "optional:u32",
+      "verification": "optional:CaseWorkVerification"
+    },
+    "CaseWorkVerification": {
+      "$enum": ["filesystem_readback"]
+    },
+    "CaseWorkProgress": {
+      "goal_turn_ref": "string",
+      "verification": "optional:CaseWorkVerification",
+      "pending_effect_refs": "array:string",
+      "verified_effect_refs": "array:string",
+      "insufficient_evidence_refs": "array:string",
+      "goal_satisfaction": "string"
     },
     "TextConversationInput": {
       "case_ref": "string",
@@ -817,7 +829,8 @@
       "observed_generation": "u64",
       "posture": "CaseWorkPosture",
       "answer": "nullable:string",
-      "steps": "array:CaseWorkStepObservation"
+      "steps": "array:CaseWorkStepObservation",
+      "progress": "optional:CaseWorkProgress"
     },
     "AttemptObservation": {
       "outcome_id": "optional:string",
@@ -1500,7 +1513,8 @@
           },
           "recall": {
             "query": "string",
-            "limit": "usize"
+            "limit": "usize",
+            "required_refs": "optional:array:string"
           },
           "workflow_inspect": {}
         }
@@ -1516,6 +1530,10 @@
           },
           "recall": {
             "trace": "CanonicalRecallTrace"
+          },
+          "recall_insufficient": {
+            "request": "RecallQuery",
+            "reason": "string"
           },
           "workflow": {
             "definition": "CaseWorkflowDefinition",

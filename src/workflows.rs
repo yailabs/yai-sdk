@@ -980,6 +980,24 @@ pub struct CaseWorkLimits {
     pub max_input_units: usize,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_output_tokens: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub verification: Option<CaseWorkVerification>,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CaseWorkVerification {
+    #[default]
+    #[serde(rename = "filesystem_readback")]
+    FilesystemReadback,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct CaseWorkProgress {
+    pub goal_turn_ref: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub verification: Option<CaseWorkVerification>,
+    pub pending_effect_refs: Vec<String>,
+    pub verified_effect_refs: Vec<String>,
+    pub insufficient_evidence_refs: Vec<String>,
+    pub goal_satisfaction: String,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct TextConversationInput {
@@ -1070,6 +1088,8 @@ pub struct CaseWorkObservation {
     pub posture: CaseWorkPosture,
     pub answer: Option<String>,
     pub steps: Vec<CaseWorkStepObservation>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub progress: Option<CaseWorkProgress>,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct AttemptObservation {
@@ -2017,6 +2037,8 @@ pub enum CaseReadRequest {
     Recall {
         query: String,
         limit: usize,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        required_refs: Option<Vec<String>>,
     },
     #[serde(rename = "workflow_inspect")]
     WorkflowInspect {
@@ -2034,6 +2056,11 @@ pub enum CaseReadResult {
     #[serde(rename = "recall")]
     Recall {
         trace: CanonicalRecallTrace,
+    },
+    #[serde(rename = "recall_insufficient")]
+    RecallInsufficient {
+        request: RecallQuery,
+        reason: String,
     },
     #[serde(rename = "workflow")]
     Workflow {

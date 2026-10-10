@@ -3,6 +3,7 @@ import type { CaseReadRequest, CaseReadResult, CaseOperation, CaseWorkStepObserv
 
 export const query: CaseReadRequest = { read: "knowledge_search", query: "checkpoint", limit: 4 };
 export const recall: CaseReadRequest = { read: "recall", query: "previous decision", limit: 4 };
+export const exactRecall: CaseReadRequest = { ...recall, required_refs: ["decision:exact"] };
 export const workflow: CaseReadRequest = { read: "workflow_inspect" };
 // @ts-expect-error Caller cannot add another Case to a qualified read.
 export const crossCase: CaseReadRequest = { read: "knowledge_search", query: "private", limit: 4, case_id: "case:foreign" };
@@ -12,6 +13,7 @@ export const mismatched: CaseReadRequest = { read: "workflow_inspect", query: "i
 export function sourceReferences(result: CaseReadResult): string[] {
   if (result.kind === "knowledge") return result.view.sources.map(source => source.source_id ?? source.id);
   if (result.kind === "recall") return result.trace.source_closure.map(source => source.source_ref);
+  if (result.kind === "recall_insufficient") return []; // Required anchors are NOT recovered evidence.
   return [result.definition.workflow_definition_id, result.resolution.workflow_binding_id];
 }
 export function proposedFile(operation: CaseOperation): string | undefined {
