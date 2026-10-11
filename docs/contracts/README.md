@@ -166,6 +166,17 @@ postures; an indeterminate delivery is never permission to dispatch again.
 These contracts expose YAI meaning and do not grant the executor Participant
 the submitting Principal's authority.
 
+The TypeScript `@yai/sdk/projections` surface uses the generated
+`ConversationIntent`, `ConversationPosture` and `CaseWorkObservation` owners
+directly. `ConversationSendInput.intent` therefore carries the same optional
+executor, Workflow execution and finite limits as the Rust workflows;
+`ConversationExecution.work` retains exact ordered step lineage. An ordinary
+SEND with no `work_limits` stays an ordinary SEND. Explicit continuation uses
+`ConversationWorkResumeInput.observed_generation`, not a new submission ID.
+These are compatible projections of the existing operations, not streaming or
+new client-side execution semantics. A primary provider result, a Work answer
+and completion of an authorized effect must not be conflated.
+
 Case events carry exact Case, generation, sequence, cursor and affected-view
 facts. They invalidate cached views; they are not replacement canonical state.
 Resynchronize via supported reads after reconnect, missing continuity or Host

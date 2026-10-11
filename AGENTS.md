@@ -1,5 +1,12 @@
 # SDK ownership
 
+## REQUIRED: MAIN CHECKOUT ONLY
+
+**Operator instruction (2026-10-11): work in this repository's existing `main`
+checkout. Do not create a worktree or alternate delivery branch unless the
+operator explicitly asks for one. Reconcile existing work, verify, commit and
+publish on `main`; preserve concurrent edits and never force-push.**
+
 This public MIT repository owns supported client contracts and transport, not
 YAI semantics, authority, persistence, scheduler or server implementation. Private
 Core and Studio repositories consume compatible contracts, never shared HEADs.
