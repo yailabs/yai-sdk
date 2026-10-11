@@ -6,8 +6,7 @@
 checkout. Do not create a worktree or alternate delivery branch unless the
 operator explicitly asks for one. If `main` is occupied by another agent, stop
 and wait; do not bypass ownership with a branch or worktree. Reconcile existing
-work, verify, commit and
-publish on `main`; preserve concurrent edits and never force-push.**
+work, verify, commit and publish on `main`; preserve concurrent edits and never force-push.**
 
 This public MIT repository owns supported client contracts and transport, not
 YAI semantics, authority, persistence, scheduler or server implementation. Private

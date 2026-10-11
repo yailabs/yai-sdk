@@ -36,7 +36,12 @@ reconciles the public surfaces. This is not installed Core qualification.
 `make check` passes on the consolidated source: workflow generation (264 types /
 58 generated operations), Rust workspace/all-targets, strict TypeScript consumers,
 local TCP/UDS fixtures, package identity/legal and 14 documentation owners. The
-Application inventory remains 130. Log: `/tmp/sdk-main-full-check.log`.
+Application inventory remains 130. The last transferred progressive TypeScript fixture initially omitted required
+`memory_search_mode`; it now explicitly supplies `standard` without relaxing the
+contract. Final log: `/tmp/sdk-main-final-check.log`. All delivery branch histories
+are reachable from main; retired worktree files are preserved outside Git at
+`/home/mothx/.cache/tmp/sdk-main-consolidation-20261011/retired-sdk-files`.
+Only the primary main checkout and main branch remain; the same applies remotely.
 No real model, shared Host replacement, Studio automatic consumer acceptance or
 operator acceptance is inferred from this SDK representation. Core owns compatible
 Host rejection/dispatch/recovery qualification. The public client must never silently

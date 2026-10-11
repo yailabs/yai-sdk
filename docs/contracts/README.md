@@ -336,4 +336,3 @@ Author/executor/Submission/Turn/request and existing Work/Review/recovery
 remain distinct. Configuration/native compatibility blockers are received
 Core refusals, never permission to SEND again or downgrade automatically.
 The public inventory remains 130; no additional orchestrator or operation.
-
