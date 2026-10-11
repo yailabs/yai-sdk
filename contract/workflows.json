@@ -747,6 +747,15 @@
       "work_limits": "optional:CaseWorkLimits",
       "workflow_execution_id": "optional:string"
     },
+    "ConversationExecutionMode": { "$enum": ["automatic"] },
+    "AutomaticConversationObservation": {
+      "binding_ref": "string",
+      "limits": "CaseWorkLimits",
+      "consequence": "AutomaticConversationConsequence"
+    },
+    "AutomaticConversationConsequence": {
+      "$enum": ["answer_only", "work_observed", "effects_pending", "effects_verified"]
+    },
     "CaseWorkLimits": {
       "invocations": "u16",
       "operations": "u16",
@@ -767,6 +776,7 @@
       "goal_satisfaction": "string"
     },
     "TextConversationInput": {
+      "execution": "optional:ConversationExecutionMode",
       "case_ref": "string",
       "participant_ref": "string",
       "thread_ref": "string",
@@ -857,6 +867,7 @@
       "primary_result": "nullable:ConversationPrimaryResult",
       "attempt_outcomes": "array:AttemptObservation",
       "work": "optional:CaseWorkObservation",
+      "automatic_execution": "optional:AutomaticConversationObservation",
       "prepared_context": "optional:PreparedContextObservation"
     },
     "ConversationSubmissionIdentityPosture": {
@@ -896,6 +907,7 @@
     "ExecutionDiscovery": {"schema":"string", "case_ref":"string", "participant_ref":"string",
       "generation":"u64", "entries":"array:ExecutionDiscoveryEntry", "limit":"usize", "scope":"string"},
     "ProgressiveConversationInput": {
+      "execution": "optional:ConversationExecutionMode",
       "case_ref": "string",
       "participant_ref": "string",
       "thread_ref": "string",
@@ -974,6 +986,7 @@
       ]
     },
     "TaskConversationInput": {
+      "execution": "optional:ConversationExecutionMode",
       "case_ref": "string",
       "participant_ref": "string",
       "thread_ref": "string",

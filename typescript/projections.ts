@@ -269,11 +269,12 @@ export type PolicyLifecycleAction = "validate" | "publish" | "retire" | "revoke"
 export interface PolicyLifecycleInput { artifact_ref: string; reason: string }
 
 export interface ConversationSendInput {
+  execution?: import("./workflows.js").ConversationExecutionMode;
   case_ref: string; participant_ref: string; thread_ref: string;
   submission_ref: string; expected_generation: number;
   parts: Array<{ modality: "text"; media_type: "text/plain"; bytes: number[] }>;
   memory_search_mode?: "standard" | "fast";
-  /** Opt-in real provider streaming, never a canonical partial result. */
+  /** Opt-in provisional delivery; canonical completion remains separate. */
   progressive_output?: boolean;
   intent?: ConversationIntent;
 }
@@ -286,6 +287,7 @@ export interface ConversationExecution {
   primary_result?: { result_id: string; invocation_id: string; output: string; selection: { selected_target_id: string } } | null;
   attempt_outcomes: ProviderAttemptObservation[];
   work?: CaseWorkObservation | null;
+  automatic_execution?: import("./workflows.js").AutomaticConversationObservation;
 }
 
 export interface ProviderAttemptObservation {
@@ -430,11 +432,12 @@ export interface ProviderPosture {
 export interface SemanticEvidence { evidence_id: string; target_id: string; capability: string; posture: string; suite_id: string; run_id: string }
 
 export interface CognitiveBinding { binding_id: string; participant_id: string; role: string; capability: string; target_id: string; semantic_evidence_id: string;
+  conversation_limits?: import("./workflows.js").CaseWorkLimits;
   target_policy?: { kind: "ordered_eligible"; alternatives: Array<{ target_id: string; target_digest: string; semantic_evidence_id: string }> } }
 
 export interface SuitabilityInput { target_ref: string; capability: "primary_conversation"; suite_ref: string; run_ref: string; evidence_refs: string[] }
 
-export interface CognitiveBindingInput { case_ref: string; participant_ref: string; role: "primary"; capability: "primary_conversation"; candidates: Array<{ target_ref: string; semantic_evidence_ref: string }>; replace: boolean }
+export interface CognitiveBindingInput { case_ref: string; participant_ref: string; role: "primary"; capability: "primary_conversation"; candidates: Array<{ target_ref: string; semantic_evidence_ref: string }>; replace: boolean; conversation_limits?: import("./workflows.js").CaseWorkLimits }
 
 export interface ProviderConnectionModelsInput { tenant_id: string; endpoint: string; locality: ProviderRegistration["locality"]; credential_ref: string }
 

@@ -16,6 +16,32 @@ The v0.1.0 SDK is a supported client contract, not an implementation of Core
 semantics. This record qualifies Linux same-user local IPC and bounded macOS
 peer-credential queries; full native Host integration remains Linux-only.
 
+## Main consolidation and automatic Conversation — 2026-10-11
+
+Published base `6beb2224`; the stale main checkout's pending work is retained in
+`5c5075e` and reconciled with published history. Earlier 118/129-operation records
+below remain historical; the actual Application inventory stays **130**.
+
+The in-progress Unified SDK projection was transferred to main by operator request.
+Generated text/progressive inputs carry optional top-level `execution: automatic`;
+legacy omission remains unchanged. Observation carries optional exact binding,
+limits and consequence. TypeScript hand projections reuse the generated owners.
+Rust and TypeScript negative controls reject invented modes/consequences.
+
+An initial transfer caught a producer edit in progress: the input had moved from
+`intent.execution` to top-level `execution` while generated Rust was still stale.
+The initial Rust run failed; regeneration from the canonical workflow contract
+reconciles the public surfaces. This is not installed Core qualification.
+
+`make check` passes on the consolidated source: workflow generation (264 types /
+58 generated operations), Rust workspace/all-targets, strict TypeScript consumers,
+local TCP/UDS fixtures, package identity/legal and 14 documentation owners. The
+Application inventory remains 130. Log: `/tmp/sdk-main-full-check.log`.
+No real model, shared Host replacement, Studio automatic consumer acceptance or
+operator acceptance is inferred from this SDK representation. Core owns compatible
+Host rejection/dispatch/recovery qualification. The public client must never silently
+downgrade an automatic request to legacy SEND.
+
 ## Case Work TypeScript projection — 2026-10-09
 
 Historical pre-reconciliation record; superseded by the published projection below.

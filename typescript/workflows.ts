@@ -643,6 +643,13 @@ export interface ConversationIntent {
   work_limits?: CaseWorkLimits;
   workflow_execution_id?: string;
 }
+export type ConversationExecutionMode = "automatic";
+export interface AutomaticConversationObservation {
+  binding_ref: string;
+  limits: CaseWorkLimits;
+  consequence: AutomaticConversationConsequence;
+}
+export type AutomaticConversationConsequence = "answer_only" | "work_observed" | "effects_pending" | "effects_verified";
 export interface CaseWorkLimits {
   invocations: number;
   operations: number;
@@ -661,6 +668,7 @@ export interface CaseWorkProgress {
   goal_satisfaction: string;
 }
 export interface TextConversationInput {
+  execution?: ConversationExecutionMode;
   case_ref: string;
   participant_ref: string;
   thread_ref: string;
@@ -728,6 +736,7 @@ export interface ConversationObservation {
   primary_result?: ConversationPrimaryResult | null;
   attempt_outcomes: Array<AttemptObservation>;
   work?: CaseWorkObservation;
+  automatic_execution?: AutomaticConversationObservation;
   prepared_context?: PreparedContextObservation;
 }
 export type ConversationSubmissionIdentityPosture = "unavailable" | "retained" | "caller_verified_legacy";
@@ -769,6 +778,7 @@ export interface ExecutionDiscovery {
   scope: string;
 }
 export interface ProgressiveConversationInput {
+  execution?: ConversationExecutionMode;
   case_ref: string;
   participant_ref: string;
   thread_ref: string;
@@ -819,6 +829,7 @@ export interface ConversationProgressObservation {
 export type MemorySearchMode = "standard" | "fast";
 export type ContextSelectionSource = "deterministic" | "system_one";
 export interface TaskConversationInput {
+  execution?: ConversationExecutionMode;
   case_ref: string;
   participant_ref: string;
   thread_ref: string;

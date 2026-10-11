@@ -91,6 +91,17 @@ No release qualification is implied. Core semantics and Studio product tasks rem
 
 ## Active downstream product delivery
 
+### Main consolidation and automatic Conversation representation — 2026-10-11
+
+Operator instruction: one SDK checkout and one branch, `main`. Existing delivery
+history and unique qualification records are reconciled here. Agents must stop and
+wait when main is occupied; no branch/worktree bypass (see AGENTS.md).
+
+Automatic Conversation adds typed opt-in input and observed consequences within
+the existing operational Task. Representation/compatibility checks are SDK scope.
+Core semantics, compatible installed Host, Studio adoption and human acceptance
+remain separate open gates. [Consumer boundary](contracts/README.md#automatic-conversation-consumer-boundary).
+
 ### Operational Conversation identity and material continuation
 
 The existing Core-owned progressive-delivery and operational-projection Tasks

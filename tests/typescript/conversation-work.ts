@@ -143,3 +143,15 @@ export const independentSource: MaterialSourceRelationship = {
 };
 // @ts-expect-error a matching filename cannot attest a Source/Resource relationship.
 export const fakeSourcePosture: MaterialSourceRelationship["posture"] = "same_filename";
+
+// Automatic routing belongs to Core, with no client-assigned executor or budgets.
+export const automatic: ConversationSendInput = {
+  ...ordinary, submission_ref: "send:automatic", intent: undefined, execution: "automatic",
+};
+export const automaticObservation: NonNullable<ConversationExecution["automatic_execution"]> = {
+  binding_ref: "binding:exact", limits, consequence: "answer_only",
+};
+// @ts-expect-error the public request cannot select an unlimited execution mode.
+export const unlimitedExecution: ConversationSendInput["execution"] = "unlimited";
+// @ts-expect-error model narration is not an attested consequence.
+export const inventedConsequence: typeof automaticObservation.consequence = "model_says_done";

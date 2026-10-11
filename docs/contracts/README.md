@@ -316,3 +316,24 @@ SDK projects supported contracts and transport; it does not infer admission, fil
 This obligation does not block independent releases on Studio acceptance or duplicate
 Studio documentation. Independent open-source consumers need only the public contracts and local handoff facts; the Studio link is integration guidance, not a private semantic dependency.
 No new feature, runtime qualification or acceptance claim follows from this method.
+
+### Automatic Conversation consumer boundary
+
+The existing `conversation.send` envelope accepts optional top-level
+`execution: "automatic"` in Text, Task and Progressive inputs. It is not an
+Answer/Work UI mode. Core resolves the exact executor and immutable limits
+from an owner-admitted primary cognitive binding's `conversation_limits`.
+Clients must not invent defaults, a Participant or permissions. Older closed
+Core envelopes reject this field: never remove it and retry as text-only.
+Omitted inputs and historical explicit `intent.work_limits` keep their meaning.
+
+The optional observation `automatic_execution` names that exact binding and
+limits, plus `answer_only`, `work_observed`, `effects_pending` or
+`effects_verified`. These are recorded consequences, not a universal goal
+oracle. `answer_only` is not an Operation, a Policy refusal or a Receipt;
+Core projects `provider_result_recorded` rather than completed action.
+Author/executor/Submission/Turn/request and existing Work/Review/recovery
+remain distinct. Configuration/native compatibility blockers are received
+Core refusals, never permission to SEND again or downgrade automatically.
+The public inventory remains 130; no additional orchestrator or operation.
+

@@ -972,6 +972,30 @@ pub struct ConversationIntent {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub workflow_execution_id: Option<String>,
 }
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ConversationExecutionMode {
+    #[default]
+    #[serde(rename = "automatic")]
+    Automatic,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct AutomaticConversationObservation {
+    pub binding_ref: String,
+    pub limits: CaseWorkLimits,
+    pub consequence: AutomaticConversationConsequence,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum AutomaticConversationConsequence {
+    #[default]
+    #[serde(rename = "answer_only")]
+    AnswerOnly,
+    #[serde(rename = "work_observed")]
+    WorkObserved,
+    #[serde(rename = "effects_pending")]
+    EffectsPending,
+    #[serde(rename = "effects_verified")]
+    EffectsVerified,
+}
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct CaseWorkLimits {
     pub invocations: u16,
@@ -1001,6 +1025,8 @@ pub struct CaseWorkProgress {
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct TextConversationInput {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub execution: Option<ConversationExecutionMode>,
     pub case_ref: String,
     pub participant_ref: String,
     pub thread_ref: String,
@@ -1131,6 +1157,8 @@ pub struct ConversationObservation {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub work: Option<CaseWorkObservation>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub automatic_execution: Option<AutomaticConversationObservation>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prepared_context: Option<PreparedContextObservation>,
 }
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -1228,6 +1256,8 @@ pub struct ExecutionDiscovery {
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ProgressiveConversationInput {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub execution: Option<ConversationExecutionMode>,
     pub case_ref: String,
     pub participant_ref: String,
     pub thread_ref: String,
@@ -1332,6 +1362,8 @@ pub enum ContextSelectionSource {
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TaskConversationInput {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub execution: Option<ConversationExecutionMode>,
     pub case_ref: String,
     pub participant_ref: String,
     pub thread_ref: String,
