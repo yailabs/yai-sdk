@@ -1,8 +1,11 @@
-// Public client conformance, not a Core execution or real-provider proof.
+// Public representation only: no Core admission, provider or Studio proof.
 import type {
   CaseWorkLimits, CaseWorkObservation, ConversationExecution, ConversationIntent,
   ConversationPosture, ConversationSendInput, ConversationSubmission,
   InspectedConversationExecution, ConversationWorkResumeInput,
+  ConversationObservation, ConversationProgressObservation,
+  ConversationIdentity, ConversationRequestGetInput, ExecutionDiscoveryInput,
+  MaterialInspectInput, MaterialSourceRelationship,
 } from "../../typescript/projections.js";
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends
@@ -12,8 +15,9 @@ type Assert<T extends true> = T;
 export type IntentHasOneOwner = Assert<Equal<ConversationSendInput["intent"], ConversationIntent | undefined>>;
 export type PostureHasOneOwner = Assert<Equal<ConversationExecution["posture"], ConversationPosture>>;
 export type WorkHasOneOwner = Assert<Equal<ConversationExecution["work"], CaseWorkObservation | null | undefined>>;
+export type ProgressOptInPreserved = Assert<Equal<ConversationSendInput["progressive_output"], boolean | undefined>>;
 
-// Old ordinary SEND remains valid, with no implicit work or executor identity.
+// Ordinary SEND stays ordinary. Focused context is not a Work preset.
 export const ordinary: ConversationSendInput = {
   case_ref: "case:isolated", participant_ref: "participant:author",
   thread_ref: "thread:isolated", submission_ref: "send:ordinary",
@@ -26,15 +30,17 @@ export const limits: CaseWorkLimits = {
   invocations: 2, operations: 1, effects: 0, max_input_units: 8192,
 };
 
-// Work is explicit, bounded, and may distinguish author from executor.
+// Explicit intent shares the generated owner, including author/executor and
+// Workflow binding. Core, not this type fixture, decides compatibility.
 export const work: ConversationSendInput = {
-  ...ordinary, submission_ref: "send:work", memory_search_mode: "fast",
+  ...ordinary, submission_ref: "send:work", memory_search_mode: "standard",
   intent: {
-    context_depth: "focused", executor_participant_id: "participant:model",
+    executor_participant_id: "participant:model",
     work_limits: { ...limits, max_output_tokens: 96 },
     workflow_execution_id: "workflow-execution:admitted",
   },
 };
+export const progressiveWork: ConversationSendInput = { ...work, progressive_output: true };
 
 export const review: ConversationSubmission = {
   created: true,
@@ -60,24 +66,80 @@ export const exhausted: ConversationExecution = {
   work: { ...review.execution.work!, posture: "budget_exhausted" },
 };
 
+// Exact Core absence is null; older omitted fields remain compatible.
+export const noAnswer: CaseWorkObservation = {
+  ...review.execution.work!, answer: null,
+  steps: [{ ordinal: 1, source_ref: "step:pending", selection_ref: "selection:pending",
+    target_ref: "target:exact", invocation_ref: null, provider_result_ref: null,
+    operation_ref: null, outcome_refs: [] }],
+};
+
+export const admittedWithoutResult: ConversationObservation = {
+  case_ref: "case:isolated", participant_ref: "participant:author",
+  submission_ref: "send:pending", turn_ref: "turn:pending", request_ref: "request:pending",
+  observed_generation: 10, posture: "admitted", invocation_refs: [],
+  primary_result: null, attempt_outcomes: [],
+};
+
 export const uncertain: InspectedConversationExecution = {
   ...review.execution, posture: "delivery_indeterminate", primary_result: null,
   work: { ...review.execution.work!, posture: "delivery_indeterminate" },
   prepared_context: null,
 };
 
-// Exact continuation is not a second SEND. Core still decides resumability.
+// Provisional fragments are not a Work answer or a committed model result.
+export type CanonicalProgressExecution = Assert<Equal<ConversationProgressObservation["execution"], ConversationObservation>>;
+export const partial: ConversationProgressObservation = {
+  schema: "yai.conversation_progress.v1", case_ref: "case:isolated",
+  participant_ref: "participant:author", executor_participant_ref: "participant:model",
+  thread_ref: "thread:isolated", turn_ref: "turn:pending", request_ref: "request:pending",
+  availability: "live", stream_ref: "stream:exact",
+  oldest_sequence: 1, last_sequence: 1, history_gap: false,
+  events: [], partial_output: "provisional", partial_output_limited: false,
+  execution: admittedWithoutResult,
+  current_invocation_ref: null, current_target_ref: null,
+};
+
+// Continuation retains the original submission and an exact generation fence.
 export const resume: ConversationWorkResumeInput = {
   case_ref: "case:isolated", participant_ref: "participant:author",
   submission_ref: "send:work", observed_generation: 9,
 };
 
-// Typed clients may not drop a required bound or add client-owned authority.
-// @ts-expect-error effects is a mandatory work bound, never an assumed zero.
+// @ts-expect-error mandatory bounds are not invented by the public client.
 export const incompleteLimits: CaseWorkLimits = { invocations: 2, operations: 1, max_input_units: 8192 };
 export const escalated: ConversationIntent = {
-  // @ts-expect-error an intent does not contain a permission or Grant.
+  // @ts-expect-error assignment or intent is not a permission or Grant.
   bypass_authority: true,
 };
-// @ts-expect-error a model assertion is not a supported execution posture.
+// @ts-expect-error model assertions do not create canonical completion.
 export const fabricatedSuccess: ConversationPosture = "model_says_done";
+
+// A new independent observer knows a canonical request, not client A's journal.
+export const byRequest: ConversationRequestGetInput = {
+  case_ref: "case:isolated", participant_ref: "participant:author",
+  execution: { domain: "cognitive_composition", request_ref: "request:exact" },
+  include_context: false,
+};
+export const discovery: ExecutionDiscoveryInput = {
+  case_ref: "case:isolated", participant_ref: "participant:author", limit: 16,
+};
+export const retainedIdentity: ConversationIdentity = {
+  original_submission_ref: "send:work", submission_posture: "retained",
+  author_participant_ref: "participant:author", executor_participant_ref: "participant:model",
+  thread_ref: "thread:isolated",
+};
+export const legacyIdentity: ConversationIdentity = {
+  ...retainedIdentity, original_submission_ref: null, submission_posture: "unavailable",
+};
+export const material: MaterialInspectInput = {
+  case_ref: "case:isolated", participant_ref: "participant:author", operation_ref: "operation:exact",
+  source_ref: "source:independent",
+};
+export const independentSource: MaterialSourceRelationship = {
+  source_ref: "source:independent", revision_ref: null, material_revision_ref: null,
+  source_resource_ref: null, source_configuration_digest: null,
+  posture: "unverified", reason: "same name alone has no identity basis",
+};
+// @ts-expect-error a matching filename cannot attest a Source/Resource relationship.
+export const fakeSourcePosture: MaterialSourceRelationship["posture"] = "same_filename";

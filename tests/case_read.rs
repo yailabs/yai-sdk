@@ -14,6 +14,21 @@ fn case_read_payload_is_closed_and_variant_specific() {
 }
 
 #[test]
+fn historical_work_and_recall_omit_new_opt_in_fields() {
+    use yai_sdk::workflows::{CaseWorkLimits, CaseWorkVerification};
+    let old = serde_json::json!({"invocations":3,"operations":2,"effects":1,"max_input_units":8192});
+    let mut limits: CaseWorkLimits = serde_json::from_value(old.clone()).unwrap();
+    assert_eq!(serde_json::to_value(&limits).unwrap(), old);
+    limits.verification = Some(CaseWorkVerification::FilesystemReadback);
+    assert_eq!(serde_json::to_value(&limits).unwrap()["verification"], "filesystem_readback");
+    let old_read = serde_json::json!({"read":"recall","query":"previous decision","limit":4});
+    let read: CaseReadRequest = serde_json::from_value(old_read.clone()).unwrap();
+    assert_eq!(serde_json::to_value(&read).unwrap(), old_read);
+    let exact: CaseReadRequest = serde_json::from_value(serde_json::json!({"read":"recall","query":"previous decision","limit":4,"required_refs":["decision:exact"]})).unwrap();
+    assert_eq!(serde_json::to_value(exact).unwrap()["required_refs"][0], "decision:exact");
+}
+
+#[test]
 fn exact_operation_is_a_proposal_with_typed_origin() {
     let value = serde_json::json!({"schema":"yai.operation.v1","operation_id":"operation:proposed","operation_digest":"sha256:exact",
       "case_id":"case:isolated","participant_id":"participant:model","scope":{"case_id":"case:isolated","participant_refs":["participant:model"],"resource_refs":["resource:file"],"policy_refs":[]},

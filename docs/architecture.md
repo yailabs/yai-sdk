@@ -18,6 +18,25 @@ projections, compatibility and conformance; Studio owns presentation and local
 UI state. This repository is independently MIT licensed; no private repository
 history or semantic implementation is copied.
 
+## Bounded Work verification and exact Recall anchors
+
+`CaseWorkLimits.verification = filesystem_readback` is an optional immutable
+Core intent. The SDK neither checks files nor decides goal satisfaction.
+`CaseWorkObservation.progress` projects the original goal Turn, retained
+pending/verified effect references and insufficient required evidence. Its
+`goal_satisfaction = not_established` must not be rendered as task success.
+A completed answer is not a universal goal oracle; Core owns the selected
+postcondition gate. Historical omitted fields retain their exact encoding.
+
+Native `CaseReadRequest.recall.required_refs` optionally names exact disclosed
+anchors. A v2 read observation may contain `recall_insufficient` with the exact
+`RecallQuery` and budget refusal reason; it contains no recovered evidence.
+Clients must handle this variant explicitly and not display its required
+references as retrieved Sources. Existing unanchored reads remain v1.
+This is an opt-in contract extension, not an SDK Recall implementation or
+permission expansion. Consumers of the new v9 Work/v2 read contracts need this
+compatible projection; no new Application operation is introduced (130 remain).
+
 The Cargo workspace contains the `yai-sdk` Application client and a `yvex-sdk`
 0.1 compatibility facade. Canonical `yvex-sdk` 0.2 lives in YVEX's independent
 `sdk/rust` workspace and owns its public client implementation, transport and

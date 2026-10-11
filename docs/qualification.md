@@ -18,6 +18,8 @@ peer-credential queries; full native Host integration remains Linux-only.
 
 ## Case Work TypeScript projection — 2026-10-09
 
+Historical pre-reconciliation record; superseded by the published projection below.
+
 Starting SDK `8ef877e6ed4ea288627ed25179e881e6e648d4f5`, against published
 Core `3802e96edb3a477b4f49c0b34df4f6c684824232`, this slice aligns
 `@yai/sdk/projections` with the existing generated Case Work contract. It
@@ -43,6 +45,130 @@ qualified context projection. This SDK-only change does not add CLI Work flags.
 The current CLI cannot author the complete bounded Work intent through that
 command yet; Core owns closing that product-surface gap. Never substitute a new
 SEND for observation or explicit resumability, and never replay uncertain Work.
+
+## Case Work projection reconciliation — 2026-10-09
+
+### Delegated Decision policy projection — 2026-10-11
+
+Base `6da0b353a368653fcb2ffcf09f9aa05de4add876`; public inventory stays 130.
+Four independent Rust controls decode an actual controlled public Core v3 Decision
+(`tests/fixtures/delegated-decision-v3.json`), retain exact rule/source references,
+distinguish observer from proposer, reject incomplete typed provenance, and
+preserve legacy omitted/null basis and old/fenced input. TypeScript checks
+additive input and nullable basis; client code does not derive Authority.
+Core separately qualifies delegated disclosure and current-resource negatives.
+This contract proof is not a real model, Studio native or human acceptance result.
+The default sandbox prohibits UDS creation; standalone socket conformance needs
+the ordinary permitted local IPC environment, not a change to SDK semantics.
+
+The [consumer contract](contracts/README.md#delegated-decision-explanation) names
+the exact fields, withheld/mismatch behavior and Studio reproduction requirements.
+No generic regeneration, new transport, operation, credential or authority store
+is introduced.
+
+### Agentic-loop projection — 2026-10-10
+
+Starting from `34cc6586`, the generated Rust/TypeScript contract adds opt-in
+filesystem readback verification, derived Work progress, exact required Recall
+anchors and typed budget insufficiency. `make check` passes with local TCP/UDS
+conformance, exhaustive TypeScript consumers and omitted-field roundtrips.
+The initial sandbox run could not bind local peers; it is not qualifying
+evidence. The subsequent unrestricted local-fixture gate passes independently.
+Inventory remains 130; generated workflows contain 261 types / 58 operations.
+
+These are representation/compatibility tests, not Core postcondition enforcement,
+real-model tool choice, operator acceptance or Studio integration. New opt-in
+v9 Work/v2 reads require the compatible client; old unanchored reads and omitted
+Work fields preserve their encoding. Core separately qualifies controller and
+installed product behavior. The SDK has no CLI: the Core owner supplies official
+`yai case conversation send ... --work --verify-effects` and observation checks
+after its corresponding publication and supported installation.
+
+### Cross-client identity / material extension
+
+The subsequent isolated slice starts from published `8713c440`. It adds optional
+`ConversationIdentity`, typed discovery/request observation over existing
+operations, and `resource.material.inspect` (130 descriptors). Rust/TypeScript
+controls distinguish original Submission from request aliases, explicit legacy
+absence, unverified Source relationship and missing receipts. Privacy negatives
+reject fabricated authority and effect postures. The standalone gate does not
+qualify Core file fences, store migration, real models or Studio UI.
+
+The 2026-10-10 continuation qualifies opt-in `MaterialReadContent` against legacy
+omission, exact Unicode text, unavailable posture and closed-field negatives.
+`cargo test --locked`, TypeScript check, workflow generation and package boundary
+checks pass. These are representation claims; actual read disclosure, integrity,
+the 65,536-byte producer bound and no live reread belong to Core qualification.
+
+The [captured standalone runs](../tests/qualification/conversation-identity-material/runs/20261009-contract/observations.jsonl)
+retain the first TypeScript fixture failure (missing explicit `include_context`)
+and its repair without weakening the schema. The repaired complete `make check`
+passed in 2.614 seconds with unchanged source, before the final conservative
+default-enum ordering and documentation reconciliation; the final gate is
+separately retained. No provider request or private credential is involved.
+
+This slice starts from published SDK
+`f91a1d16193a059cec71054dc67df97bb36dcdab`, not from the older 118-operation
+delivery branch. It carries forward the independently qualified representation
+corrections from `a8dbf0775aa650047d232c6a2b04a85f8ece230a` while retaining all
+129 catalog descriptors and the new progress, native-read, Web Search and Skill
+contracts. No operation, input identity, wire schema, product version or YVEX pin
+changes. Shared Core and SDK working trees are preserved without adopting WIP.
+
+The [TypeScript controls](../tests/typescript/conversation-work.ts) exercise
+ordinary Focused SEND separately from explicit bounded Work, author/executor,
+Workflow binding, progressive opt-in, Review/budget/uncertainty postures, exact
+continuation and pending explicit nulls. Compiler negatives reject missing
+bounds, permission overrides and fabricated success. Rust controls retain both
+null and omission round trips, including pending execution inside a provisional
+progress envelope. No partial output is promoted to a completed Work answer.
+
+The [raw standalone observations](../tests/qualification/case-work-projection/runs/20261009-reconciled/observations.jsonl)
+retain the published thin-projection compiler refusal before repair, and the
+stale generator assertion that counted only two SEND wrappers after the public
+progressive wrapper made three. The assertion is corrected to require all three
+supported methods, not disabled. Final standalone validation is recorded
+separately from those failures. It does not qualify Core authority, installed
+Host streaming, real YVEX inference, external Web Search or Studio consumption.
+
+Final `make check` passes in 14.672 seconds: 54 Rust tests across workspace/all
+targets, strict TypeScript Work/native-read/search consumer fixtures, 13 workflow
+generator controls, finite/management contract checks, package/SemVer/legal and
+14 documentation-owner checks. The 129-descriptor catalog, dependencies,
+lockfiles, native-read and Skill contract tests remain unchanged from `f91a1d1`.
+Golden-local and real-provider evidence are not newly run for this
+representation-only correction; the earlier Core CLI checkpoint retains its own
+controlled native/Golden scope, not new streaming evidence.
+
+The unchanged published Core CLI checkout also passes `make check-docs
+test-roadmap` (71 canonical document metadata owners, 137 linked documents,
+16 protocol tests). Two failed attempts are retained: a removed temporary
+documentation venv and an OS Python missing `jsonschema`; restoring the
+repository-pinned dependencies in the ignored isolated build resolves them.
+These are documentation-environment repairs, not Core semantic integration.
+
+Core remains unpublished at the overlapping owner boundary. The independent
+Core CLI checkpoint is `9380f0efce81d62a4fdba5234b3fb350f36b1914` on
+`delivery/conversation-case-work-cli-20261009`; it must not be wholesale applied
+over `conversation.rs` / `registry.rs`. Preserve the owner's `--progress`,
+cursor/stream fields and unrelated Skill registry entries. Reconcile exact Work
+continuation, typed SDK errors and human step/author/executor lineage as focused
+hunks, with one public budget grammar. Client checks do not replace Core's limit
+validation or grant authority. Existing Work+Focused incompatibility is not
+relaxed by TypeScript representability.
+
+Operator product checks remain official reads: `yai case conversation send
+--help`, `yai case conversation observe --help`, `yai capabilities --json`.
+No installed feature or new inference is claimed from this SDK-only slice. Only
+after the compatible Core checkpoint is published and installed can an operator
+compare `yai case conversation observe CASE --participant AUTHOR --submission
+EXACT --progress --json` with Studio. Missing stream data or unknown delivery
+requires exact observation, never a fresh SEND or blind continuation.
+
+The actual normally installed `yai` help still lacks both Work submission flags
+and progressive observation flags. Its version read succeeds, but is not a
+129-operation native qualification. No supported install or Host lifecycle
+operation is performed here while the overlapping Core checkpoint is unpublished.
 
 ## Ordinary Conversation context projection — 2026-10-08
 

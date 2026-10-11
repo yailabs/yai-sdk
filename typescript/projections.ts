@@ -1,4 +1,4 @@
-import type { RecallBounds, HandoffAcceptInput, ResourceAction, ConversationIntent, ConversationPosture, CaseWorkObservation } from "./workflows.js";
+import type { RecallBounds, HandoffAcceptInput, ResourceAction, ConversationIntent, ConversationPosture, CaseWorkObservation, CaseOperation } from "./workflows.js";
 export * from "./workflows.js";
 export type { CaseSummary as LiveCaseRow } from "./workflows.js";
 /** Supported public Application projections. No semantic implementation.
@@ -160,7 +160,52 @@ export interface HandoffResultInput { target_case_ref: string; handoff_ref: stri
 
 export interface DecisionHistoryInput { case_ref: string; participant_ref: string; max_decisions: number }
 
-export interface DecisionInspectInput { case_ref: string; participant_ref: string; decision_ref: string }
+export interface DecisionInspectInput { case_ref: string; participant_ref: string; decision_ref: string; operation_ref?: string | null }
+
+/** Exact retained policy contribution, not current Policy or a permission grant. */
+export interface DecisionRuleProvenance {
+  binding_id: string; artifact_id: string; policy_ir_rule_id: string; source_id: string;
+  fact_refs: string[]; source_locations: string[];
+}
+export interface DecisionPolicyValidity {
+  binding_id: string; lineage_id: string; artifact_id: string;
+  contract: { mode: "unbounded" | "bounded"; valid_from_unix_ms?: number | null; refresh_after_unix_ms?: number | null; expires_at_unix_ms?: number | null };
+  posture: "valid" | "not_yet_valid" | "refresh_required" | "stale" | "expired" | "revoked" | "unavailable";
+  reason: string; revoke_event_id?: string | null;
+}
+export interface DecisionAuthorityEvaluation {
+  subject: "proposer" | "reviewer"; participant_id: string | null; required_roles: string[];
+  observed_roles: string[]; eligible_participant_ids: string[]; satisfied: boolean;
+  contributing_rules: DecisionRuleProvenance[];
+}
+export interface DecisionObligationEvaluation {
+  obligation: "pre_observation" | "post_observation" | "audit_reason" | "source_provenance";
+  status: "satisfied" | "missing_deny" | "missing_requires_review" | "required_at_execution";
+  evidence_refs: string[]; contributing_rules: DecisionRuleProvenance[];
+}
+/** Historical evaluated basis. Never replace these digests with current bindings. */
+export interface DecisionBasis {
+  schema: "yai.decision_basis.v1" | "yai.decision_basis.v2" | "yai.decision_basis.v3";
+  basis_id: string; integrity_digest: string; case_id: string; tenant_id?: string | null;
+  evaluated_case_generation: number; authority_evaluated_at_unix_ms?: number;
+  policy_validity?: DecisionPolicyValidity[]; earliest_policy_expiry_unix_ms?: number | null;
+  operation_id: string; operation_digest: string; operation_kind: string;
+  proposer_participant_id: string; resource_attachment_id: string; resource_kind: string;
+  effective_policy_id: string; effective_policy_digest: string; materializer_version: string;
+  policy_binding_refs: string[]; policy_artifact_refs: string[]; matched_rule_refs: string[];
+  contributing_provenance: DecisionRuleProvenance[];
+  mechanical_posture: "satisfied" | "target_outside_attachment" | "payload_exceeds_attachment" | "attachment_mismatch";
+  operation_restriction: "explicit_allow" | "explicit_deny" | "no_applicable_allow";
+  review_required: boolean; authority: DecisionAuthorityEvaluation[]; obligations: DecisionObligationEvaluation[];
+  final_posture: "allow" | "deny" | "require_review"; final_reason: string; review_action_ref?: string | null;
+}
+export interface DecisionProjection {
+  schema?: string; decision_id: string; decision_digest?: string;
+  operation_id: string; operation_digest?: string; outcome: "allow" | "deny" | "require_review";
+  source?: { policy_id: string; owner_participant_id: string } | null;
+  decision_basis?: DecisionBasis | null; reason: string; basis_refs: string[];
+  decided_at_case_generation?: number;
+}
 
 export interface DecisionTrajectory {
   schema: "yai.cognitive_decision_trajectory.v1"; trajectory_id: string; case_id: string; participant_id: string;
@@ -168,7 +213,8 @@ export interface DecisionTrajectory {
   pre_decision: { cut_generation: number; content_backing: Array<{ source_ref: string; posture: string }>; unsupported_families: string[] };
   task_context?: string | null;
   candidate_posture: "exact_reconstructed" | "partial" | "unavailable";
-  decision: { decision_id: string; operation_id: string; outcome: "allow" | "deny" | "require_review"; reason: string; basis_refs: string[] };
+  selected_operation?: CaseOperation | null;
+  decision: DecisionProjection;
   related_evidence: Array<{ transition_id: string; recorded_generation: number }>;
   correction_decisions: string[]; missingness: string[];
   readiness: { pre_state_available: boolean; working_state_available: boolean; candidate_set_available: boolean; decision_basis_available: boolean; consequence_available: boolean; correction_available: boolean; historical_distribution_available: boolean };
@@ -229,7 +275,6 @@ export interface ConversationSendInput {
   memory_search_mode?: "standard" | "fast";
   /** Opt-in real provider streaming, never a canonical partial result. */
   progressive_output?: boolean;
-  // Core 3802e96: ordinary SEND and bounded Case Work share one immutable intent.
   intent?: ConversationIntent;
 }
 
@@ -288,7 +333,7 @@ export interface PreparedContext {
 
 export type InspectedConversationExecution = ConversationExecution & { prepared_context?: PreparedContext | null };
 
-export type ExecutionReference = { domain: "runtime_work" | "resource_request"; submission_ref: string }
+export type ExecutionReference = { domain: "conversation" | "runtime_work" | "resource_request"; submission_ref: string }
   | { domain: "controlled_effect"; operation_ref: string }
   | { domain: "cognitive_realization"; plan_ref: string }
   | { domain: "cognitive_composition"; request_ref: string }

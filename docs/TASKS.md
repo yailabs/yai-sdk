@@ -12,6 +12,14 @@ publication: {html: true, pdf: false, index: true}
 
 [Documentation](README.md)
 
+**Operational Conversation continuation (2026-10-11):** the existing Core
+`YAI.CASE.CAPABILITY.OPERATIONAL.PROJECTION.0` consumes the additive
+[delegated Decision projection](contracts/README.md#delegated-decision-explanation).
+SDK qualification covers typed historical basis, exact optional Operation fence,
+legacy/null compatibility and unchanged 130 descriptors. Core owns observer
+disclosure; Studio native and human acceptance remain separate. No completed
+SDK foundation is reopened and no successor Task is selected.
+
 | Task | State | Exit |
 | --- | --- | --- |
 | PRODUCT.REPOSITORY.BOUNDARY.0 | COMPLETE | Independent MIT client/projection owner; canonical Core mutation/probe projections exclude private persisted state; standalone conformance and final real Core/Studio integration qualified at the bounded Linux local scope. |
@@ -83,18 +91,21 @@ No release qualification is implied. Core semantics and Studio product tasks rem
 
 ## Active downstream product delivery
 
-### Operational Conversation — Case Work projection
+### Operational Conversation identity and material continuation
 
-The Core-coordinated `YAI.CASE.CONVERSATION.OPERATIONAL.EXPERIENCE.0` milestone
-includes an independently deliverable alignment of the existing Case Work
-contract. The TypeScript consumer projection now reuses the generated intent,
-posture and Work observation types already exposed by Rust. This fixes the
-client gap without adding operations, a scheduler or an authority owner.
-Streaming and progressive execution remain separate, unpublished Core work;
-this projection does not claim those boundaries or Studio qualification.
-Concurrent Core streaming and untracked Skill lifecycle work are preserved and
-excluded from this SDK slice. Context Sufficiency remains IN PROGRESS in Core.
-See [bounded projection qualification](qualification.md#case-work-typescript-projection--2026-10-09).
+The existing Core-owned progressive-delivery and operational-projection Tasks
+add typed request-based observation/discovery over released execution operations
+and one filesystem provenance read. The inventory is 130; no completed platform,
+Case Work or Skill foundation is reopened. Submission identity is optional for
+older servers and explicit when unavailable. Source/Resource relationship,
+baseline, Review and receipt projection never confer authority. SDK conformance
+is independent of Core's store/effect proof and Studio consumption.
+
+The same contract closure adds opt-in, bounded retained baseline text to material
+inspection. Default requests preserve the `d749a24` closed response shape; no new
+operation or authority is introduced. Rust/TypeScript representation and negative
+controls qualify the projection only; Core installation and native Studio remain
+independent gates.
 
 ### Conversation Context Sufficiency consumer
 
@@ -186,8 +197,27 @@ receipts, plus SearchAPI Resource imports. There is no SDK semantic owner, secon
 orchestrator or retry policy. Generated workflow exports support independent
 consumers without adopting unpublished thin projection work.
 
+The subsequent independently owned Case Work projection reconciliation starts
+from published SDK `f91a1d16193a059cec71054dc67df97bb36dcdab`, preserving its
+129 descriptors, progress/native-read/Skill contracts and consumer tests.
+The thin TypeScript surface now reuses the generated intent, posture and Work
+types; shared output DTOs preserve Core's explicit nulls and older omissions.
+This closes the representation gap, not unpublished Core streaming, installed
+integration or Studio acceptance. The Core CLI checkpoint and overlapping
+`conversation.rs` / `registry.rs` WIP require hunk-level reconciliation by their
+owner; no shared Core files or operator runtime are changed in this SDK slice.
+See [reconciliation evidence](qualification.md#case-work-projection-reconciliation--2026-10-09).
+
 Full operational Conversation remains IN PROGRESS in its producer/client owners.
 Live-model execution, web credentials, integrated native product and human
 acceptance are not standalone SDK exits. No completed platform Task or successor
 roadmap is selected. [Qualification](qualification.md#operational-conversation-public-contracts--2026-10-09)
 records the 53-test contract scope and exact limitations.
+
+## Product experience handoff adoption
+
+Substantial consumer-facing contract changes follow the
+[contract handoff](contracts/README.md#studio-consumer-handoff), discoverable from
+AGENTS. This docs-only outcome changes no operation inventory, package/schema
+version, selected Task state or consumer pin. Core semantics and Studio native/human
+acceptance require their independent evidence; current qualifications are unchanged.

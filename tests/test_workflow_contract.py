@@ -21,6 +21,15 @@ class ContractTests(unittest.TestCase):
         for path, result in zip(('src/workflows.rs', 'typescript/workflows.ts'), outputs):
             self.assertEqual((ROOT / path).read_text(), result)
 
+    def test_case_work_verification_and_required_recall_are_owned_facts(self):
+        rust, ts = generator.render(self.contract)
+        self.assertIn('pub verification: Option<CaseWorkVerification>', rust)
+        self.assertIn('pub progress: Option<CaseWorkProgress>', rust)
+        self.assertIn('required_refs?: Array<string>', ts)
+        self.assertIn('"recall_insufficient"', ts)
+        self.assertIn('pending_effect_refs: Array<string>', ts)
+        self.assertIn('goal_satisfaction: string', ts)
+
     def test_unknown_type_refuses(self):
         self.contract['types']['CaseRefInput']['case_ref'] = 'UnknownPrivateState'
         with self.assertRaisesRegex(ValueError, 'unknown public type'):
@@ -52,8 +61,9 @@ class ContractTests(unittest.TestCase):
         rust, _ = generator.render(self.contract)
         self.assertIn('pub fn send_text(', rust)
         self.assertIn('pub fn send_with_search(', rust)
+        self.assertIn('pub fn send_progressive(', rust)
         self.assertIn('pub fn get_context(', rust)
-        self.assertEqual(rust.count('const ID: &\'static str = "conversation.send"'), 2)
+        self.assertEqual(rust.count('const ID: &\'static str = "conversation.send"'), 3)
 
     def test_input_variant_collision_and_unknown_type_refuse(self):
         op = next(op for op in self.contract['operations'] if op['id'] == 'conversation.send')

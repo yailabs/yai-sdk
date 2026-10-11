@@ -77,6 +77,83 @@ the published execution operations; a new correlation does not authorize replay.
 
 ## Public projections and privacy
 
+### Delegated Decision explanation
+
+The existing `decision.trajectory.inspect` / `yai.decision_trajectory_inspect_input.v1`
+accepts optional `operation_ref` as an exact association fence. Older omitted
+or null fields remain compatible; no new operation is added (130 descriptors).
+`DecisionTrajectory.decision` now projects `DecisionProjection` and optional
+`DecisionBasis` v1/v2/v3 in Rust and TypeScript. It retains evaluated generation,
+Operation digest/proposer/Resource, effective-policy digest, binding/artifact refs,
+rule contributions, source/fact/location refs, authority/obligation evaluations,
+validity-at-evaluation and optional review-action reference. These are historical
+facts, not today's policy, a Grant, or proof of an applied effect. Legacy absent
+or null basis remains unavailable; `basis_refs: []` alone means neither no policy
+nor ALLOW.
+
+Core permits an author's delegated Work inspection only after exact committed
+Turn/request/selection/invocation/result/Operation lineage and current identity
+and Resource disclosure qualify. SDK performs no authority calculation. Observer
+Participant, original author and Operation proposer/executor remain distinct.
+`unauthorized / decision_not_visible` withholds the read without confirming the
+existence or outcome of a hidden Decision. A disclosed mismatched Operation gives
+`error / decision_operation_mismatch`, with no trajectory data. Lost reads may be
+reobserved; neither refusal nor reconnection permits SEND, Review continuation or
+effect replay. Rust `DecisionInspectInput` can use the existing typed
+`client::Operation` surface; TypeScript remains types-only.
+
+Studio must use exact Case/observer/Decision/Operation identity, render retained
+outcomes `allow`, `deny`, `require_review`, and separately show withheld or absent
+basis. Policy source locations refer to recorded source artifacts, not live paths.
+No private persistence, model-text parsing or executor impersonation is needed.
+Required consumer checks: disclosed delegation, hidden/unrelated observer,
+mismatched association, replaced historical policy and unavailable legacy basis.
+This delivery does not qualify Studio native rendering or generic regeneration.
+
+### Cross-client execution identity and material provenance
+
+`conversation().discover` projects the existing bounded `execution.list`.
+`conversation().get_by_request` projects `execution.get` with a
+`cognitive_composition` request reference. No private client journal or new SEND
+is needed. `ConversationObservation.identity` is additive and optional for older
+servers. Its original Submission, author, executor and Thread are distinct from
+the canonical Turn/request. `retained` means Core retained the original token;
+`caller_verified_legacy` means an exact caller-supplied token matched the old
+canonical admission; `unavailable` has a null original token. For request-only
+legacy observations the old `submission_ref` string is empty, never a request
+alias. Do not resume an unavailable identity or automatically redispatch.
+After recovery, `resume_work` still uses the original token, author and current
+observed generation; Core owns eligibility, immutable budgets and authority.
+
+`resources().inspect_material` adds `resource.material.inspect` (130 released
+descriptors), with `yai.material_inspect_input.v1` / `yai.material_provenance.v1`.
+It observes an exact governed filesystem Operation, not an arbitrary path. The
+typed result separates the read baseline, proposed digest, Decisions/Reviews,
+PREPARE, receipt and post-observation. `prepared` is not proof of dispatch;
+`applied_attested` requires a canonical applied receipt. `uncertain` never means
+success. All snapshots are retained observations, not live file-state claims.
+
+An optional Source is independently disclosure-qualified. `unverified` and
+`unavailable` have no equivalence claim. `retained_scope_content_match` records
+independently bound root scope and exact retained content, not the identity of a
+physical file object or write permission. `bound_read` additionally identifies a
+canonical read baseline used by Core's versioned write proposal/Operation. Older
+unbound proposals retain `prepare_only`/`unavailable`, not a fabricated read.
+Filesystem file identity is descriptor-observed device/inode and modification/
+change times, not a client licence to act. Neither client selects evidence,
+creates receipts nor enforces a write fence. Closed DTOs refuse invented
+postures, authority fields and secrets.
+
+`include_baseline_content: true` explicitly requests the retained UTF-8 baseline
+through the same material inspection. The optional `baseline.content` is a typed
+`retained { text }` or `unavailable { reason }`, never a live filesystem read or
+reconstruction from a Source. Core limits this projection to 65,536 bytes and
+requalifies the original read disclosure; compare the text's UTF-8 length and
+SHA-256 against the adjacent baseline fields. By default the field is omitted,
+preserving the closed response shape of `d749a24` clients. Absence on an older
+producer is unavailable content, not an empty file. The operation inventory
+remains 130; consumer/native and producer evidence remain separate.
+
 Mutation receipts bind Case identity/generation and bounded Transition identity
 facts. They never export persisted CaseState/Transition layouts. Probe projections
 exclude carrier tokens, private process ownership and storage seals. Their
@@ -166,16 +243,15 @@ postures; an indeterminate delivery is never permission to dispatch again.
 These contracts expose YAI meaning and do not grant the executor Participant
 the submitting Principal's authority.
 
-The TypeScript `@yai/sdk/projections` surface uses the generated
-`ConversationIntent`, `ConversationPosture` and `CaseWorkObservation` owners
-directly. `ConversationSendInput.intent` therefore carries the same optional
-executor, Workflow execution and finite limits as the Rust workflows;
-`ConversationExecution.work` retains exact ordered step lineage. An ordinary
-SEND with no `work_limits` stays an ordinary SEND. Explicit continuation uses
-`ConversationWorkResumeInput.observed_generation`, not a new submission ID.
-These are compatible projections of the existing operations, not streaming or
-new client-side execution semantics. A primary provider result, a Work answer
-and completion of an authorized effect must not be conflated.
+`@yai/sdk/projections` reuses generated `ConversationIntent`,
+`ConversationPosture` and `CaseWorkObservation` instead of narrowing Work to
+ordinary chat. The input retains the independently published
+`progressive_output` opt-in. Work answer, step invocation/result/Operation
+references and Conversation primary result accept explicit `null` as emitted
+by Core, as well as older omitted fields. No answer or result is invented from
+that absence. Optional native-read and Operation payloads keep their existing
+omission contract. This compatible representation correction adds no operation,
+wire-schema identity, execution owner or retry behavior.
 
 Case events carry exact Case, generation, sequence, cursor and affected-view
 facts. They invalidate cached views; they are not replacement canonical state.
@@ -214,3 +290,29 @@ including `search_api` with a fixed supported provider and native credential
 reference. Typed WebSearch results are producer-owned URL/title/snippet/provenance
 records, not acquired Case Sources. The SDK stores no token and implements no
 search, policy, compiler, tool orchestration or Skills semantic owner.
+
+## Studio consumer handoff
+
+The handoff is resource- and service-general: document discovery, connection and
+identity separately from documentary Source intake. An attached service or advertised
+operation is not an Authority grant. Cover manual operations and supported
+model-requested operations, their governance, observations, exact-object navigation,
+recovery and contextual presentation. Conversation remains a first-class interaction
+and continuity surface; it does not become a second execution owner. Future database,
+Redis, container, endpoint, process, remote-system or MCP integrations require their
+own public contracts and evidence; this protocol asserts no new family support.
+
+For substantial product-facing changes, include the following in the existing Task
+or release handoff, without a new registry or reporting hierarchy:
+
+- User intent/domain, public operations/types and exact compatible producer/SDK revisions; absent capability and version compatibility behavior.
+- Canonical identities, disclosure/freshness/finality and available actions; admission remains with the semantic owner, never SDK or frontend.
+- Recovery observations and explicit continuation eligibility; lost acknowledgement never authorizes automatic redispatch.
+- Reproducible public reads and controlled positive/negative evidence, with exact objects and unearned real-provider gates.
+- Affected existing Studio journey and missing projection, if any; the Studio Task owner determines presentation reuse, exact navigation, Context and native qualification under its [experience contract](https://github.com/yailabs/studio/blob/main/docs/interaction-contracts.md#product-experience-integration).
+
+SDK projects supported contracts and transport; it does not infer admission, fill missing identities or own UI orchestration. Independently versioned consumer pins must be qualified against the connected producer.
+
+This obligation does not block independent releases on Studio acceptance or duplicate
+Studio documentation. Independent open-source consumers need only the public contracts and local handoff facts; the Studio link is integration guidance, not a private semantic dependency.
+No new feature, runtime qualification or acceptance claim follows from this method.
