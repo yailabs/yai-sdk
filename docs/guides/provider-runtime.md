@@ -12,7 +12,7 @@ publication: {html: true, pdf: false, index: true}
 
 [Guides](README.md) · [Public contracts](../contracts/README.md)
 
-SDK 0.2 projects YAI-owned provider semantics; it does not implement inference,
+SDK 0.3 projects YAI-owned provider semantics; it does not implement inference,
 calculate Authority, manage models, or orchestrate Case Work. The independent
 YVEX client remains unchanged. TypeScript remains a types-only contract package.
 
@@ -33,8 +33,11 @@ YVEX client remains unchanged. TypeScript remains a types-only contract package.
 The canonical [operation inventory](../../contract/operations.json) has 136
 operations; [workflow types](../../contract/workflows.json) generate both Rust and
 TypeScript projections. Older operations and explicit bounded Work remain supported.
-SDK 0.2 deliberately changes Rust source types for automatic observation limits
+SDK 0.2 deliberately changed Rust source types for automatic observation limits
 to optional, so consumers must handle an explicitly admitted text profile.
+SDK 0.3 adds the optional approved public DER TLS trust anchor to the profile;
+Rust struct-literal consumers must account for the additional field. Old JSON
+profiles without that field remain unchanged.
 
 Five public protocols are represented: `open_ai_chat`, `anthropic_messages`,
 `google_generate_content`, `cohere_chat`, `bedrock_converse`. Brands sharing a
@@ -44,6 +47,11 @@ reports implemented capabilities; each actual target must separately qualify.
 `ProviderHttpProfile` carries authentication *kind*, paths, API version, output
 token field, expected response alias and optional expected reported deployment
 fingerprint. It never carries a secret. Remote inference opt-in defaults off.
+For a private HTTPS service, `tls_trust_anchor_der` is the base64-encoded public
+certificate independently approved for that target. It is not a private key,
+TOFU discovery, an alternate hostname or an option to bypass verification.
+Absent an anchor the normal WebPKI roots apply; an explicit anchor restricts trust
+to that approved root while preserving hostname, TLS and DNS/locality checks.
 `catalog_path` omitted means exact-model/catalog-less operation, not an invented
 catalog. Producer-reported metadata is not independently verified model weights.
 
@@ -88,7 +96,7 @@ fragments are provisional and do not create a canonical answer or Receipt.
 
 ## Studio handoff
 
-Consume SDK 0.2's typed contracts and negotiated operation descriptors. Inspect
+Consume SDK 0.3's typed contracts and negotiated operation descriptors. Inspect
 protocol support and current targets separately. Show configured versus observed
 identity and unknown runtime/artifact facts. Use readiness rather than SEND as a
 compatibility probe, and display partial setup and exact current blockers.

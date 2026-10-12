@@ -56,6 +56,7 @@ export interface ProviderDeploymentObservation {
   tokenizer_identity?: string | null;
   template_identity?: string | null;
   context_capacity_tokens?: number | null;
+  capacity?: ProviderCapacityObservation;
   provenance: string;
   artifact_independently_verified: boolean;
   observed_at_unix_ms: number;
@@ -389,6 +390,7 @@ export type ProviderOutputTokenField = "max_tokens" | "max_completion_tokens";
 export interface ProviderHttpProfile {
   protocol: ProviderWireProtocol;
   authentication?: ProviderAuthentication;
+  tls_trust_anchor_der?: string;
   remote_inference_opt_in?: boolean;
   inference_path?: string;
   catalog_path?: string;

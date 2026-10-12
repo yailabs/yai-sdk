@@ -76,6 +76,8 @@ pub struct ProviderDeploymentObservation {
     pub tokenizer_identity: Option<String>,
     pub template_identity: Option<String>,
     pub context_capacity_tokens: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub capacity: Option<ProviderCapacityObservation>,
     pub provenance: String,
     pub artifact_independently_verified: bool,
     pub observed_at_unix_ms: u64,
@@ -504,6 +506,8 @@ pub struct ProviderHttpProfile {
     pub protocol: ProviderWireProtocol,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub authentication: Option<ProviderAuthentication>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tls_trust_anchor_der: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub remote_inference_opt_in: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]

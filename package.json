@@ -1,6 +1,6 @@
 {
   "name": "@yai/sdk",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "license": "MIT",
   "description": "YAI public contract types only; no TypeScript runtime transport client",

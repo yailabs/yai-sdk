@@ -16,7 +16,7 @@
     },
     "ProviderDeploymentObservation":{"schema":"string","target_id":"string","observation_id":"string","configured_model_id":"string",
       "observed_model_id":"nullable:string","representation_identity":"nullable:string","engine_identity":"nullable:string","engine_generation":"nullable:u64",
-      "machine_identity":"nullable:string","tokenizer_identity":"nullable:string","template_identity":"nullable:string","context_capacity_tokens":"nullable:u64",
+      "machine_identity":"nullable:string","tokenizer_identity":"nullable:string","template_identity":"nullable:string","context_capacity_tokens":"nullable:u64","capacity":"optional:ProviderCapacityObservation",
       "provenance":"string","artifact_independently_verified":"bool","observed_at_unix_ms":"u64","metadata_identity":"nullable:string","posture":"string"},
     "ProviderCapabilityEvidence":{"capability":"string","provenance":"string","evidence_refs":"array:string","verified_minimum":"optional:u64"},
     "ProviderQualification":{"qualification_id":"string","target_id":"string","suite_id":"string","run_id":"string","evidence":"ProviderProbeEvidence",
@@ -87,7 +87,7 @@
     "ProviderAuthentication": {"$tagged_union":{"tag":"kind","variants":{"bearer":{},"header":{"name":"string"},"aws_sig_v4":{"region":"string"}}}},
     "ProviderOutputTokenField": {"$enum":["max_tokens","max_completion_tokens"]},
     "ProviderHttpProfile": {
-      "protocol":"ProviderWireProtocol","authentication":"optional:ProviderAuthentication","remote_inference_opt_in":"optional:bool","inference_path":"optional:string",
+      "protocol":"ProviderWireProtocol","authentication":"optional:ProviderAuthentication","tls_trust_anchor_der":"optional:string","remote_inference_opt_in":"optional:bool","inference_path":"optional:string",
       "catalog_path":"optional:string","api_version":"optional:string","expected_response_model":"optional:string",
       "output_token_field":"optional:ProviderOutputTokenField","expected_deployment_identity":"optional:string"
     },
