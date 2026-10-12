@@ -268,7 +268,7 @@ closing a Studio window.
 ## Operational Conversation, native reads and versioned Skills
 
 The additive public contract exports generated workflows through Rust and
-`@yai/sdk/workflows`. The operation catalog has 129 descriptors.
+`@yai/sdk/workflows`. The operation catalog has 136 descriptors.
 `send_progressive` opts into actual producer fragments; `conversation.progress.get`
 returns the versioned exact Case/author/executor/Thread/Turn/request/Invocation/target
 envelope, bounded sequence/cursor and provisional snapshot. Canonical execution

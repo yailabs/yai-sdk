@@ -400,25 +400,21 @@ export interface ResourceRequestInput { case_ref: string; participant_ref: strin
 export interface CaseResumeInput { case_ref: string; participant_ref: string; previous_submission_ref: string; submission_ref: string; run_ref: string; checkpoint_digest: string; budgets: RuntimeBudgets }
 
 export interface ProviderRegistration {
-  tenant_id: string; provider_key: string; adapter: "open_ai_compatible";
+  tenant_id: string; provider_key: string; adapter: "open_ai_compatible" | "http_inference";
   endpoint: string; model_id: string; credential_ref: string;
   locality: "loopback" | "private_network" | "remote"; extension_adapter_id?: "yvex.http.v1";
+  http_profile?: import("./workflows.js").ProviderHttpProfile;
 }
 
-export interface ProviderTarget extends ProviderRegistration { target_id: string; integrity_digest: string }
+export { type ProviderTarget } from "./workflows.js";
 
-export interface ProviderProbeEvidence {
-  run_id: string; target_id: string; started_at_unix_ms: number; completed_at_unix_ms: number;
-  transport_connected: boolean; exact_model_addressed: boolean; chat_text_envelope_valid: boolean;
-  structured_json_object_valid: boolean; usage_accounting_observed: boolean;
-  health_endpoint_observed: boolean; extension_telemetry_observed: boolean;
-  text_embedding_envelope_valid?: boolean; embedding_dimension?: number;
-  realization_shapes?: string[]; failure_codes: string[];
-}
+import type { ProviderProbeEvidence } from "./workflows.js";
+export { type ProviderProbeEvidence } from "./workflows.js";
 
 export interface ProviderQualificationInput { target_ref: string; evidence: ProviderProbeEvidence; suite_ref: string; valid_until_unix_ms?: number }
 
-export interface ProviderQualification { qualification_id: string; target_id: string; suite_id: string; run_id: string; evidence: ProviderProbeEvidence; capabilities: Array<{ capability: string; provenance: string; evidence_refs: string[] }> }
+export { type ProviderQualification } from "./workflows.js";
+import type { ProviderQualification } from "./workflows.js";
 
 export interface ProviderBindingInput { case_ref: string; participant_ref: string; ordered_target_refs: string[]; failover_policy: "none" | "safe_only"; max_attempts_per_turn: number }
 
