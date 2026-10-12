@@ -96,6 +96,20 @@ fragments are provisional and do not create a canonical answer or Receipt.
 
 ## Studio handoff
 
+The executable [public Rust example](../../examples/provider_runtime.rs) connects
+to an already running supported Host and performs only negotiated reads:
+
+```sh
+cargo run --locked --example provider_runtime -- /absolute/yai/home protocols
+cargo run --locked --example provider_runtime -- /absolute/yai/home readiness case:exact participant:author
+cargo run --locked --example provider_runtime -- /absolute/yai/home compare comparison.json
+```
+
+The Home selects the existing local transport, not a private database read or a
+client submission journal. An unsupported operation or semantic refusal remains
+explicit; the example does not launch a Host, qualify a provider or retry a SEND.
+Operator product checks use the official `yai ...` commands in Core's runbook.
+
 Consume SDK 0.3's typed contracts and negotiated operation descriptors. Inspect
 protocol support and current targets separately. Show configured versus observed
 identity and unknown runtime/artifact facts. Use readiness rather than SEND as a
