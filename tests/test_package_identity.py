@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from check_platform_parity import compare_studio_yvex, compare_studio_yvex_pin
@@ -17,6 +18,8 @@ class PackageIdentity(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
+        self.version = tomllib.loads((ROOT / "Cargo.toml").read_text())["package"]["version"]
+        self.base_version = self.version.split("+", 1)[0].split("-", 1)[0]
         for name in ("Cargo.toml", "Cargo.lock", "package.json", "package-lock.json", "tools/check.py"):
             target = self.root / name
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -25,6 +28,13 @@ class PackageIdentity(unittest.TestCase):
     def check(self):
         return subprocess.run([sys.executable, str(self.root / "tools/check.py")],
                               capture_output=True, text=True).returncode
+
+    def replace_current_version(self, original, replacement):
+        marker = f'"{self.version}"'
+        self.assertIn(marker, original, "version mutation must not silently become a no-op")
+        changed = original.replace(marker, f'"{replacement}"')
+        self.assertNotEqual(changed, original)
+        return changed
 
     def test_current_projection(self):
         self.assertEqual(self.check(), 0)
@@ -73,21 +83,24 @@ class PackageIdentity(unittest.TestCase):
         compare_studio_yvex(client, legacy)
 
     def test_each_projection_drift_refuses(self):
+        major, minor, patch = self.base_version.split(".")
+        different = f"{major}.{minor}.{int(patch) + 1}"
         for name in ("Cargo.lock", "package.json", "package-lock.json"):
             with self.subTest(name=name):
                 path = self.root / name
                 original = path.read_text()
-                path.write_text(original.replace('"0.1.0"', '"0.2.0"'))
+                path.write_text(self.replace_current_version(original, different))
                 self.assertNotEqual(self.check(), 0)
                 path.write_text(original)
 
     def test_invalid_prerelease_refuses_even_when_projections_agree(self):
-        for value in ("0.1.0-01", "0.1.0-rc.01", "0.1.0-rc..1", "0.1.0+build..1"):
+        for suffix in ("-01", "-rc.01", "-rc..1", "+build..1"):
+            value = self.base_version + suffix
             originals = {}
             for name in ("Cargo.toml", "Cargo.lock", "package.json", "package-lock.json"):
                 path = self.root / name
                 originals[path] = path.read_text()
-                path.write_text(originals[path].replace('"0.1.0"', f'"{value}"'))
+                path.write_text(self.replace_current_version(originals[path], value))
             self.assertNotEqual(self.check(), 0, value)
             for path, original in originals.items():
                 path.write_text(original)
@@ -95,7 +108,7 @@ class PackageIdentity(unittest.TestCase):
     def test_standard_prerelease_is_valid(self):
         for name in ("Cargo.toml", "Cargo.lock", "package.json", "package-lock.json"):
             path = self.root / name
-            path.write_text(path.read_text().replace('"0.1.0"', '"0.1.0-rc.1+build.01"'))
+            path.write_text(self.replace_current_version(path.read_text(), self.base_version + "-rc.1+build.01"))
         self.assertEqual(self.check(), 0)
 
 
