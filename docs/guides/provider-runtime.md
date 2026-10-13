@@ -135,13 +135,15 @@ client submission journal. An unsupported operation or semantic refusal remains
 explicit; the example does not launch a Host, qualify a provider or retry a SEND.
 Operator product checks use the official `yai ...` commands in Core's runbook.
 
-Consume SDK 0.3's typed contracts and negotiated operation descriptors. Inspect
+Consume SDK 0.4's typed contracts and negotiated operation descriptors. Inspect
 protocol support and current targets separately. Show configured versus observed
 identity and unknown runtime/artifact facts. Use readiness rather than SEND as a
 compatibility probe, and display partial setup and exact current blockers.
 
-For native credential entry use the protected native facility and its Tenant-scoped
-reference, then rotate the non-secret revision through the public owner. Never put
+For native credential entry use `provider.credential.store` and its Tenant-scoped
+reference. This public owner advances the non-secret revision before one protected
+write; `provider.credential.status` observes uncertain delivery without rewriting.
+An older Host must explicitly report these operations as unavailable. Never put
 credentials in SDK profiles, laboratory evidence, UI metadata or reports.
 
 Qualify native consumer interaction independently: text profile with v2 opt-in;
