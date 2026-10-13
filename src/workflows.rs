@@ -352,6 +352,39 @@ pub struct ProviderCredentialRotateInput {
     pub target_ref: String,
     pub revision_label: String,
 }
+#[derive(Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProviderCredentialStoreInput {
+    pub target_ref: String,
+    pub revision_label: String,
+    pub secret: String,
+}
+impl std::fmt::Debug for ProviderCredentialStoreInput {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ProviderCredentialStoreInput").field("sensitive_input", &"[REDACTED]").finish_non_exhaustive()
+    }
+}
+impl Drop for ProviderCredentialStoreInput {
+    fn drop(&mut self) {
+        zeroize::Zeroize::zeroize(&mut self.secret);
+    }
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProviderCredentialStatusInput {
+    pub target_ref: String,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ProviderCredentialStorageObservation {
+    pub schema: String,
+    pub target_ref: String,
+    pub write_ref: Option<String>,
+    pub posture: String,
+    pub reason: Option<String>,
+    pub revisions: Vec<ProviderCredentialRevision>,
+    pub credential_available: bool,
+    pub case_authority: bool,
+}
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct ProviderCredentialRevision {
     pub schema: String,
@@ -3671,6 +3704,34 @@ impl Operation for ProviderRotateCredential<'_> {
 impl<T: ClientTransport> Provider<'_, T> {
     pub fn rotate_credential(&self, correlation: &str, input: &ProviderCredentialRotateInput) -> Result<Response<ProviderCredentialRevision>, Error> {
         self.0.execute(correlation, &ProviderRotateCredential(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProviderStoreCredential<'a>(&'a ProviderCredentialStoreInput);
+impl Operation for ProviderStoreCredential<'_> {
+    type Output = ProviderCredentialStorageObservation;
+    const ID: &'static str = "provider.credential.store";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.provider_credential_store_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.provider_credential_storage.v1");
+}
+impl<T: ClientTransport> Provider<'_, T> {
+    pub fn store_credential(&self, correlation: &str, input: &ProviderCredentialStoreInput) -> Result<Response<ProviderCredentialStorageObservation>, Error> {
+        self.0.execute(correlation, &ProviderStoreCredential(input))
+    }
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct ProviderCredentialStatus<'a>(&'a ProviderCredentialStatusInput);
+impl Operation for ProviderCredentialStatus<'_> {
+    type Output = ProviderCredentialStorageObservation;
+    const ID: &'static str = "provider.credential.status";
+    const INPUT_CONTRACT: Option<&'static str> = Some("yai.provider_credential_status_input.v1");
+    const OUTPUT_CONTRACT: Option<&'static str> = Some("yai.provider_credential_storage.v1");
+}
+impl<T: ClientTransport> Provider<'_, T> {
+    pub fn credential_status(&self, correlation: &str, input: &ProviderCredentialStatusInput) -> Result<Response<ProviderCredentialStorageObservation>, Error> {
+        self.0.execute(correlation, &ProviderCredentialStatus(input))
     }
 }
 #[derive(Serialize)]

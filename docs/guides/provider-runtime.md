@@ -12,7 +12,7 @@ publication: {html: true, pdf: false, index: true}
 
 [Guides](README.md) · [Public contracts](../contracts/README.md)
 
-SDK 0.3 projects YAI-owned provider semantics; it does not implement inference,
+SDK 0.4 projects YAI-owned provider semantics; it does not implement inference,
 calculate Authority, manage models, or orchestrate Case Work. The independent
 YVEX client remains unchanged. TypeScript remains a types-only contract package.
 
@@ -25,12 +25,14 @@ YVEX client remains unchanged. TypeScript remains a types-only contract package.
 | `provider.probe` / `provider().probe` | Immutable explicit synthetic submission, optional streaming and common workload |
 | `provider.probe.get` / `provider().probe_run` | Retained original run, no automatic retry |
 | `provider.credential.rotate` / `provider().rotate_credential` | Non-secret revision; invalidates previous credential qualification |
+| `provider.credential.store` / `provider().store_credential` | One protected native replacement, no secret in public observations |
+| `provider.credential.status` / `provider().credential_status` | Exact storage/recovery posture without rewrite |
 | `provider.case.setup` / `provider().setup_case` | Separate model executor, admitted model view and bounded profile; explicit partial steps |
 | `conversation.readiness` / `conversation().readiness` | Current automatic admission and requestable capability facts, without SEND |
 | `provider.lab.compare` / `provider().compare_runs` | Retained probes OR disclosure-qualified canonical executions; never redispatches |
 | `product.distribution.verify` / `product().verify_distribution` | Publisher signature/component verification, not entitlement or Case authority |
 
-The canonical [operation inventory](../../contract/operations.json) has 136
+The canonical [operation inventory](../../contract/operations.json) has 138
 operations; [workflow types](../../contract/workflows.json) generate both Rust and
 TypeScript projections. Older operations and explicit bounded Work remain supported.
 SDK 0.2 deliberately changed Rust source types for automatic observation limits
@@ -38,6 +40,29 @@ to optional, so consumers must handle an explicitly admitted text profile.
 SDK 0.3 adds the optional approved public DER TLS trust anchor to the profile;
 Rust struct-literal consumers must account for the additional field. Old JSON
 profiles without that field remain unchanged.
+
+SDK 0.4 adds `provider().store_credential` and `provider().credential_status`,
+with contracts `yai.provider_credential_store_input.v1`,
+`yai.provider_credential_status_input.v1` and `yai.provider_credential_storage.v1`.
+Store input is an intentionally sensitive, same-user native transport request:
+`target_ref`, unique `revision_label`, and bounded `secret`. Never log/serialize it
+to a journal, fixture, model context or diagnostic file. Rust Debug is redacted;
+owned input and wire buffers are zeroized on drop. This does not erase every caller,
+JSON or JavaScript string copy, or protect an attacker-controlled process memory.
+
+Core records only a non-secret write identity and revisions. All same-Tenant
+targets sharing the credential reference are invalidated atomically before one
+native write. The OS-protected envelope must match the current write identity;
+old or unbound native material is not silently qualified. A failed/uncertain write
+is observed with `credential_status`, never automatically retried. Reusing an
+already prepared revision label refuses without another native write.
+
+Status exposes `write_ref`, exact revisions, `stored/not_stored/unbound/unavailable`,
+reason, `credential_available` and `case_authority=false`, never secret bytes.
+`stored` is local storage evidence, not authentication success, provider qualification,
+commercial entitlement or Case authority. Locked/unsupported vaults are explicitly
+unavailable. These operations require current Tenant Owner authority; a caller
+must negotiate their descriptors because an older installed Host lacks them.
 
 Five public protocols are represented: `open_ai_chat`, `anthropic_messages`,
 `google_generate_content`, `cohere_chat`, `bedrock_converse`. Brands sharing a

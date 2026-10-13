@@ -276,6 +276,24 @@ export interface ProviderCredentialRotateInput {
   target_ref: string;
   revision_label: string;
 }
+export interface ProviderCredentialStoreInput {
+  target_ref: string;
+  revision_label: string;
+  secret: string;
+}
+export interface ProviderCredentialStatusInput {
+  target_ref: string;
+}
+export interface ProviderCredentialStorageObservation {
+  schema: string;
+  target_ref: string;
+  write_ref?: string | null;
+  posture: string;
+  reason?: string | null;
+  revisions: Array<ProviderCredentialRevision>;
+  credential_available: boolean;
+  case_authority: boolean;
+}
 export interface ProviderCredentialRevision {
   schema: string;
   revision_id: string;

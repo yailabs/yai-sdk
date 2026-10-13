@@ -1853,12 +1853,13 @@ dependencies = [
 
 [[package]]
 name = "yai-sdk"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "libc",
  "semver",
  "serde",
  "serde_json",
+ "zeroize",
 ]
 
 [[package]]

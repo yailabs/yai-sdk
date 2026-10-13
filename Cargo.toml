@@ -1,6 +1,6 @@
 [package]
 name = "yai-sdk"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 license = "MIT"
 description = "Supported local YAI client protocol and Rust SDK"
@@ -14,3 +14,4 @@ libc = "0.2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 semver = "1"
+zeroize = "1"

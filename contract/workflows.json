@@ -61,6 +61,10 @@
     "ProviderProbeExecutionObservation":{"schema":"string","target_ref":"string","submission_ref":"string","created":"bool","posture":"string","run":"ProviderProbeRetainedRun"},
     "ProviderLabRunReference":{"target_ref":"string","submission_ref":"string"},
     "ProviderCredentialRotateInput":{"target_ref":"string","revision_label":"string"},
+    "ProviderCredentialStoreInput":{"target_ref":"string","revision_label":"string","secret":"string"},
+    "ProviderCredentialStatusInput":{"target_ref":"string"},
+    "ProviderCredentialStorageObservation":{"schema":"string","target_ref":"string","write_ref":"nullable:string","posture":"string","reason":"nullable:string",
+      "revisions":"array:ProviderCredentialRevision","credential_available":"bool","case_authority":"bool"},
     "ProviderCredentialRevision":{"schema":"string","revision_id":"string","integrity_digest":"string","tenant_id":"string","target_id":"string",
       "target_digest":"string","sequence":"u64","revision_label":"string","principal_id":"string","recorded_at_unix_ms":"u64"},
     "ProviderLabExecutionReference":{"case_ref":"string","author_participant_ref":"string","submission_ref":"string"},
@@ -2209,7 +2213,9 @@
       "definition": "ResourceDefinitionInput"
     }
   },
+  "sensitive_fields": {"ProviderCredentialStoreInput":["secret"]},
   "closed_types": [
+    "ProviderCredentialStoreInput","ProviderCredentialStatusInput",
     "ProviderRegisterInput","ProviderHttpProfile","ProviderProbeRequestInput","ProviderCaseSetupInput","AutomaticAnswerLimits",
     "ProviderProtocolInventoryInput",
     "ConversationReadinessInput","ProviderLabCompareInput","ProviderLabRunReference","ProviderLabExecutionReference","ProviderLabWorkload",
@@ -2311,6 +2317,8 @@
     {"id":"provider.probe.get","family":"provider","method":"probe_run","input":"ProviderProbeReferenceInput","output":"ProviderProbeExecutionObservation","input_contract":"yai.provider_probe_get_input.v1","output_contract":"yai.provider_probe_execution.v1"},
     {"id":"provider.lab.compare","family":"provider","method":"compare_runs","input":"ProviderLabCompareInput","output":"ProviderLabComparison","input_contract":"yai.provider_lab_compare_input.v1","output_contract":"yai.provider_lab_comparison.v1"},
     {"id":"provider.credential.rotate","family":"provider","method":"rotate_credential","input":"ProviderCredentialRotateInput","output":"ProviderCredentialRevision","input_contract":"yai.provider_credential_rotate_input.v1","output_contract":"yai.provider_credential_revision.v1"},
+    {"id":"provider.credential.store","family":"provider","method":"store_credential","input":"ProviderCredentialStoreInput","output":"ProviderCredentialStorageObservation","input_contract":"yai.provider_credential_store_input.v1","output_contract":"yai.provider_credential_storage.v1"},
+    {"id":"provider.credential.status","family":"provider","method":"credential_status","input":"ProviderCredentialStatusInput","output":"ProviderCredentialStorageObservation","input_contract":"yai.provider_credential_status_input.v1","output_contract":"yai.provider_credential_storage.v1"},
     {"id":"provider.protocols","family":"provider","method":"protocols","input":"ProviderProtocolInventoryInput","output":"ProviderProtocolInventory","input_contract":"yai.provider_protocol_inventory_input.v1","output_contract":"yai.provider_protocol_inventory.v1"},
     {"id":"provider.register","family":"provider","method":"register","input":"ProviderRegisterInput","output":"ProviderTarget","input_contract":"yai.provider_register_input.v1","output_contract":"yai.provider_target.v1"},
     {"id":"provider.case.setup","family":"provider","method":"setup_case","input":"ProviderCaseSetupInput","output":"ProviderCaseSetupResult","input_contract":"yai.provider_case_setup_input.v1","output_contract":"yai.provider_case_setup.v1"},

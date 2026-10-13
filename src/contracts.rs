@@ -9,13 +9,21 @@ pub const HOST_TELEMETRY_SCHEMA: &str = "yai.local_host.telemetry.v1";
 pub const APPLICATION_PROTOCOL: &str = "yai.studio.application.v1";
 pub const CAPABILITY_CATALOG_SCHEMA: &str = "yai.application_capability_catalog.v1";
 const PROCESS_IDENTITY_SCHEMA: &str = "yai.local_process_identity.v1";
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct OperationRequest {
     pub protocol: String,
     pub operation_ref: String,
     pub correlation_ref: String,
     #[serde(default)]
     pub input: Value,
+}
+impl std::fmt::Debug for OperationRequest {
+    fn fmt(&self,f:&mut std::fmt::Formatter<'_>)->std::fmt::Result{
+        let mut debug=f.debug_struct("OperationRequest");
+        debug.field("protocol",&self.protocol).field("operation_ref",&self.operation_ref).field("correlation_ref",&self.correlation_ref);
+        if self.operation_ref=="provider.credential.store" {debug.field("input",&"[REDACTED]");}else{debug.field("input",&self.input);}
+        debug.finish()
+    }
 }
 
 pub use crate::workflows::{OperationError, OperationResult, ResultState, CaseUpdate};

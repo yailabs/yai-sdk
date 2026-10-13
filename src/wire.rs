@@ -62,8 +62,8 @@ pub enum ServerFrame {
     },
 }
 pub fn write_frame<T: Serialize>(writer: &mut impl Write, frame: &T) -> Result<(), String> {
-    let bytes = serde_json::to_vec(frame)
-        .map_err(|error| format!("host_frame_serialize_failed:{error}"))?;
+    let bytes = zeroize::Zeroizing::new(serde_json::to_vec(frame)
+        .map_err(|error| format!("host_frame_serialize_failed:{error}"))?);
     // The newline delimiter is part of the bounded frame on both sides.
     if bytes.len() >= MAX_FRAME_BYTES {
         return Err("host_frame_too_large".into());
@@ -80,7 +80,7 @@ pub fn write_frame<T: Serialize>(writer: &mut impl Write, frame: &T) -> Result<(
 }
 
 pub fn read_frame<T: for<'de> Deserialize<'de>>(reader: &mut impl BufRead) -> Result<T, String> {
-    let mut bytes = Vec::new();
+    let mut bytes = zeroize::Zeroizing::new(Vec::new());
     let read = reader
         .take((MAX_FRAME_BYTES + 1) as u64)
         .read_until(b'\n', &mut bytes)
@@ -91,5 +91,6 @@ pub fn read_frame<T: for<'de> Deserialize<'de>>(reader: &mut impl BufRead) -> Re
     if bytes.len() > MAX_FRAME_BYTES || !bytes.ends_with(b"\n") {
         return Err("host_frame_too_large".into());
     }
-    serde_json::from_slice(&bytes).map_err(|error| format!("host_frame_invalid:{error}"))
+    // Parser diagnostics must not quote credential-bearing input values.
+    serde_json::from_slice(&bytes).map_err(|error| format!("host_frame_invalid:line={}:column={}",error.line(),error.column()))
 }

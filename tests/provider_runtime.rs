@@ -3,6 +3,26 @@ use serde_json::json;
 use yai_sdk::workflows::*;
 
 #[test]
+fn credential_inputs_redact_debug_and_storage_status_never_exposes_material(){
+    let secret=format!("synthetic-private-{}",std::process::id());
+    let input=ProviderCredentialStoreInput{target_ref:"provider-target:test".into(),revision_label:"new".into(),secret:secret.clone()};
+    assert!(!format!("{input:?}").contains(&secret));
+    let request=yai_sdk::OperationRequest{protocol:yai_sdk::APPLICATION_PROTOCOL.into(),operation_ref:"provider.credential.store".into(),correlation_ref:"credential:test".into(),input:serde_json::to_value(&input).unwrap()};
+    assert!(!format!("{request:?}").contains(&secret));
+    let frame=yai_sdk::wire::ClientFrame::ApplicationRequest{request};
+    assert!(!format!("{frame:?}").contains(&secret));
+    let observation:ProviderCredentialStorageObservation=serde_json::from_value(json!({"schema":"yai.provider_credential_storage.v1","target_ref":"provider-target:test",
+        "write_ref":null,"posture":"unavailable","reason":"provider_vault_locked_or_unavailable","revisions":[],"credential_available":false,"case_authority":false})).unwrap();
+    assert!(!observation.credential_available);assert!(!observation.case_authority);
+    let mut raw=Vec::new();yai_sdk::wire::write_frame(&mut raw,&frame).unwrap();
+    let decoded:yai_sdk::wire::ClientFrame=yai_sdk::wire::read_frame(&mut std::io::Cursor::new(raw)).unwrap();
+    assert!(!format!("{decoded:?}").contains(&secret));
+    let malformed=format!("{{\"type\":\"{secret}\"}}\n");
+    let error=yai_sdk::wire::read_frame::<yai_sdk::wire::ClientFrame>(&mut std::io::Cursor::new(malformed)).unwrap_err();
+    assert!(!error.contains(&secret));
+}
+
+#[test]
 fn protocol_profiles_are_typed_closed_and_never_contain_credentials(){
     for protocol in ["open_ai_chat","anthropic_messages","google_generate_content","cohere_chat","bedrock_converse"]{
         let profile:ProviderHttpProfile=serde_json::from_value(json!({"protocol":protocol,"remote_inference_opt_in":false})).unwrap();

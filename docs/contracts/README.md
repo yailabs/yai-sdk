@@ -77,6 +77,14 @@ the published execution operations; a new correlation does not authorize replay.
 
 ## Public projections and privacy
 
+Sensitive provider credential enrollment is confined to `provider.credential.store`
+on the verified same-user transport. Its typed input and `OperationRequest` Debug
+redact material; native frame buffers and owned sensitive input are zeroized.
+Serialization remains necessary for transmission and must never become a log or
+private client journal. Core/OS retain only the legitimate protected material;
+public status contains non-secret write/revision identity. See the
+[credential contract](../guides/provider-runtime.md).
+
 ### Delegated Decision explanation
 
 The existing `decision.trajectory.inspect` / `yai.decision_trajectory_inspect_input.v1`

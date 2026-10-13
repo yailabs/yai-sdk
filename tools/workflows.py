@@ -113,7 +113,10 @@ def render(contract):
             rust.append('}')
             ts.append(f'export type {name} = ' + ' | '.join(json.dumps(value) for value in values) + ';')
             continue
-        rust.append('#[derive(Clone, Debug, Default, Serialize, Deserialize)]')
+        sensitive = contract.get('sensitive_fields', {}).get(name, [])
+        if any(field not in fields or fields[field] != 'string' for field in sensitive):
+            raise ValueError('sensitive fields must identify owned strings')
+        rust.append('#[derive(Clone, Default, Serialize, Deserialize)]' if sensitive else '#[derive(Clone, Debug, Default, Serialize, Deserialize)]')
         if name in contract['closed_types']:
             rust.append('#[serde(deny_unknown_fields)]')
         parameter = generics.get(name)
@@ -140,6 +143,13 @@ def render(contract):
             ts.append(f'  {field}{"?" if ts_optional else ""}: {ts_type};')
         rust.append('}')
         ts.append('}')
+        if sensitive:
+            rust.extend([f'impl std::fmt::Debug for {name} {{',
+                '    fn fmt(&self, f: &mut std::fmt::Formatter<\'_>) -> std::fmt::Result {',
+                f'        f.debug_struct("{name}").field("sensitive_input", &"[REDACTED]").finish_non_exhaustive()',
+                '    }', '}', f'impl Drop for {name} {{', '    fn drop(&mut self) {'])
+            rust.extend(f'        zeroize::Zeroize::zeroize(&mut self.{field});' for field in sensitive)
+            rust.extend(['    }', '}'])
     families = {}
     ids = set()
     methods = set()
