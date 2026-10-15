@@ -276,7 +276,7 @@ closing a Studio window.
 ## Operational Conversation, native reads and versioned Skills
 
 The additive public contract exports generated workflows through Rust and
-`@yai/sdk/workflows`. The operation catalog has 136 descriptors.
+`@yai/sdk/workflows`. The operation catalog has 138 descriptors.
 `send_progressive` opts into actual producer fragments; `conversation.progress.get`
 returns the versioned exact Case/author/executor/Thread/Turn/request/Invocation/target
 envelope, bounded sequence/cursor and provisional snapshot. Canonical execution
@@ -300,6 +300,33 @@ records, not acquired Case Sources. The SDK stores no token and implements no
 search, policy, compiler, tool orchestration or Skills semantic owner.
 
 ## Studio consumer handoff
+
+### Bounded native feedback and exact context expansion
+
+`execution.get` / Conversation context inspection optionally projects
+`ProviderInputObservation.native_feedback` (`yai.native_feedback_composition.v1`).
+It identifies mandatory correlated results, any deferred read payloads, completeness,
+representation, exact verbatim/selected protocol-body byte costs and the immutable
+conservative input-unit ceiling. `selected_request_bytes_before_pin` excludes any
+subsequent producer generation pin; `serialized_request_bytes` remains the complete
+observed wire size. Neither byte quarters nor semantic W units are tokenizer counts.
+Missing/null diagnostics mean unavailable historical evidence, not zero cost.
+
+`CaseWorkStepObservation.context_projection` optionally identifies an exact
+same-Work source result, source digest, JSON-pointer scope and literal projected
+value (`yai.native_context_projection.v1`). This is inspection of retained material,
+not a new Resource observation, effect, Receipt, globally complete evidence group or
+proof of the objective. Source disclosure is Core-owned and rechecked. A deferred
+reference is not resident evidence and grants no permission or permanent access.
+Explicit expansion may still refuse when source/backing/disclosure or budget fails.
+
+These are additive projections over the existing operations, not a new context
+store or SDK compaction engine. Rust and TypeScript preserve omitted/null older
+fields. Consumers must not decode private provider wires, invent omitted material,
+equate API success with Work completion or retry SEND on a capacity refusal.
+Qualify disclosure loss, exact source identity, deferred versus complete posture,
+over-bound expansion, independent recovery and no duplicate dispatch in the actual
+consumer. Controlled Core/SDK evidence is not native Studio or real-model acceptance.
 
 The handoff is resource- and service-general: document discovery, connection and
 identity separately from documentary Source intake. An attached service or advertised

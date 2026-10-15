@@ -63,3 +63,29 @@ fn context_diagnostics_preserve_unavailable_and_refuse_fabricated_confidence_or_
     assert!(serde_json::from_value::<ContextPreparationObservation>(value).is_err());
     assert!(serde_json::from_str::<ContextSelectionSource>("\"calibrated_confidence\"").is_err());
 }
+
+#[test]
+fn native_feedback_diagnostics_are_additive_and_preserve_exact_budget_facts() {
+    let mut historical=serde_json::to_value(ProviderInputObservation::default()).unwrap();
+    assert!(historical.get("native_feedback").is_none());
+    assert!(serde_json::from_value::<ProviderInputObservation>(historical.clone()).unwrap().native_feedback.is_none());
+    historical["native_feedback"]=serde_json::Value::Null;
+    assert!(serde_json::from_value::<ProviderInputObservation>(historical.clone()).unwrap().native_feedback.is_none());
+    let diagnostics=serde_json::json!({"schema":"yai.native_feedback_composition.v1",
+        "mandatory_result_refs":["provider-result:first","provider-result:second"],"omitted_result_refs":[],
+        "completeness":"complete","encoding":"lossless","verbatim_feedback_bytes":18000,"resident_feedback_bytes":7000,
+        "verbatim_request_bytes":42565,"selected_request_bytes_before_pin":31565,"input_unit_limit":8192});
+    historical["native_feedback"]=diagnostics.clone();
+    let new:ProviderInputObservation=serde_json::from_value(historical.clone()).unwrap();
+    assert_eq!(serde_json::to_value(new).unwrap()["native_feedback"],diagnostics);
+    historical["native_feedback"]["deferred_result_refs"]=serde_json::json!(["provider-result:first"]);
+    historical["native_feedback"]["completeness"]=serde_json::json!("qualified_projections");
+    assert_eq!(serde_json::from_value::<ProviderInputObservation>(historical.clone()).unwrap().native_feedback.unwrap().deferred_result_refs,Some(vec!["provider-result:first".into()]));
+    historical["native_feedback"]["bearer"]=serde_json::json!("not-a-public-fact");
+    assert!(serde_json::from_value::<ProviderInputObservation>(historical).is_err());
+    let projection=serde_json::json!({"schema":"yai.native_context_projection.v1","provider_result_id":"provider-result:inspection",
+        "source_provider_result_ref":"provider-result:source","source_digest":"sha256:exact","pointer":"/observation/result",
+        "value":{"waiting_count":7},"completeness":"complete_pointer_scope_not_source_or_task_sufficiency","material_is_authority":false});
+    let typed:NativeContextProjection=serde_json::from_value(projection.clone()).unwrap();
+    assert_eq!(serde_json::to_value(typed).unwrap(),projection);
+}

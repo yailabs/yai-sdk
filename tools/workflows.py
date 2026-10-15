@@ -24,7 +24,7 @@ def render(contract):
                 return f'Vec<{inner}>' if language == 'rust' else f'Array<{inner}>'
             if kind == 'map':
                 return f'std::collections::BTreeMap<String, {inner}>' if language == 'rust' else f'Record<string, {inner}>'
-            if kind in ('optional', 'nullable'):
+            if kind in ('optional', 'nullable', 'optional_nullable'):
                 return f'Option<{inner}>' if language == 'rust' else (inner if kind == 'optional' else f'{inner} | null')
             raise ValueError(f'unknown type constructor: {kind}')
         primitives = {'string': ('String', 'string'), 'u8': ('u8', 'number'), 'u64': ('u64', 'number'),
@@ -84,10 +84,10 @@ def render(contract):
                 for field, kind in body.items():
                     if not re.fullmatch('[a-z][a-z0-9_]*', field) or field == tag:
                         raise ValueError('invalid union field')
-                    if kind.startswith('optional:'):
+                    if kind.startswith(('optional:', 'optional_nullable:')):
                         rust.append('        #[serde(default, skip_serializing_if = "Option::is_none")]')
                     rust.append(f'        {field}: {ty(kind, "rust")},')
-                    ts_fields.append(f'{field}{"?" if kind.startswith(("optional:", "nullable:")) else ""}: {ty(kind, "typescript")}')
+                    ts_fields.append(f'{field}{"?" if kind.startswith(("optional:", "optional_nullable:", "nullable:")) else ""}: {ty(kind, "typescript")}')
                 rust.append('    },')
                 projected.append('{ ' + '; '.join(ts_fields) + ' }')
             rust.append('}')
@@ -129,7 +129,7 @@ def render(contract):
         for field, kind in fields.items():
             if not re.fullmatch('[a-z][a-z0-9_]*', field):
                 raise ValueError('invalid public field')
-            optional = kind.startswith('optional:')
+            optional = kind.startswith(('optional:', 'optional_nullable:'))
             if optional:
                 rust.append('    #[serde(default, skip_serializing_if = "Option::is_none")]')
             rust.append(f'    pub {field}: {ty(kind, "rust")},')

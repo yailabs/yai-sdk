@@ -1,4 +1,4 @@
-import type { RecallBounds, HandoffAcceptInput, ResourceAction, ConversationIntent, ConversationPosture, CaseWorkObservation, CaseOperation } from "./workflows.js";
+import type { RecallBounds, HandoffAcceptInput, ResourceAction, ConversationIntent, ConversationPosture, CaseWorkObservation, CaseOperation, NativeFeedbackComposition } from "./workflows.js";
 export * from "./workflows.js";
 export type { CaseSummary as LiveCaseRow } from "./workflows.js";
 /** Supported public Application projections. No semantic implementation.
@@ -315,6 +315,7 @@ export interface InputObservation {
   rendered_input_id: string; target_id: string; model_id: string;
   serialized_request_digest: string; serialized_request_bytes: number; observed_at_unix_ms: number;
   refusal: string | null;
+  native_feedback?: NativeFeedbackComposition | null;
   capacity: null | {
     public_contract: string; observation_kind: string; model_id: string;
     input_tokens: number | null; input_capacity_tokens: number; sequence_capacity_tokens: number;

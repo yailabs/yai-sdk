@@ -15,6 +15,14 @@ class ContractTests(unittest.TestCase):
     def setUp(self):
         self.contract = json.loads((ROOT / 'contract/workflows.json').read_text())
 
+    def test_optional_nullable_output_is_one_rust_option_and_explicit_ts_null(self):
+        rust, ts = generator.render(self.contract)
+        self.assertIn('pub native_feedback: Option<NativeFeedbackComposition>', rust)
+        self.assertNotIn('Option<Option<NativeFeedbackComposition>>', rust)
+        self.assertIn('native_feedback?: NativeFeedbackComposition | null', ts)
+        self.assertIn('context_projection?: NativeContextProjection | null', ts)
+        self.assertIn('deferred_result_refs?: Array<string> | null', ts)
+
     def test_checked_projections_are_exact(self):
         outputs = generator.render(self.contract)
         self.assertEqual(outputs, generator.render(copy.deepcopy(self.contract)))

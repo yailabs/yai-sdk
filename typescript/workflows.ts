@@ -350,6 +350,30 @@ export interface ProviderInputObservation {
   observed_at_unix_ms: number;
   capacity?: ProviderCapacityObservation | null;
   refusal?: string | null;
+  native_feedback?: NativeFeedbackComposition | null;
+}
+export interface NativeFeedbackComposition {
+  schema: string;
+  mandatory_result_refs: Array<string>;
+  omitted_result_refs: Array<string>;
+  completeness: string;
+  encoding: string;
+  verbatim_feedback_bytes: number;
+  resident_feedback_bytes: number;
+  verbatim_request_bytes: number;
+  selected_request_bytes_before_pin: number;
+  input_unit_limit?: number | null;
+  deferred_result_refs?: Array<string> | null;
+}
+export interface NativeContextProjection {
+  schema: string;
+  provider_result_id: string;
+  source_provider_result_ref: string;
+  source_digest: string;
+  pointer: string;
+  value: unknown;
+  completeness: string;
+  material_is_authority: boolean;
 }
 export interface ProviderLabExecutionComparison {
   case_ref: string;
@@ -1265,6 +1289,7 @@ export interface CaseWorkStepObservation {
   outcome_refs: Array<string>;
   operation?: CaseOperation;
   read_observation?: CaseReadObservation;
+  context_projection?: NativeContextProjection | null;
 }
 export interface CaseWorkObservation {
   schema: string;

@@ -74,7 +74,12 @@
       "provider_prefill_micros":"nullable:u64","provider_decode_micros":"nullable:u64","memory_bytes":"nullable:u64"},
     "ProviderInvocationLineage":{"projection_id":"string","context_frame_id":"string","case_generation":"u64","rendered_input_id":"string","rendered_input_digest":"string","output_contract_id":"string","continuation_disposition":"string"},
     "ProviderInputObservation":{"schema":"string","observation_id":"string","invocation_id":"string","case_id":"string","case_generation":"u64","participant_id":"string",
-      "rendered_input_id":"string","target_id":"string","model_id":"string","serialized_request_digest":"string","serialized_request_bytes":"usize","observed_at_unix_ms":"u64","capacity":"nullable:ProviderCapacityObservation","refusal":"nullable:string"},
+      "rendered_input_id":"string","target_id":"string","model_id":"string","serialized_request_digest":"string","serialized_request_bytes":"usize","observed_at_unix_ms":"u64","capacity":"nullable:ProviderCapacityObservation","refusal":"nullable:string","native_feedback":"optional_nullable:NativeFeedbackComposition"},
+    "NativeFeedbackComposition":{"schema":"string","mandatory_result_refs":"array:string","omitted_result_refs":"array:string",
+      "completeness":"string","encoding":"string","verbatim_feedback_bytes":"usize","resident_feedback_bytes":"usize",
+      "verbatim_request_bytes":"usize","selected_request_bytes_before_pin":"usize","input_unit_limit":"nullable:usize","deferred_result_refs":"optional_nullable:array:string"},
+    "NativeContextProjection":{"schema":"string","provider_result_id":"string","source_provider_result_ref":"string","source_digest":"string",
+      "pointer":"string","value":"json","completeness":"string","material_is_authority":"bool"},
     "ProviderLabExecutionComparison":{"case_ref":"string","submission_ref":"string","identity":"ConversationIdentity","turn_ref":"string","request_ref":"string",
       "observed_generation":"u64","posture":"ConversationPosture","automatic_execution":"nullable:AutomaticConversationObservation",
       "primary_selection":"nullable:ProviderSelection","work_progress":"nullable:CaseWorkProgress","total_invocations":"nullable:usize","omitted_invocations":"nullable:usize",
@@ -963,7 +968,8 @@
       "operation_ref": "nullable:string",
       "outcome_refs": "array:string",
       "operation": "optional:CaseOperation",
-      "read_observation": "optional:CaseReadObservation"
+      "read_observation": "optional:CaseReadObservation",
+      "context_projection": "optional_nullable:NativeContextProjection"
     },
     "CaseWorkObservation": {
       "schema": "string",
@@ -2215,6 +2221,8 @@
   },
   "sensitive_fields": {"ProviderCredentialStoreInput":["secret"]},
   "closed_types": [
+    "NativeFeedbackComposition",
+    "NativeContextProjection",
     "ProviderCredentialStoreInput","ProviderCredentialStatusInput",
     "ProviderRegisterInput","ProviderHttpProfile","ProviderProbeRequestInput","ProviderCaseSetupInput","AutomaticAnswerLimits",
     "ProviderProtocolInventoryInput",

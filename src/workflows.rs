@@ -451,6 +451,36 @@ pub struct ProviderInputObservation {
     pub observed_at_unix_ms: u64,
     pub capacity: Option<ProviderCapacityObservation>,
     pub refusal: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_feedback: Option<NativeFeedbackComposition>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NativeFeedbackComposition {
+    pub schema: String,
+    pub mandatory_result_refs: Vec<String>,
+    pub omitted_result_refs: Vec<String>,
+    pub completeness: String,
+    pub encoding: String,
+    pub verbatim_feedback_bytes: usize,
+    pub resident_feedback_bytes: usize,
+    pub verbatim_request_bytes: usize,
+    pub selected_request_bytes_before_pin: usize,
+    pub input_unit_limit: Option<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub deferred_result_refs: Option<Vec<String>>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NativeContextProjection {
+    pub schema: String,
+    pub provider_result_id: String,
+    pub source_provider_result_ref: String,
+    pub source_digest: String,
+    pub pointer: String,
+    pub value: serde_json::Value,
+    pub completeness: String,
+    pub material_is_authority: bool,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct ProviderLabExecutionComparison {
@@ -1853,6 +1883,8 @@ pub struct CaseWorkStepObservation {
     pub operation: Option<CaseOperation>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub read_observation: Option<CaseReadObservation>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context_projection: Option<NativeContextProjection>,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct CaseWorkObservation {
