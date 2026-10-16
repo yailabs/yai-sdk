@@ -7,6 +7,22 @@ use yai_sdk::*;
 
 static SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
+#[test]
+fn attempt_diagnostics_are_optional_typed_evidence_not_delivery_authority() {
+    use yai_sdk::workflows::AttemptObservation;
+    let old:AttemptObservation=serde_json::from_value(serde_json::json!({"delivery":"response_invalid","failure_class":"response_schema_invalid"})).unwrap();
+    assert!(old.response_diagnostic.is_none());
+    let value=serde_json::json!({"delivery":"response_invalid","no_execution_proven":false,
+        "failure_class":"response_validation:provider_function_arguments_json_invalid",
+        "response_diagnostic":{"received_http":{"bytes":99,"digest":"sha256:fixture"},
+            "entity":{"bytes":33,"digest":"sha256:entity"},"normalized_payload":null,
+            "media_type":"application/json","framing":"content_length","entity_complete":true,
+            "stream_complete":null,"json_error":{"category":"syntax","line":1,"column":8}}});
+    let projected:AttemptObservation=serde_json::from_value(value.clone()).unwrap();
+    assert_eq!(projected.response_diagnostic.as_ref().unwrap().json_error.as_ref().unwrap().column,8);
+    assert_eq!(serde_json::to_value(projected).unwrap(),value);
+}
+
 fn mock_host(
     mismatch: bool,
     lose_response: bool,

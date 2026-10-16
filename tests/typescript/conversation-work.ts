@@ -6,11 +6,20 @@ import type {
   ConversationObservation, ConversationProgressObservation,
   ConversationIdentity, ConversationRequestGetInput, ExecutionDiscoveryInput,
   MaterialInspectInput, MaterialSourceRelationship,
+  AttemptObservation, ProviderResponseDiagnostic,
 } from "../../typescript/projections.js";
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends
   (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;
+
+export type OptionalResponseEvidence = Assert<Equal<AttemptObservation['response_diagnostic'], ProviderResponseDiagnostic | undefined>>;
+export const responseDiagnostic: ProviderResponseDiagnostic = {
+  received_http: { bytes: 100, digest: 'sha256:synthetic-http' },
+  entity: { bytes: 40, digest: 'sha256:synthetic-entity' }, normalized_payload: null,
+  media_type: 'application/json', framing: 'content_length', entity_complete: true,
+  stream_complete: null, json_error: { category: 'syntax', line: 1, column: 8 },
+};
 
 export type IntentHasOneOwner = Assert<Equal<ConversationSendInput["intent"], ConversationIntent | undefined>>;
 export type PostureHasOneOwner = Assert<Equal<ConversationExecution["posture"], ConversationPosture>>;

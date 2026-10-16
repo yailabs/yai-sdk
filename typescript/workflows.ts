@@ -1302,6 +1302,18 @@ export interface CaseWorkObservation {
   steps: Array<CaseWorkStepObservation>;
   progress?: CaseWorkProgress;
 }
+export interface ProviderResponseExtent { bytes: number; digest: string }
+export interface ProviderJsonDiagnostic { category: string; line: number; column: number }
+export interface ProviderResponseDiagnostic {
+  received_http: ProviderResponseExtent;
+  entity: ProviderResponseExtent | null;
+  normalized_payload: ProviderResponseExtent | null;
+  media_type: string | null;
+  framing: string;
+  entity_complete: boolean;
+  stream_complete: boolean | null;
+  json_error: ProviderJsonDiagnostic | null;
+}
 export interface AttemptObservation {
   outcome_id?: string;
   target_id?: string;
@@ -1312,6 +1324,7 @@ export interface AttemptObservation {
   response_status?: number;
   no_execution_proven?: boolean;
   failure_class?: string;
+  response_diagnostic?: ProviderResponseDiagnostic;
   recorded_at_unix_ms?: number;
 }
 export interface ConversationObservation {

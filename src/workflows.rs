@@ -1900,6 +1900,28 @@ pub struct CaseWorkObservation {
     pub progress: Option<CaseWorkProgress>,
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct ProviderResponseExtent {
+    pub bytes: u64,
+    pub digest: String,
+}
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ProviderJsonDiagnostic {
+    pub category: String,
+    pub line: u32,
+    pub column: u32,
+}
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ProviderResponseDiagnostic {
+    pub received_http: ProviderResponseExtent,
+    pub entity: Option<ProviderResponseExtent>,
+    pub normalized_payload: Option<ProviderResponseExtent>,
+    pub media_type: Option<String>,
+    pub framing: String,
+    pub entity_complete: bool,
+    pub stream_complete: Option<bool>,
+    pub json_error: Option<ProviderJsonDiagnostic>,
+}
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct AttemptObservation {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub outcome_id: Option<String>,
@@ -1919,6 +1941,8 @@ pub struct AttemptObservation {
     pub no_execution_proven: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub failure_class: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub response_diagnostic: Option<ProviderResponseDiagnostic>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub recorded_at_unix_ms: Option<u64>,
 }

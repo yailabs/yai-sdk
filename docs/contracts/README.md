@@ -77,6 +77,31 @@ the published execution operations; a new correlation does not authorize replay.
 
 ## Public projections and privacy
 
+### Retained provider response diagnostics
+
+SDK 0.4.1 adds optional `AttemptObservation.response_diagnostic` on existing
+Conversation/Execution reads; there are no new operations. Historical attempts
+omit it. `failure_class` remains an extensible, Core-authored string: new local
+validation refusals use `response_validation:<static_predicate>`. Producer
+refusals retain their existing `remote_response_rejected` / `remote_stream_rejected`
+classes. Neither a precise cause nor HTTP 200 proves execution success or retry safety.
+
+`ProviderResponseDiagnostic` separates `received_http` (including HTTP framing),
+`entity` (deframed bytes, when available), and adapter-authored
+`normalized_payload`, each with an exact byte count and SHA-256 digest. These
+are received/derived identities, not producer sent-byte attestations. Entity
+completeness, framing, optional streaming completion and sanitized media type
+are independent facts. Null means unavailable, never zero or complete. A bounded
+JSON category/line/column refers to the rejected decoded JSON input (native
+argument JSON where its failure predicate says so), not an HTTP byte offset.
+No body, argument, arbitrary parser message, header parameter or credential is
+projected. Digests cannot reconstruct a lost body.
+
+Core owns v1/v2 outcome integrity and disclosure. Clients project these facts,
+retain exact original Submission recovery, and never retry indeterminate work.
+Studio should render the static failure alongside delivery, qualified HTTP
+status and evidence availability; no new page or authority calculation is implied.
+
 Sensitive provider credential enrollment is confined to `provider.credential.store`
 on the verified same-user transport. Its typed input and `OperationRequest` Debug
 redact material; native frame buffers and owned sensitive input are zeroized.
